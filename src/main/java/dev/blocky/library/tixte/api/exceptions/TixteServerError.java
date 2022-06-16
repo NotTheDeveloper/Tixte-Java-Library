@@ -15,6 +15,7 @@
  */
 package dev.blocky.library.tixte.api.exceptions;
 
+import com.sun.nio.sctp.IllegalReceiveException;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -22,9 +23,9 @@ import org.jetbrains.annotations.NotNull;
  * @version v1.0.0
  * @since v1.0.0-alpha.1
  */
-public class NotFound extends RuntimeException
+public class TixteServerError extends IllegalReceiveException
 {
-    public NotFound(@NotNull String message)
+    public TixteServerError(@NotNull String message)
     {
         super(message);
     }

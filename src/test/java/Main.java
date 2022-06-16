@@ -1,12 +1,12 @@
 /**
  * Copyright 2022 Dominic (aka. BlockyDotJar)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +15,11 @@
  */
 
 import dev.blocky.library.tixte.api.TixteClient;
-import dev.blocky.library.tixte.api.TixteClientBuilder;
+import dev.blocky.library.tixte.api.exceptions.Forbidden;
+import dev.blocky.library.tixte.api.exceptions.Unauthorized;
+import dev.blocky.library.tixte.internal.annotations.Undocumented;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,19 +32,20 @@ import java.nio.file.Paths;
  * @version v1.0.0
  * @since v1.0.0-alpha.1
  */
+@Undocumented
 public class Main
 {
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    // private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private static final File file = new File("src/main/resources/secrets.json");
 
-
-    public static void main(@NotNull String[] args) throws IOException
-    {
-        TixteClient client = TixteClientBuilder.createTixteClient(getAPIKey(), getSessionToken(), getDefaultDomain());
-        System.out.println(client.deleteFile(" "));
+    @Undocumented
+    public static void main(@NotNull String[] args) throws IOException, Forbidden, Unauthorized {
+        TixteClient client = TixteClient.Builder.createClient(getAPIKey(), getSessionToken(), getDefaultDomain());
+        System.out.println( client.getRawTixteClient().deleteDomainRaw("reudiggenhund.is-from.space"));
     }
 
     @NotNull
+    @Undocumented
     public static String getAPIKey() throws IOException
     {
         String content = new String(Files.readAllBytes(Paths.get(file.toURI())), StandardCharsets.UTF_8);
@@ -53,6 +54,7 @@ public class Main
     }
 
     @NotNull
+    @Undocumented
     public static String getSessionToken() throws IOException
     {
         String content = new String(Files.readAllBytes(Paths.get(file.toURI())), StandardCharsets.UTF_8);
@@ -61,6 +63,7 @@ public class Main
     }
 
     @NotNull
+    @Undocumented
     public static String getDefaultDomain() throws IOException
     {
         String content = new String(Files.readAllBytes(Paths.get(file.toURI())), StandardCharsets.UTF_8);

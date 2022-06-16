@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.api.exceptions;
+package dev.blocky.library.tixte.internal.annotations;
 
-import org.jetbrains.annotations.NotNull;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * This is an annotation, which tells the developers since when a method/class is deprecated.
+ *
  * @author BlockyDotJar
  * @version v1.0.0
  * @since v1.0.0-alpha.1
  */
-public class NotFound extends RuntimeException
+@Retention(RetentionPolicy.RUNTIME)
+@Target( { ElementType.TYPE, ElementType.METHOD } )
+public @interface DeprecatedSince
 {
-    public NotFound(@NotNull String message)
-    {
-        super(message);
-    }
+    /**
+     * @return The version, since when the method/class is deprecated
+     */
+    String version();
 }

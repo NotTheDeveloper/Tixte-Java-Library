@@ -13,34 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.api;
+package dev.blocky.library.tixte.api.exceptions;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author BlockyDotJar
  * @version v1.0.0
  * @since v1.0.0-alpha.1
  */
-public class TixteClientBuilder
+public class HTTPException extends RuntimeException
 {
-
-    @NotNull
-    public static TixteClient createTixteClient(@NotNull String apiKey, @Nullable String sessionKey, @Nullable String defaultDomain)
+    public HTTPException(@NotNull String message)
     {
-        return new TixteClient(apiKey, sessionKey, defaultDomain);
-    }
-
-    @NotNull
-    public static TixteClient createTixteClient(@NotNull String apiKey, @Nullable String sessionKey)
-    {
-        return new TixteClient(apiKey, sessionKey);
-    }
-
-    @NotNull
-    public static TixteClient createTixteClient(@NotNull String apiKey)
-    {
-        return new TixteClient(apiKey);
+        super(message);
     }
 }

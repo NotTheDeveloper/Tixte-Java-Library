@@ -22,9 +22,9 @@ import org.jetbrains.annotations.NotNull;
  * @version v1.0.0
  * @since v1.0.0-alpha.1
  */
-public class NotFound extends RuntimeException
+public class Forbidden extends IllegalAccessException
 {
-    public NotFound(@NotNull String message)
+    public Forbidden(@NotNull String message)
     {
         super(message);
     }

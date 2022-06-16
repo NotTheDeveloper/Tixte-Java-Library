@@ -17,14 +17,16 @@ package dev.blocky.library.tixte.api.exceptions;
 
 import org.jetbrains.annotations.NotNull;
 
+import javax.security.auth.login.LoginException;
+
 /**
  * @author BlockyDotJar
  * @version v1.0.0
  * @since v1.0.0-alpha.1
  */
-public class NotFound extends RuntimeException
+public class Unauthorized extends LoginException
 {
-    public NotFound(@NotNull String message)
+    public Unauthorized(@NotNull String message)
     {
         super(message);
     }

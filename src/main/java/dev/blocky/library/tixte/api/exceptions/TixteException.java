@@ -15,6 +15,8 @@
  */
 package dev.blocky.library.tixte.api.exceptions;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.security.auth.login.LoginException;
 
 /**
@@ -24,12 +26,7 @@ import javax.security.auth.login.LoginException;
  */
 public class TixteException extends LoginException
 {
-
-    public TixteException()
-    {
-    }
-
-    public TixteException(String message)
+    public TixteException(@NotNull String message)
     {
         super(message);
     }

@@ -1,12 +1,12 @@
 /**
  * Copyright 2022 Dominic (aka. BlockyDotJar)
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,43 +15,40 @@
  */
 package dev.blocky.library.tixte.api;
 
-import dev.blocky.library.tixte.api.exceptions.NotFound;
-import dev.blocky.library.tixte.api.exceptions.TixteException;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import dev.blocky.library.tixte.api.exceptions.Forbidden;
+import dev.blocky.library.tixte.api.exceptions.Unauthorized;
 import dev.blocky.library.tixte.internal.APIEndpoints;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import dev.blocky.library.tixte.internal.annotations.Undocumented;
+import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.io.BufferedReader;
+import javax.annotation.CheckReturnValue;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.util.Objects;
 
-public class TixteClient extends APIEndpoints
+/**
+ * @author BlockyDotJar
+ * @version v1.0.0
+ * @since v1.0.0-alpha.1
+ */
+@Undocumented
+public strictfp class TixteClient extends APIEndpoints
 {
-    private static final CloseableHttpClient connection = HttpClientBuilder.create().build();
-    private final Logger logger = LoggerFactory.getLogger(TixteClient.class);
-    private final StringBuffer responseContent = new StringBuffer();
-    private final String apiKey;
-    private static HttpResponse response;
-    private String sessionToken;
-    private String defaultDomain;
-    private BufferedReader reader;
-    private String line;
+    private transient final OkHttpClient client = new OkHttpClient();
+    private transient final String apiKey;
+    private transient volatile String url, directURL, deletionURL, domain;
+    private transient volatile String sessionToken, defaultDomain;
+    private transient volatile Request request;
+    private transient volatile boolean isCustom;
 
+    @Undocumented
     protected TixteClient(@NotNull String apiKey, @Nullable String sessionToken, @Nullable String defaultDomain)
     {
         this.apiKey = apiKey;
@@ -60,10 +57,11 @@ public class TixteClient extends APIEndpoints
 
         if (apiKey.isEmpty())
         {
-            logger.error("\"apiKey\" cannot be undefined.", new TixteException());
+            throw new IllegalArgumentException("\"apiKey\" cannot be undefined.");
         }
     }
 
+    @Undocumented
     protected TixteClient(@NotNull String apiKey, @Nullable String sessionToken)
     {
         this.apiKey = apiKey;
@@ -71,375 +69,1585 @@ public class TixteClient extends APIEndpoints
 
         if (apiKey.isEmpty())
         {
-            logger.error("\"apiKey\" cannot be undefined.", new TixteException());
+            throw new IllegalArgumentException("\"apiKey\" cannot be undefined.");
         }
     }
 
+    @Undocumented
     protected TixteClient(@NotNull String apiKey)
     {
         this.apiKey = apiKey;
 
         if (apiKey.isEmpty())
         {
-            logger.error("\"apiKey\" cannot be undefined.", new TixteException());
+            throw new IllegalArgumentException("\"apiKey\" cannot be undefined.");
         }
     }
 
     @NotNull
-    public synchronized String getSize() throws IOException
+    @Undocumented
+    public String getHeader() throws IOException
     {
-        try
+        try (Response response = client.newCall(request).execute())
         {
-            HttpGet request = new HttpGet(BASE_URL + SIZE_ENDPOINT);
-            request.addHeader("Authorization", apiKey);
-            response = connection.execute(request);
-
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            while ((line = reader.readLine()) != null)
-            {
-                responseContent.append(line);
-            }
-
-            reader.close();
+            return response.headers().toString();
         }
-        finally
-        {
-            connection.close();
-        }
-        return responseContent.toString();
     }
 
     @NotNull
-    public synchronized String getUploads(int amount, int page) throws IOException {
-        try
-        {
-            if (amount == 0 || page == 0)
-            {
-                logger.error("The amount/page can not be 0!", new IllegalArgumentException());
-            }
-
-            if (amount < 0 || page < 0)
-            {
-                logger.error("The amount/page can not be under 0!", new IllegalArgumentException());
-            }
-
-            HttpGet request = new HttpGet(BASE_URL + FILE_ENDPOINT + "?page=" + page + "&amount=" + amount);
-            request.addHeader("Authorization", apiKey);
-            response = connection.execute(request);
-
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            while ((line = reader.readLine()) != null)
-            {
-                responseContent.append(line);
-            }
-
-            reader.close();
-        }
-        finally
-        {
-            connection.close();
-        }
-        return responseContent.toString();
-    }
-
-    @NotNull
-    public synchronized String getUserInfo() throws IOException
-    {
-        try
-        {
-            HttpGet request = new HttpGet(BASE_URL + ACCOUNT_ENDPOINT);
-            request.addHeader("Authorization", apiKey);
-            response = connection.execute(request);
-
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            while ((line = reader.readLine()) != null)
-            {
-                responseContent.append(line);
-            }
-
-            reader.close();
-        }
-        finally
-        {
-            connection.close();
-        }
-        return responseContent.toString();
-    }
-
-    @NotNull
-    public synchronized String getUserInformationByName(@NotNull String user) throws IOException
-    {
-        try
-        {
-            if (user.isEmpty())
-            {
-                logger.error("\"user\" cannot be undefined.", new TixteException());
-            }
-
-            HttpGet request = new HttpGet(BASE_URL + "/users/" + user);
-            request.addHeader("Authorization", sessionToken);
-            response = connection.execute(request);
-
-            if (response.getStatusLine().getStatusCode() == 404)
-            {
-                logger.error("User " + user + " was not found.", new NotFound());
-            }
-
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            while ((line = reader.readLine()) != null)
-            {
-                responseContent.append(line);
-            }
-
-            reader.close();
-        }
-        finally
-        {
-            connection.close();
-        }
-        return responseContent.toString();
-    }
-
-    @NotNull
-    public synchronized String getUserInformationByName(@NotNull String sessionToken, @NotNull String user) throws IOException
-    {
-        try
-        {
-            if (sessionToken.isEmpty())
-            {
-                logger.error("\"sessionToken\" cannot be undefined.", new TixteException());
-            }
-
-            if (user.isEmpty())
-            {
-                logger.error("\"user\" cannot be undefined.", new TixteException());
-            }
-
-            HttpGet request = new HttpGet(BASE_URL + "/users/" + user);
-            request.addHeader("Authorization", sessionToken);
-            response = connection.execute(request);
-
-            if (response.getStatusLine().getStatusCode() == 404)
-            {
-                logger.error("User " + user + " was not found.", new NotFound());
-            }
-
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            while ((line = reader.readLine()) != null)
-            {
-                responseContent.append(line);
-            }
-
-            reader.close();
-        }
-        finally
-        {
-            connection.close();
-        }
-        return responseContent.toString();
-    }
-
-    @NotNull
-    public synchronized String getUserDomains() throws IOException
-    {
-        try
-        {
-            HttpGet request = new HttpGet(BASE_URL + DOMAINS_ENDPOINT);
-            request.addHeader("Authorization", sessionToken);
-            response = connection.execute(request);
-
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            while ((line = reader.readLine()) != null)
-            {
-                responseContent.append(line);
-            }
-
-            reader.close();
-        }
-        finally
-        {
-            connection.close();
-        }
-        return responseContent.toString();
-    }
-
-    @NotNull
-    public synchronized String getUserDomains(@NotNull String sessionToken) throws IOException
-    {
-        try
-        {
-            if (sessionToken.isEmpty())
-            {
-                logger.error("\"sessionToken\" cannot be undefined.", new TixteException());
-            }
-
-            HttpGet request = new HttpGet(BASE_URL + DOMAINS_ENDPOINT);
-            request.addHeader("Authorization", sessionToken);
-            response = connection.execute(request);
-
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            while ((line = reader.readLine()) != null)
-            {
-                responseContent.append(line);
-            }
-
-            reader.close();
-        }
-        finally
-        {
-            connection.close();
-        }
-        return responseContent.toString();
-    }
-
-    @NotNull
-    public synchronized String uploadFile(@NotNull String filePath) throws IOException
-    {
-        try
-        {
-            File file = new File(filePath);
-
-            if (!file.exists())
-            {
-                logger.error("File " + file.getName() + " was not found.", new NotFound());
-            }
-
-            HttpEntity entity = MultipartEntityBuilder.create()
-                    .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
-                    .setBoundary("===" + System.currentTimeMillis() + "===")
-                    .setCharset(StandardCharsets.UTF_8)
-                    .setContentType(
-                            ContentType.MULTIPART_FORM_DATA)
-                    .addPart(file.getName(),
-                            new FileBody(file))
-                    .build();
-            HttpPost request = new HttpPost(BASE_URL + UPLOAD_ENDPOINT);
-            request.addHeader("domain", defaultDomain);
-            request.addHeader("Authorization", apiKey);
-            request.setEntity(entity);
-            response = connection.execute(request);
-
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            while ((line = reader.readLine()) != null)
-            {
-                responseContent.append(line);
-            }
-
-            reader.close();
-        }
-        finally
-        {
-            connection.close();
-        }
-        return responseContent.toString();
-    }
-
-    @NotNull
-    public synchronized String uploadFile(@NotNull String imagePath, @NotNull String domain) throws IOException
-    {
-        try
-        {
-            File file = new File(imagePath);
-
-            if (!file.exists())
-            {
-                logger.error("File " + file.getName() + " was not found.", new NotFound());
-            }
-
-            if (domain.isEmpty())
-            {
-                logger.error("\"domain\" cannot be undefined.", new TixteException());
-            }
-
-            HttpEntity entity = MultipartEntityBuilder.create()
-                    .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
-                    .setBoundary("===" + System.currentTimeMillis() + "===")
-                    .setCharset(StandardCharsets.UTF_8)
-                    .setContentType(
-                            ContentType.MULTIPART_FORM_DATA)
-                    .addPart(file.getName(),
-                            new FileBody(file))
-                    .build();
-            HttpPost request = new HttpPost(BASE_URL + UPLOAD_ENDPOINT);
-            request.addHeader("domain", domain);
-            request.addHeader("Authorization", apiKey);
-            request.setEntity(entity);
-            response = connection.execute(request);
-
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            while ((line = reader.readLine()) != null)
-            {
-                responseContent.append(line);
-            }
-
-            reader.close();
-        }
-        finally
-        {
-            connection.close();
-        }
-        return responseContent.toString();
-    }
-
-    @NotNull
-    public synchronized String deleteFile(@NotNull String fileId) throws IOException
-    {
-        try
-        {
-            if (fileId.isEmpty())
-            {
-                logger.error("\"fileId\" cannot be undefined.", new TixteException());
-            }
-
-            HttpDelete request = new HttpDelete(BASE_URL + FILE_ENDPOINT + "/" + fileId);
-            request.addHeader("Authorization", apiKey);
-            response = connection.execute(request);
-
-            if (response.getStatusLine().getStatusCode() == 404)
-            {
-                logger.error("File with Id " + fileId + " was not found.", new NotFound());
-            }
-
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-            while ((line = reader.readLine()) != null)
-            {
-                responseContent.append(line);
-            }
-
-            reader.close();
-        }
-        finally
-        {
-            connection.close();
-        }
-        return responseContent.toString();
-    }
-
-    @NotNull
+    @Undocumented
     public String getAPIKey()
     {
         return apiKey;
     }
 
     @Nullable
+    @Undocumented
     public String getDefaultDomain()
     {
         return defaultDomain;
     }
 
     @Nullable
+    @Undocumented
     public String getSessionToken()
     {
         return sessionToken;
+    }
+
+    @NotNull
+    @Undocumented
+    public TixteClient.User getTixteUser()
+    {
+        return new TixteClient.User();
+    }
+
+    @NotNull
+    @Undocumented
+    public TixteClient.FileSystem getTixteFileSystem()
+    {
+        return new TixteClient.FileSystem();
+    }
+
+    @NotNull
+    @Undocumented
+    public TixteClient.Domains getTixteDomains()
+    {
+        return new TixteClient.Domains();
+    }
+
+    public TixteClient.Raw getRawTixteClient()
+    {
+        return new TixteClient.Raw();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        TixteClient that = (TixteClient) o;
+
+        return apiKey.equals(that.apiKey) &&
+                Objects.equals(request, that.request) &&
+                Objects.equals(sessionToken, that.sessionToken) &&
+                Objects.equals(defaultDomain, that.defaultDomain);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(apiKey, request, sessionToken, defaultDomain);
+    }
+
+    @Override
+    public String toString() {
+        return "TixteClient{" +
+                "apiKey='" + apiKey + '\'' +
+                ", request=" + request +
+                ", sessionToken='" + sessionToken + '\'' +
+                ", defaultDomain='" + defaultDomain + '\'' +
+                '}';
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////7/////
+
+    /**
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-alpha.1
+     */
+    @Undocumented
+    public static class Builder
+    {
+        @NotNull
+        @Undocumented
+        public static TixteClient createClient(@NotNull String apiKey, @Nullable String sessionKey, @Nullable String defaultDomain)
+        {
+            return new TixteClient(apiKey, sessionKey, defaultDomain);
+        }
+
+        @NotNull
+        @Undocumented
+        public static TixteClient createClient(@NotNull String apiKey, @Nullable String sessionKey)
+        {
+            return new TixteClient(apiKey, sessionKey);
+        }
+
+        @NotNull
+        @Undocumented
+        public static TixteClient createClient(@NotNull String apiKey)
+        {
+            return new TixteClient(apiKey);
+        }
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////7/////
+
+    /**
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-alpha.1
+     */
+    @Undocumented
+    public class User
+    {
+        @Undocumented
+        public boolean isEmailVerified() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getBoolean("email_verified");
+        }
+
+        @Undocumented
+        public String getPhoneNumber() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("phone");
+        }
+
+        @Undocumented
+        public String getLastLogin() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("last_login");
+        }
+
+        @Undocumented
+        public int getFlagCount() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getInt("flags");
+        }
+
+        @Undocumented
+        public int getPremiumTier() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getInt("premium_tier");
+        }
+
+        @Undocumented
+        public boolean hasMFAEnabled() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getBoolean("mfa_enabled");
+        }
+
+        @Undocumented
+        public String getId() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("id");
+        }
+
+        @Undocumented
+        public String getAvatarId() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("avatar");
+        }
+
+        @Undocumented
+        public String getUploadRegion() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("upload_region");
+        }
+
+        @Undocumented
+        public String getEmail() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("email");
+        }
+
+        @Undocumented
+        @CheckReturnValue
+        public String getUsername() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("username");
+        }
+
+        @Undocumented
+        public int getFlagCount(@NotNull String user) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user));
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getInt("flags");
+        }
+
+        @Undocumented
+        public String getId(@NotNull String user) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user));
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("id");
+        }
+
+        @Undocumented
+        public String getAvatarId(@NotNull String user) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user));
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("avatar");
+        }
+
+        @Undocumented
+        @CheckReturnValue
+        public String getUsername(@NotNull String user) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user));
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("username");
+        }
+
+        @Undocumented
+        public int getFlagCount(@NotNull String user, @NotNull String sessionToken) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user, sessionToken));
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getInt("flags");
+        }
+
+        @Undocumented
+        public String getId(@NotNull String user, @NotNull String sessionToken) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user, sessionToken));
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("id");
+        }
+
+        @Undocumented
+        public String getAvatarId(@NotNull String user, @NotNull String sessionToken) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user, sessionToken));
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("avatar");
+        }
+
+        @Undocumented
+        @CheckReturnValue
+        public String getUsername(@NotNull String user, @NotNull String sessionToken) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user, sessionToken));
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("username");
+        }
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////7/////
+
+    /**
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-alpha.1
+     */
+    @Undocumented
+    public class FileSystem
+    {
+        @Undocumented
+        public long getUsedSize() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawSize());
+            JSONObject data = json.getJSONObject("data");
+            return data.getInt("used");
+        }
+
+        @Undocumented
+        public long getLimit() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawSize());
+            JSONObject data = json.getJSONObject("data");
+            return data.getInt("limit");
+        }
+
+        @Undocumented
+        public int getPremiumTier() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawSize());
+            JSONObject data = json.getJSONObject("data");
+            return data.getInt("premium_tier");
+        }
+
+        @Undocumented
+        public int getTotalUploadCount(int page) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            return data.getInt("total");
+        }
+
+        @Undocumented
+        public int getResults(int page) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            return data.getInt("results");
+        }
+
+        @Undocumented
+        public int getPermissionLevel(int page, int index) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("uploads");
+
+            return array.getJSONObject(index).getInt("permission_level");
+        }
+
+        @Undocumented
+        public String getExtension(int page, int index) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("uploads");
+
+            return array.getJSONObject(index).getString("extension");
+        }
+
+        @Undocumented
+        public long getSize(int page, int index) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("uploads");
+
+            return array.getJSONObject(index).getInt("size");
+        }
+
+        @Undocumented
+        public String getUploadDate(int page, int index) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("uploads");
+
+            return array.getJSONObject(index).getString("uploaded_at");
+        }
+
+        @Undocumented
+        public String getDomain(int page, int index) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("uploads");
+
+            return array.getJSONObject(index).getString("domain");
+        }
+
+        @Undocumented
+        public String getName(int page, int index) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("uploads");
+
+            return array.getJSONObject(index).getString("name");
+        }
+
+        @Undocumented
+        public String getMimeType(int page, int index) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("uploads");
+
+            return array.getJSONObject(index).getString("mimetype");
+        }
+
+        @Undocumented
+        public String getExpirationTime(int page, int index) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("uploads");
+
+            return array.getJSONObject(index).getString("expiration");
+        }
+
+        @Undocumented
+        public String getAssetId(int page, int index) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("uploads");
+
+            return array.getJSONObject(index).getString("asset_id");
+        }
+
+        @Undocumented
+        public int getType(int page, int index) throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("uploads");
+
+            return array.getJSONObject(index).getInt("type");
+        }
+
+        @Undocumented
+        public String getFileName(int page, int index) throws Forbidden, Unauthorized, IOException
+        {
+            return getName(page, index) + "." + getExtension(page, index);
+        }
+
+        @Undocumented
+        public String getUploadRegion() throws Forbidden, Unauthorized, IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("upload_region");
+        }
+
+        @Undocumented
+        public String getURL()
+        {
+            return url;
+        }
+
+        @Undocumented
+        public String getDirectURL()
+        {
+            return directURL;
+        }
+
+        @Undocumented
+        public String getDeletionURL()
+        {
+            return deletionURL;
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull File file) throws IOException, Forbidden, Unauthorized
+        {
+                JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(file));
+                JSONObject data = json.getJSONObject("data");
+
+                url = data.getString("url");
+                directURL = data.getString("direct_url");
+                deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull File file, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(file, isPrivate));
+            JSONObject data = json.getJSONObject("data");
+
+            url = data.getString("url");
+            directURL = data.getString("direct_url");
+            deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull File file, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(file, domain));
+            JSONObject data = json.getJSONObject("data");
+
+            url = data.getString("url");
+            directURL = data.getString("direct_url");
+            deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull File file, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(file, domain, isPrivate));
+            JSONObject data = json.getJSONObject("data");
+
+            url = data.getString("url");
+            directURL = data.getString("direct_url");
+            deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull URI filePath) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath));
+            JSONObject data = json.getJSONObject("data");
+
+            url = data.getString("url");
+            directURL = data.getString("direct_url");
+            deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull URI filePath, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, isPrivate));
+            JSONObject data = json.getJSONObject("data");
+
+            url = data.getString("url");
+            directURL = data.getString("direct_url");
+            deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull URI filePath, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, domain));
+            JSONObject data = json.getJSONObject("data");
+
+            url = data.getString("url");
+            directURL = data.getString("direct_url");
+            deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull URI filePath, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, domain, isPrivate));
+            JSONObject data = json.getJSONObject("data");
+
+            url = data.getString("url");
+            directURL = data.getString("direct_url");
+            deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull String filePath) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath));
+            JSONObject data = json.getJSONObject("data");
+
+            url = data.getString("url");
+            directURL = data.getString("direct_url");
+            deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull String filePath, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, isPrivate));
+            JSONObject data = json.getJSONObject("data");
+
+            url = data.getString("url");
+            directURL = data.getString("direct_url");
+            deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull String filePath, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, domain));
+            JSONObject data = json.getJSONObject("data");
+
+            url = data.getString("url");
+            directURL = data.getString("direct_url");
+            deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void uploadFile(@NotNull String filePath, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, domain, isPrivate));
+            JSONObject data = json.getJSONObject("data");
+
+            url = data.getString("url");
+            directURL = data.getString("direct_url");
+            deletionURL = data.getString("deletion_url");
+        }
+
+        @Undocumented
+        public void deleteFile(@NotNull String fileId) throws IOException, Forbidden, Unauthorized
+        {
+            getRawTixteClient().deleteFileRaw(fileId);
+        }
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////7/////
+
+    /**
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-alpha.1
+     */
+    @Undocumented
+    public class Domains
+    {
+        @Undocumented
+        public int getUsableDomainCount() throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawOwnedDomains());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getInt("count");
+        }
+
+        @Undocumented
+        public String getUsableDomains(int index) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawOwnedDomains());
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("domains");
+
+            return array.getJSONObject(index).getString("domain");
+        }
+
+        @Undocumented
+        public boolean isActive(int index) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawOwnedDomains());
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("domains");
+
+            return array.getJSONObject(index).getBoolean("active");
+        }
+
+        @Undocumented
+        public int getDomainCount() throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getInt("total");
+        }
+
+        @Undocumented
+        public String getOwnerId(int index) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains());
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("domains");
+
+            return array.getJSONObject(index).getString("owner");
+        }
+
+        @Undocumented
+        public String getDomainName(int index) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains());
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("domains");
+
+            return array.getJSONObject(index).getString("name");
+        }
+
+        @Undocumented
+        public int getUploadCount(int index) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains());
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("domains");
+
+            return array.getJSONObject(index).getInt("uploads");
+        }
+
+        @Undocumented
+        public int getDomainCount(@NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains(sessionToken));
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getInt("total");
+        }
+
+        @Undocumented
+        public String getOwnerId(int index, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains(sessionToken));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("domains");
+
+            return array.getJSONObject(index).getString("owner");
+        }
+
+        @Undocumented
+        public String getDomainName(int index, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains(sessionToken));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("domains");
+
+            return array.getJSONObject(index).getString("name");
+        }
+
+        @Undocumented
+        public int getUploadCount(int index, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains(sessionToken));
+            JSONObject data = json.getJSONObject("data");
+            JSONArray array = data.getJSONArray("domains");
+
+            return array.getJSONObject(index).getInt("uploads");
+        }
+
+        @NotNull
+        @Undocumented
+        public String generateDomain() throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().generateRawDomain());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("name") + "." + data.getString("domain");
+        }
+
+        @Undocumented
+        public boolean isCustom()
+        {
+            return isCustom;
+        }
+
+        @Undocumented
+        public String getLastDeletedDomain()
+        {
+            return domain;
+        }
+
+        @Undocumented
+        public void addSubdomain(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().addSubdomainRaw(domainName));
+            JSONObject data = json.getJSONObject("data");
+
+            isCustom = data.getBoolean("custom");
+        }
+
+        @Undocumented
+        public void addSubdomain(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().addSubdomainRaw(domainName, sessionToken));
+            JSONObject data = json.getJSONObject("data");
+
+            isCustom = data.getBoolean("custom");
+        }
+
+        @Undocumented
+        public void addCustomDomain(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().addCustomDomainRaw(domainName));
+            JSONObject data = json.getJSONObject("data");
+
+            isCustom = data.getBoolean("custom");
+        }
+
+        @Undocumented
+        public void addCustomDomain(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().addCustomDomainRaw(domainName, sessionToken));
+            JSONObject data = json.getJSONObject("data");
+
+            isCustom = data.getBoolean("custom");
+        }
+
+        @Undocumented
+        public void deleteDomain(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().deleteDomainRaw(domainName));
+            JSONObject data = json.getJSONObject("data");
+
+            domain = data.getString("domain");
+        }
+
+        @Undocumented
+        public void deleteDomain(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().deleteDomainRaw(domainName, sessionToken));
+            JSONObject data = json.getJSONObject("data");
+
+            domain = data.getString("domain");
+        }
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////7/////
+
+    /**
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-alpha.1
+     */
+    public class Raw
+    {
+        @NotNull
+        @Undocumented
+        public String getRawSize() throws IOException, Forbidden, Unauthorized
+        {
+            request = new Request.Builder()
+                    .url(BASE_URL + SIZE_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String getRawUploads(int page) throws IOException, Forbidden, Unauthorized
+        {
+            if (page < 0)
+            {
+                throw new IllegalArgumentException("\"page\" cannot be under 0.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + FILE_ENDPOINT + "?page=" + page)
+                    .addHeader("Authorization", apiKey)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull File file) throws IOException, Forbidden, Unauthorized
+        {
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", defaultDomain)
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull File file, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", defaultDomain)
+                    .addHeader("type", isPrivate ? "2": "1")
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull File file, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        {
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            if (domain.isEmpty())
+            {
+                throw new IllegalArgumentException("\"domain\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", domain)
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull File file, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", domain)
+                    .addHeader("type", isPrivate ? "2": "1")
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull URI filePath) throws IOException, Forbidden, Unauthorized
+        {
+            File file = new File(filePath);
+
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", defaultDomain)
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull URI filePath, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            File file = new File(filePath);
+
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", defaultDomain)
+                    .addHeader("type", isPrivate ? "2": "1")
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull URI filePath, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        {
+            File file = new File(filePath);
+
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            if (domain.isEmpty())
+            {
+                throw new IllegalArgumentException("\"domain\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", domain)
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull URI filePath, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            File file = new File(filePath);
+
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", domain)
+                    .addHeader("type", isPrivate ? "2": "1")
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+               return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull String filePath) throws IOException, Forbidden, Unauthorized
+        {
+            File file = new File(filePath);
+
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", defaultDomain)
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull String filePath, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            File file = new File(filePath);
+
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", defaultDomain)
+                    .addHeader("type", isPrivate ? "2": "1")
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull String filePath, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        {
+            File file = new File(filePath);
+
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            if (domain.isEmpty())
+            {
+                throw new IllegalArgumentException("\"domain\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", domain)
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String uploadFileRaw(@NotNull String filePath, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        {
+            File file = new File(filePath);
+
+            if (!file.exists())
+            {
+                throw new FileNotFoundException("File " + file.getName() + " was not found.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + UPLOAD_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .addHeader("domain", domain)
+                    .addHeader("type", isPrivate ? "2": "1")
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(file, MediaType.get("multipart/form-data")))
+                            .build()
+                    )
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        @CanIgnoreReturnValue
+        public String deleteFileRaw(@NotNull String fileId) throws IOException, Forbidden, Unauthorized
+        {
+            if (fileId.isEmpty())
+            {
+                throw new IllegalArgumentException("\"fileId\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + FILE_ENDPOINT + "/" + fileId)
+                    .addHeader("Authorization", apiKey)
+                    .delete()
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String getRawUserInfo() throws IOException, Forbidden, Unauthorized
+        {
+            request = new Request.Builder()
+                    .url(BASE_URL + ACCOUNT_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String getRawUserInfoByName(@NotNull String user) throws IOException, Forbidden, Unauthorized
+        {
+            if (user.isEmpty())
+            {
+                throw new IllegalArgumentException("\"user\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + "/users/" + user)
+                    .addHeader("Authorization", sessionToken)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String getRawUserInfoByName(@NotNull String user, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            if (sessionToken.isEmpty())
+            {
+                throw new IllegalArgumentException("\"sessionToken\" cannot be undefined.");
+            }
+
+            if (user.isEmpty())
+            {
+                throw new IllegalArgumentException("\"user\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + "/users/" + user)
+                    .addHeader("Authorization", sessionToken)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String getRawUserDomains() throws IOException, Forbidden, Unauthorized
+        {
+            request = new Request.Builder()
+                    .url(BASE_URL + DOMAINS_ENDPOINT)
+                    .addHeader("Authorization", sessionToken)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String getRawUserDomains(@NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            if (sessionToken.isEmpty())
+            {
+                throw new IllegalArgumentException("\"sessionToken\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + DOMAINS_ENDPOINT)
+                    .addHeader("Authorization", sessionToken)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String getRawOwnedDomains() throws IOException, Forbidden, Unauthorized
+        {
+            request = new Request.Builder()
+                    .url(BASE_URL + "/domains")
+                    .addHeader("Authorization", apiKey)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String generateRawDomain() throws IOException, Forbidden, Unauthorized
+        {
+            request = new Request.Builder()
+                    .url(BASE_URL + "/resources/generate-domain")
+                    .addHeader("Authorization", apiKey)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String addSubdomainRaw(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        {
+            if (domainName.isEmpty())
+            {
+                throw new IllegalArgumentException("\"domainName\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + DOMAINS_ENDPOINT)
+                    .addHeader("Authorization", sessionToken)
+                    .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": false }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String addSubdomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            if (domainName.isEmpty())
+            {
+                throw new IllegalArgumentException("\"domainName\" cannot be undefined.");
+            }
+
+            if (sessionToken.isEmpty())
+            {
+                throw new IllegalArgumentException("\"sessionToken\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + DOMAINS_ENDPOINT)
+                    .addHeader("Authorization", sessionToken)
+                    .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": false }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String addCustomDomainRaw(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        {
+            if (domainName.isEmpty())
+            {
+                throw new IllegalArgumentException("\"domainName\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + DOMAINS_ENDPOINT)
+                    .addHeader("Authorization", sessionToken)
+                    .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": true }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String addCustomDomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            if (domainName.isEmpty())
+            {
+                throw new IllegalArgumentException("\"domainName\" cannot be undefined.");
+            }
+
+            if (sessionToken.isEmpty())
+            {
+                throw new IllegalArgumentException("\"sessionToken\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + DOMAINS_ENDPOINT)
+                    .addHeader("Authorization", sessionToken)
+                    .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": true }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String deleteDomainRaw(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        {
+            if (domainName.isEmpty())
+            {
+                throw new IllegalArgumentException("\"domainName\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + DOMAINS_ENDPOINT + "/" + domainName)
+                    .addHeader("Authorization", sessionToken)
+                    .delete()
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String deleteDomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        {
+            if (domainName.isEmpty())
+            {
+                throw new IllegalArgumentException("\"domainName\" cannot be undefined.");
+            }
+
+            if (sessionToken.isEmpty())
+            {
+                throw new IllegalArgumentException("\"sessionToken\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + DOMAINS_ENDPOINT + "/" + domainName)
+                    .addHeader("Authorization", sessionToken)
+                    .delete()
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkErrorResponse(response);
+                return response.body().string();
+            }
+        }
     }
 }
