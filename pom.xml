@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.blocky.library</groupId>
     <artifactId>tixte4j</artifactId>
-    <version>1.0.0-alpha.2</version>
+    <version>1.0.0-alpha.3</version>
     <packaging>jar</packaging>
     <build>
         <pluginManagement>
@@ -144,6 +144,11 @@
             <version>3.1.0</version>
         </dependency>
         <dependency>
+            <groupId>com.neovisionaries</groupId>
+            <artifactId>nv-websocket-client</artifactId>
+            <version>2.14</version>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
             <version>1.6.20</version>
@@ -172,6 +177,11 @@
             <groupId>com.google.errorprone</groupId>
             <artifactId>error_prone_annotations</artifactId>
             <version>2.14.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
         </dependency>
     </dependencies>
 </project>

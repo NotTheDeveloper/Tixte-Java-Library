@@ -16,15 +16,16 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import dev.blocky.library.tixte.api.exceptions.Forbidden;
-import dev.blocky.library.tixte.api.exceptions.Unauthorized;
-import dev.blocky.library.tixte.internal.APIEndpoints;
-import dev.blocky.library.tixte.internal.annotations.Undocumented;
+import dev.blocky.library.tixte.annotations.Undocumented;
+import dev.blocky.library.tixte.internal.ratelimit.RateLimitInterceptor;
+import dev.blocky.library.tixte.internal.requests.ErrorResponse;
+import dev.blocky.library.tixte.internal.utils.TixteLogger;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import javax.annotation.CheckReturnValue;
 import java.io.File;
@@ -33,16 +34,27 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Objects;
 
+import static dev.blocky.library.tixte.internal.requests.Route.Account.*;
+import static dev.blocky.library.tixte.internal.requests.Route.BASE_URL;
+import static dev.blocky.library.tixte.internal.requests.Route.Config.CONFIG_ENDPOINT;
+import static dev.blocky.library.tixte.internal.requests.Route.Domain.ACCOUNT_DOMAINS_ENDPOINT;
+import static dev.blocky.library.tixte.internal.requests.Route.Domain.DOMAINS_ENDPOINT;
+import static dev.blocky.library.tixte.internal.requests.Route.File.*;
+import static dev.blocky.library.tixte.internal.requests.Route.Resources.GENERATE_DOMAIN_ENDPOINT;
+import static dev.blocky.library.tixte.internal.requests.Route.SLASH;
+
 /**
  * @author BlockyDotJar
  * @version v1.0.0
  * @since v1.0.0-alpha.1
  */
 @Undocumented
-public strictfp class TixteClient extends APIEndpoints
+public strictfp class TixteClient extends ErrorResponse
 {
-    private transient final OkHttpClient client = new OkHttpClient();
-    private transient final String apiKey;
+    private final transient Logger logger = TixteLogger.getLog(TixteClient.class);
+    private final transient Dispatcher dispatcher = new Dispatcher();
+    private final transient String apiKey;
+    private transient volatile OkHttpClient client;
     private transient volatile String url, directURL, deletionURL, domain;
     private transient volatile String sessionToken, defaultDomain;
     private transient volatile Request request;
@@ -59,6 +71,23 @@ public strictfp class TixteClient extends APIEndpoints
         {
             throw new IllegalArgumentException("\"apiKey\" cannot be undefined.");
         }
+
+        if (sessionToken.isEmpty() || sessionToken == null)
+        {
+            logger.warn("\"sessionToken\" is undefined.");
+        }
+
+        if (defaultDomain.isEmpty() || defaultDomain == null)
+        {
+            logger.warn("\"defaultDomain\" is undefined. Because of that you can simply use createTixteClient(@NotNull String, @NotNull String).");
+        }
+
+        dispatcher.setMaxRequestsPerHost(100);
+
+        client = new OkHttpClient.Builder()
+                .addInterceptor(new RateLimitInterceptor())
+                .dispatcher(dispatcher)
+                .build();
     }
 
     @Undocumented
@@ -71,6 +100,18 @@ public strictfp class TixteClient extends APIEndpoints
         {
             throw new IllegalArgumentException("\"apiKey\" cannot be undefined.");
         }
+
+        if (sessionToken.isEmpty() || sessionToken == null)
+        {
+            logger.warn("\"sessionToken\" is undefined. Because of that you can simply use createTixteClient(@NotNull String)");
+        }
+
+        dispatcher.setMaxRequestsPerHost(100);
+
+        client = new OkHttpClient.Builder()
+                .addInterceptor(new RateLimitInterceptor())
+                .dispatcher(dispatcher)
+                .build();
     }
 
     @Undocumented
@@ -82,6 +123,13 @@ public strictfp class TixteClient extends APIEndpoints
         {
             throw new IllegalArgumentException("\"apiKey\" cannot be undefined.");
         }
+
+        dispatcher.setMaxRequestsPerHost(100);
+
+        client = new OkHttpClient.Builder()
+                .addInterceptor(new RateLimitInterceptor())
+                .dispatcher(dispatcher)
+                .build();
     }
 
     @NotNull
@@ -136,6 +184,13 @@ public strictfp class TixteClient extends APIEndpoints
         return new TixteClient.Domains();
     }
 
+    @NotNull
+    @Undocumented
+    public TixteClient.Config getTixteConfig()
+    {
+        return new TixteClient.Config();
+    }
+
     public TixteClient.Raw getRawTixteClient()
     {
         return new TixteClient.Raw();
@@ -186,42 +241,10 @@ public strictfp class TixteClient extends APIEndpoints
      * @since v1.0.0-alpha.1
      */
     @Undocumented
-    public static class Builder
-    {
-        @NotNull
-        @Undocumented
-        public static TixteClient createClient(@NotNull String apiKey, @Nullable String sessionKey, @Nullable String defaultDomain)
-        {
-            return new TixteClient(apiKey, sessionKey, defaultDomain);
-        }
-
-        @NotNull
-        @Undocumented
-        public static TixteClient createClient(@NotNull String apiKey, @Nullable String sessionKey)
-        {
-            return new TixteClient(apiKey, sessionKey);
-        }
-
-        @NotNull
-        @Undocumented
-        public static TixteClient createClient(@NotNull String apiKey)
-        {
-            return new TixteClient(apiKey);
-        }
-    }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////7/////
-
-    /**
-     * @author BlockyDotJar
-     * @version v1.0.0
-     * @since v1.0.0-alpha.1
-     */
-    @Undocumented
     public class User
     {
         @Undocumented
-        public boolean isEmailVerified() throws Forbidden, Unauthorized, IOException
+        public boolean isEmailVerified() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -230,7 +253,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getPhoneNumber() throws Forbidden, Unauthorized, IOException
+        public String getPhoneNumber() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -239,7 +262,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getLastLogin() throws Forbidden, Unauthorized, IOException
+        public String getLastLogin() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -248,7 +271,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getFlagCount() throws Forbidden, Unauthorized, IOException
+        public int getFlagCount() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -257,7 +280,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getPremiumTier() throws Forbidden, Unauthorized, IOException
+        public int getPremiumTier() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -266,7 +289,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public boolean hasMFAEnabled() throws Forbidden, Unauthorized, IOException
+        public boolean hasMFAEnabled() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -275,7 +298,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getId() throws Forbidden, Unauthorized, IOException
+        public String getId() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -284,7 +307,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getAvatarId() throws Forbidden, Unauthorized, IOException
+        public String getAvatarId() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -293,7 +316,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getUploadRegion() throws Forbidden, Unauthorized, IOException
+        public String getUploadRegion() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -302,7 +325,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getEmail() throws Forbidden, Unauthorized, IOException
+        public String getEmail() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -312,7 +335,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @Undocumented
         @CheckReturnValue
-        public String getUsername() throws Forbidden, Unauthorized, IOException
+        public String getUsername() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -321,7 +344,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getFlagCount(@NotNull String user) throws Forbidden, Unauthorized, IOException
+        public int getFlagCount(@NotNull String user) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user));
             JSONObject data = json.getJSONObject("data");
@@ -330,7 +353,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getId(@NotNull String user) throws Forbidden, Unauthorized, IOException
+        public String getId(@NotNull String user) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user));
             JSONObject data = json.getJSONObject("data");
@@ -339,7 +362,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getAvatarId(@NotNull String user) throws Forbidden, Unauthorized, IOException
+        public String getAvatarId(@NotNull String user) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user));
             JSONObject data = json.getJSONObject("data");
@@ -349,7 +372,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @Undocumented
         @CheckReturnValue
-        public String getUsername(@NotNull String user) throws Forbidden, Unauthorized, IOException
+        public String getUsername(@NotNull String user) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user));
             JSONObject data = json.getJSONObject("data");
@@ -358,7 +381,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getFlagCount(@NotNull String user, @NotNull String sessionToken) throws Forbidden, Unauthorized, IOException
+        public int getFlagCount(@NotNull String user, @NotNull String sessionToken) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user, sessionToken));
             JSONObject data = json.getJSONObject("data");
@@ -367,7 +390,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getId(@NotNull String user, @NotNull String sessionToken) throws Forbidden, Unauthorized, IOException
+        public String getId(@NotNull String user, @NotNull String sessionToken) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user, sessionToken));
             JSONObject data = json.getJSONObject("data");
@@ -376,7 +399,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getAvatarId(@NotNull String user, @NotNull String sessionToken) throws Forbidden, Unauthorized, IOException
+        public String getAvatarId(@NotNull String user, @NotNull String sessionToken) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user, sessionToken));
             JSONObject data = json.getJSONObject("data");
@@ -386,12 +409,32 @@ public strictfp class TixteClient extends APIEndpoints
 
         @Undocumented
         @CheckReturnValue
-        public String getUsername(@NotNull String user, @NotNull String sessionToken) throws Forbidden, Unauthorized, IOException
+        public String getUsername(@NotNull String user, @NotNull String sessionToken) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfoByName(user, sessionToken));
             JSONObject data = json.getJSONObject("data");
 
             return data.getString("username");
+        }
+
+        @Undocumented
+        @CheckReturnValue
+        public String getAPIKeyBySessionToken() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawAPIKeyBySessionToken());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("api_key");
+        }
+
+        @Undocumented
+        @CheckReturnValue
+        public String getAPIKeyBySessionToken(@NotNull String sessionToken) throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawAPIKeyBySessionToken(sessionToken));
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("api_key");
         }
     }
 
@@ -406,7 +449,7 @@ public strictfp class TixteClient extends APIEndpoints
     public class FileSystem
     {
         @Undocumented
-        public long getUsedSize() throws Forbidden, Unauthorized, IOException
+        public long getUsedSize() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawSize());
             JSONObject data = json.getJSONObject("data");
@@ -414,7 +457,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public long getLimit() throws Forbidden, Unauthorized, IOException
+        public long getLimit() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawSize());
             JSONObject data = json.getJSONObject("data");
@@ -422,7 +465,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getPremiumTier() throws Forbidden, Unauthorized, IOException
+        public int getPremiumTier() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawSize());
             JSONObject data = json.getJSONObject("data");
@@ -430,7 +473,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getTotalUploadCount(int page) throws Forbidden, Unauthorized, IOException
+        public int getTotalUploadCount(int page) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -438,7 +481,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getResults(int page) throws Forbidden, Unauthorized, IOException
+        public int getResults(int page) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -446,7 +489,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getPermissionLevel(int page, int index) throws Forbidden, Unauthorized, IOException
+        public int getPermissionLevel(int page, int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -456,7 +499,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getExtension(int page, int index) throws Forbidden, Unauthorized, IOException
+        public String getExtension(int page, int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -466,7 +509,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public long getSize(int page, int index) throws Forbidden, Unauthorized, IOException
+        public long getSize(int page, int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -476,7 +519,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getUploadDate(int page, int index) throws Forbidden, Unauthorized, IOException
+        public String getUploadDate(int page, int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -486,7 +529,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getDomain(int page, int index) throws Forbidden, Unauthorized, IOException
+        public String getDomain(int page, int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -496,7 +539,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getName(int page, int index) throws Forbidden, Unauthorized, IOException
+        public String getName(int page, int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -506,7 +549,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getMimeType(int page, int index) throws Forbidden, Unauthorized, IOException
+        public String getMimeType(int page, int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -516,7 +559,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getExpirationTime(int page, int index) throws Forbidden, Unauthorized, IOException
+        public String getExpirationTime(int page, int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -526,7 +569,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getAssetId(int page, int index) throws Forbidden, Unauthorized, IOException
+        public String getAssetId(int page, int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -536,7 +579,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getType(int page, int index) throws Forbidden, Unauthorized, IOException
+        public int getType(int page, int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUploads(page));
             JSONObject data = json.getJSONObject("data");
@@ -546,13 +589,13 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getFileName(int page, int index) throws Forbidden, Unauthorized, IOException
+        public String getFileName(int page, int index) throws IOException
         {
             return getName(page, index) + "." + getExtension(page, index);
         }
 
         @Undocumented
-        public String getUploadRegion() throws Forbidden, Unauthorized, IOException
+        public String getUploadRegion() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserInfo());
             JSONObject data = json.getJSONObject("data");
@@ -579,7 +622,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull File file) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull File file) throws IOException
         {
                 JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(file));
                 JSONObject data = json.getJSONObject("data");
@@ -590,7 +633,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull File file, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull File file, boolean isPrivate) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(file, isPrivate));
             JSONObject data = json.getJSONObject("data");
@@ -601,7 +644,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull File file, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull File file, @NotNull String domain) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(file, domain));
             JSONObject data = json.getJSONObject("data");
@@ -612,7 +655,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull File file, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull File file, @NotNull String domain, boolean isPrivate) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(file, domain, isPrivate));
             JSONObject data = json.getJSONObject("data");
@@ -623,7 +666,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull URI filePath) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull URI filePath) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath));
             JSONObject data = json.getJSONObject("data");
@@ -634,7 +677,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull URI filePath, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull URI filePath, boolean isPrivate) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, isPrivate));
             JSONObject data = json.getJSONObject("data");
@@ -645,7 +688,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull URI filePath, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull URI filePath, @NotNull String domain) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, domain));
             JSONObject data = json.getJSONObject("data");
@@ -656,7 +699,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull URI filePath, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull URI filePath, @NotNull String domain, boolean isPrivate) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, domain, isPrivate));
             JSONObject data = json.getJSONObject("data");
@@ -667,7 +710,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull String filePath) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull String filePath) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath));
             JSONObject data = json.getJSONObject("data");
@@ -678,7 +721,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull String filePath, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull String filePath, boolean isPrivate) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, isPrivate));
             JSONObject data = json.getJSONObject("data");
@@ -689,7 +732,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull String filePath, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull String filePath, @NotNull String domain) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, domain));
             JSONObject data = json.getJSONObject("data");
@@ -700,7 +743,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void uploadFile(@NotNull String filePath, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public void uploadFile(@NotNull String filePath, @NotNull String domain, boolean isPrivate) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().uploadFileRaw(filePath, domain, isPrivate));
             JSONObject data = json.getJSONObject("data");
@@ -711,7 +754,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void deleteFile(@NotNull String fileId) throws IOException, Forbidden, Unauthorized
+        public void deleteFile(@NotNull String fileId) throws IOException
         {
             getRawTixteClient().deleteFileRaw(fileId);
         }
@@ -728,7 +771,7 @@ public strictfp class TixteClient extends APIEndpoints
     public class Domains
     {
         @Undocumented
-        public int getUsableDomainCount() throws IOException, Forbidden, Unauthorized
+        public int getUsableDomainCount() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawOwnedDomains());
             JSONObject data = json.getJSONObject("data");
@@ -737,7 +780,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getUsableDomains(int index) throws IOException, Forbidden, Unauthorized
+        public String getUsableDomains(int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawOwnedDomains());
             JSONObject data = json.getJSONObject("data");
@@ -747,7 +790,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public boolean isActive(int index) throws IOException, Forbidden, Unauthorized
+        public boolean isActive(int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawOwnedDomains());
             JSONObject data = json.getJSONObject("data");
@@ -757,7 +800,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getDomainCount() throws IOException, Forbidden, Unauthorized
+        public int getDomainCount() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains());
             JSONObject data = json.getJSONObject("data");
@@ -766,7 +809,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getOwnerId(int index) throws IOException, Forbidden, Unauthorized
+        public String getOwnerId(int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains());
             JSONObject data = json.getJSONObject("data");
@@ -776,7 +819,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getDomainName(int index) throws IOException, Forbidden, Unauthorized
+        public String getDomainName(int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains());
             JSONObject data = json.getJSONObject("data");
@@ -786,7 +829,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getUploadCount(int index) throws IOException, Forbidden, Unauthorized
+        public int getUploadCount(int index) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains());
             JSONObject data = json.getJSONObject("data");
@@ -796,7 +839,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getDomainCount(@NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public int getDomainCount(@NotNull String sessionToken) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains(sessionToken));
             JSONObject data = json.getJSONObject("data");
@@ -805,7 +848,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getOwnerId(int index, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public String getOwnerId(int index, @NotNull String sessionToken) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains(sessionToken));
             JSONObject data = json.getJSONObject("data");
@@ -815,7 +858,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public String getDomainName(int index, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public String getDomainName(int index, @NotNull String sessionToken) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains(sessionToken));
             JSONObject data = json.getJSONObject("data");
@@ -825,7 +868,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public int getUploadCount(int index, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public int getUploadCount(int index, @NotNull String sessionToken) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().getRawUserDomains(sessionToken));
             JSONObject data = json.getJSONObject("data");
@@ -836,7 +879,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String generateDomain() throws IOException, Forbidden, Unauthorized
+        public String generateDomain() throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().generateRawDomain());
             JSONObject data = json.getJSONObject("data");
@@ -857,7 +900,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void addSubdomain(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        public void addSubdomain(@NotNull String domainName) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().addSubdomainRaw(domainName));
             JSONObject data = json.getJSONObject("data");
@@ -866,7 +909,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void addSubdomain(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public void addSubdomain(@NotNull String domainName, @NotNull String sessionToken) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().addSubdomainRaw(domainName, sessionToken));
             JSONObject data = json.getJSONObject("data");
@@ -875,7 +918,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void addCustomDomain(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        public void addCustomDomain(@NotNull String domainName) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().addCustomDomainRaw(domainName));
             JSONObject data = json.getJSONObject("data");
@@ -884,7 +927,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void addCustomDomain(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public void addCustomDomain(@NotNull String domainName, @NotNull String sessionToken) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().addCustomDomainRaw(domainName, sessionToken));
             JSONObject data = json.getJSONObject("data");
@@ -893,7 +936,7 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void deleteDomain(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        public void deleteDomain(@NotNull String domainName) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().deleteDomainRaw(domainName));
             JSONObject data = json.getJSONObject("data");
@@ -902,12 +945,136 @@ public strictfp class TixteClient extends APIEndpoints
         }
 
         @Undocumented
-        public void deleteDomain(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public void deleteDomain(@NotNull String domainName, @NotNull String sessionToken) throws IOException
         {
             JSONObject json = new JSONObject(getRawTixteClient().deleteDomainRaw(domainName, sessionToken));
             JSONObject data = json.getJSONObject("data");
 
             domain = data.getString("domain");
+        }
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////7/////
+
+    /**
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-alpha.3
+     */
+    public class Config
+    {
+        @NotNull
+        @Undocumented
+        public String getCustomCSS() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawConfig());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getString("custom_css");
+        }
+
+        @Undocumented
+        public boolean hidesBranding() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawConfig());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getBoolean("hide_branding");
+        }
+
+        @Undocumented
+        public boolean isBaseRedirected() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawConfig());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getBoolean("base_redirect");
+        }
+
+        @Undocumented
+        public boolean onlyImageActivated() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawConfig());
+            JSONObject data = json.getJSONObject("data");
+
+            return data.getBoolean("only_image");
+        }
+
+        @NotNull
+        @Undocumented
+        public String getEmbedTitle() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawConfig());
+            JSONObject data = json.getJSONObject("data");
+            JSONObject embed = data.getJSONObject("embed");
+
+            return embed.getString("title");
+        }
+
+        @NotNull
+        @Undocumented
+        public String getEmbedThemeColor() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawConfig());
+            JSONObject data = json.getJSONObject("data");
+            JSONObject embed = data.getJSONObject("embed");
+
+            return embed.getString("theme_color");
+        }
+
+        @NotNull
+        @Undocumented
+        public String getEmbedAuthorName() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawConfig());
+            JSONObject data = json.getJSONObject("data");
+            JSONObject embed = data.getJSONObject("embed");
+
+            return embed.getString("author_name");
+        }
+
+        @NotNull
+        @Undocumented
+        public String getEmbedAuthorURL() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawConfig());
+            JSONObject data = json.getJSONObject("data");
+            JSONObject embed = data.getJSONObject("embed");
+
+            return embed.getString("author_url");
+        }
+
+        @NotNull
+        @Undocumented
+        public String getEmbedProviderName() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawConfig());
+            JSONObject data = json.getJSONObject("data");
+            JSONObject embed = data.getJSONObject("embed");
+
+            return embed.getString("provider_name");
+        }
+
+        @NotNull
+        @Undocumented
+        public String getEmbedProviderURL() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawConfig());
+            JSONObject data = json.getJSONObject("data");
+            JSONObject embed = data.getJSONObject("embed");
+
+            return embed.getString("provider_url");
+        }
+
+        @NotNull
+        @Undocumented
+        public String getEmbedDescription() throws IOException
+        {
+            JSONObject json = new JSONObject(getRawTixteClient().getRawConfig());
+            JSONObject data = json.getJSONObject("data");
+            JSONObject embed = data.getJSONObject("embed");
+
+            return embed.getString("description");
         }
     }
 
@@ -922,7 +1089,7 @@ public strictfp class TixteClient extends APIEndpoints
     {
         @NotNull
         @Undocumented
-        public String getRawSize() throws IOException, Forbidden, Unauthorized
+        public String getRawSize() throws IOException 
         {
             request = new Request.Builder()
                     .url(BASE_URL + SIZE_ENDPOINT)
@@ -931,14 +1098,14 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String getRawUploads(int page) throws IOException, Forbidden, Unauthorized
+        public String getRawUploads(int page) throws IOException
         {
             if (page < 0)
             {
@@ -946,20 +1113,20 @@ public strictfp class TixteClient extends APIEndpoints
             }
 
             request = new Request.Builder()
-                    .url(BASE_URL + FILE_ENDPOINT + "?page=" + page)
+                    .url(BASE_URL + FILE_ENDPOINT + PAGE + page)
                     .addHeader("Authorization", apiKey)
                     .build();
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull File file) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull File file) throws IOException 
         {
             if (!file.exists())
             {
@@ -980,7 +1147,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -988,7 +1155,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull File file, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull File file, boolean isPrivate) throws IOException 
         {
             if (!file.exists())
             {
@@ -1010,7 +1177,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1018,7 +1185,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull File file, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull File file, @NotNull String domain) throws IOException 
         {
             if (!file.exists())
             {
@@ -1044,7 +1211,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1052,7 +1219,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull File file, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull File file, @NotNull String domain, boolean isPrivate) throws IOException
         {
             if (!file.exists())
             {
@@ -1074,7 +1241,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1082,7 +1249,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull URI filePath) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull URI filePath) throws IOException
         {
             File file = new File(filePath);
 
@@ -1105,7 +1272,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1113,7 +1280,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull URI filePath, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull URI filePath, boolean isPrivate) throws IOException
         {
             File file = new File(filePath);
 
@@ -1137,7 +1304,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1145,7 +1312,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull URI filePath, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull URI filePath, @NotNull String domain) throws IOException
         {
             File file = new File(filePath);
 
@@ -1173,7 +1340,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1181,7 +1348,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull URI filePath, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull URI filePath, @NotNull String domain, boolean isPrivate) throws IOException
         {
             File file = new File(filePath);
 
@@ -1205,7 +1372,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                return response.body().string();
             }
@@ -1213,7 +1380,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull String filePath) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull String filePath) throws IOException
         {
             File file = new File(filePath);
 
@@ -1236,7 +1403,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1244,7 +1411,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull String filePath, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull String filePath, boolean isPrivate) throws IOException
         {
             File file = new File(filePath);
 
@@ -1268,7 +1435,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1276,7 +1443,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull String filePath, @NotNull String domain) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull String filePath, @NotNull String domain) throws IOException
         {
             File file = new File(filePath);
 
@@ -1304,7 +1471,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1312,7 +1479,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String uploadFileRaw(@NotNull String filePath, @NotNull String domain, boolean isPrivate) throws IOException, Forbidden, Unauthorized
+        public String uploadFileRaw(@NotNull String filePath, @NotNull String domain, boolean isPrivate) throws IOException
         {
             File file = new File(filePath);
 
@@ -1336,7 +1503,7 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1345,7 +1512,7 @@ public strictfp class TixteClient extends APIEndpoints
         @NotNull
         @Undocumented
         @CanIgnoreReturnValue
-        public String deleteFileRaw(@NotNull String fileId) throws IOException, Forbidden, Unauthorized
+        public String deleteFileRaw(@NotNull String fileId) throws IOException
         {
             if (fileId.isEmpty())
             {
@@ -1353,14 +1520,14 @@ public strictfp class TixteClient extends APIEndpoints
             }
 
             request = new Request.Builder()
-                    .url(BASE_URL + FILE_ENDPOINT + "/" + fileId)
+                    .url(BASE_URL + FILE_ENDPOINT + SLASH + fileId)
                     .addHeader("Authorization", apiKey)
                     .delete()
                     .build();
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1368,7 +1535,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String getRawUserInfo() throws IOException, Forbidden, Unauthorized
+        public String getRawUserInfo() throws IOException
         {
             request = new Request.Builder()
                     .url(BASE_URL + ACCOUNT_ENDPOINT)
@@ -1377,15 +1544,41 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String getRawUserInfoByName(@NotNull String user) throws IOException, Forbidden, Unauthorized
+        public String getRawUserInfoByName(@NotNull String user) throws IOException
         {
+            if (user.isEmpty())
+            {
+                throw new IllegalArgumentException("\"user\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + USERS_ENDPOINT + user)
+                    .addHeader("Authorization", sessionToken)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String getRawUserInfoByName(@NotNull String user, @NotNull String sessionToken) throws IOException
+        {
+            if (sessionToken.isEmpty())
+            {
+                throw new IllegalArgumentException("\"sessionToken\" cannot be undefined.");
+            }
+
             if (user.isEmpty())
             {
                 throw new IllegalArgumentException("\"user\" cannot be undefined.");
@@ -1398,56 +1591,30 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String getRawUserInfoByName(@NotNull String user, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public String getRawUserDomains() throws IOException
         {
-            if (sessionToken.isEmpty())
-            {
-                throw new IllegalArgumentException("\"sessionToken\" cannot be undefined.");
-            }
-
-            if (user.isEmpty())
-            {
-                throw new IllegalArgumentException("\"user\" cannot be undefined.");
-            }
-
             request = new Request.Builder()
-                    .url(BASE_URL + "/users/" + user)
+                    .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
                     .addHeader("Authorization", sessionToken)
                     .build();
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String getRawUserDomains() throws IOException, Forbidden, Unauthorized
-        {
-            request = new Request.Builder()
-                    .url(BASE_URL + DOMAINS_ENDPOINT)
-                    .addHeader("Authorization", sessionToken)
-                    .build();
-
-            try (Response response = client.newCall(request).execute())
-            {
-                checkErrorResponse(response);
-                return response.body().string();
-            }
-        }
-
-        @NotNull
-        @Undocumented
-        public String getRawUserDomains(@NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public String getRawUserDomains(@NotNull String sessionToken) throws IOException
         {
             if (sessionToken.isEmpty())
             {
@@ -1455,45 +1622,45 @@ public strictfp class TixteClient extends APIEndpoints
             }
 
             request = new Request.Builder()
-                    .url(BASE_URL + DOMAINS_ENDPOINT)
+                    .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
                     .addHeader("Authorization", sessionToken)
                     .build();
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String getRawOwnedDomains() throws IOException, Forbidden, Unauthorized
+        public String getRawOwnedDomains() throws IOException
         {
             request = new Request.Builder()
-                    .url(BASE_URL + "/domains")
+                    .url(BASE_URL + DOMAINS_ENDPOINT)
                     .addHeader("Authorization", apiKey)
                     .build();
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String generateRawDomain() throws IOException, Forbidden, Unauthorized
+        public String generateRawDomain() throws IOException
         {
             request = new Request.Builder()
-                    .url(BASE_URL + "/resources/generate-domain")
+                    .url(BASE_URL + GENERATE_DOMAIN_ENDPOINT)
                     .addHeader("Authorization", apiKey)
                     .build();
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
 
                 return response.body().string();
             }
@@ -1501,7 +1668,7 @@ public strictfp class TixteClient extends APIEndpoints
 
         @NotNull
         @Undocumented
-        public String addSubdomainRaw(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        public String addSubdomainRaw(@NotNull String domainName) throws IOException
         {
             if (domainName.isEmpty())
             {
@@ -1509,7 +1676,7 @@ public strictfp class TixteClient extends APIEndpoints
             }
 
             request = new Request.Builder()
-                    .url(BASE_URL + DOMAINS_ENDPOINT)
+                    .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
                     .addHeader("Authorization", sessionToken)
                     .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": false }",
                             MediaType.get("application/json")))
@@ -1517,14 +1684,14 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String addSubdomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public String addSubdomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException
         {
             if (domainName.isEmpty())
             {
@@ -1537,7 +1704,7 @@ public strictfp class TixteClient extends APIEndpoints
             }
 
             request = new Request.Builder()
-                    .url(BASE_URL + DOMAINS_ENDPOINT)
+                    .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
                     .addHeader("Authorization", sessionToken)
                     .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": false }",
                             MediaType.get("application/json")))
@@ -1545,14 +1712,14 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String addCustomDomainRaw(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        public String addCustomDomainRaw(@NotNull String domainName) throws IOException
         {
             if (domainName.isEmpty())
             {
@@ -1560,7 +1727,7 @@ public strictfp class TixteClient extends APIEndpoints
             }
 
             request = new Request.Builder()
-                    .url(BASE_URL + DOMAINS_ENDPOINT)
+                    .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
                     .addHeader("Authorization", sessionToken)
                     .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": true }",
                             MediaType.get("application/json")))
@@ -1568,14 +1735,14 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String addCustomDomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public String addCustomDomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException
         {
             if (domainName.isEmpty())
             {
@@ -1588,7 +1755,7 @@ public strictfp class TixteClient extends APIEndpoints
             }
 
             request = new Request.Builder()
-                    .url(BASE_URL + DOMAINS_ENDPOINT)
+                    .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
                     .addHeader("Authorization", sessionToken)
                     .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": true }",
                             MediaType.get("application/json")))
@@ -1596,14 +1763,14 @@ public strictfp class TixteClient extends APIEndpoints
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String deleteDomainRaw(@NotNull String domainName) throws IOException, Forbidden, Unauthorized
+        public String deleteDomainRaw(@NotNull String domainName) throws IOException
         {
             if (domainName.isEmpty())
             {
@@ -1611,21 +1778,21 @@ public strictfp class TixteClient extends APIEndpoints
             }
 
             request = new Request.Builder()
-                    .url(BASE_URL + DOMAINS_ENDPOINT + "/" + domainName)
+                    .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT + SLASH + domainName)
                     .addHeader("Authorization", sessionToken)
                     .delete()
                     .build();
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
                 return response.body().string();
             }
         }
 
         @NotNull
         @Undocumented
-        public String deleteDomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException, Forbidden, Unauthorized
+        public String deleteDomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException
         {
             if (domainName.isEmpty())
             {
@@ -1638,14 +1805,85 @@ public strictfp class TixteClient extends APIEndpoints
             }
 
             request = new Request.Builder()
-                    .url(BASE_URL + DOMAINS_ENDPOINT + "/" + domainName)
+                    .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT + SLASH + domainName)
                     .addHeader("Authorization", sessionToken)
                     .delete()
                     .build();
 
             try (Response response = client.newCall(request).execute())
             {
-                checkErrorResponse(response);
+                checkResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String getRawAPIKeyBySessionToken() throws IOException
+        {
+            request = new Request.Builder()
+                    .url(BASE_URL + ACCOUNT_ENDPOINT + "/keys")
+                    .addHeader("Authorization", sessionToken)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String getRawAPIKeyBySessionToken(@NotNull String sessionToken) throws IOException
+        {
+            request = new Request.Builder()
+                    .url(BASE_URL + KEYS_ENDPOINT)
+                    .addHeader("Authorization", sessionToken)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String getRawConfig() throws IOException
+        {
+            request = new Request.Builder()
+                    .url(BASE_URL + CONFIG_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String setCustomCSSRaw(@NotNull String customCSS) throws IOException
+        {
+            if (customCSS.isEmpty())
+            {
+                throw new IllegalArgumentException("\"customCSS\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + CONFIG_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .patch(RequestBody.create("{ \"custom_css\": \"" + customCSS + "\" }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                checkResponse(response);
                 return response.body().string();
             }
         }

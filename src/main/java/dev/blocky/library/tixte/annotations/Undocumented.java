@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.internal.annotations;
+package dev.blocky.library.tixte.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -21,18 +21,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is an annotation, which tells the developers that a method/class should be removed in the future.
+ * This is an annotation, which tells the developers that a method/class/constructor/package is not documented yet.
  *
  * @author BlockyDotJar
  * @version v1.0.0
  * @since v1.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.TYPE, ElementType.METHOD } )
-public @interface ForRemoval
+@Target( { ElementType.PACKAGE, ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR } )
+public @interface Undocumented
 {
-    /**
-     * @return The version, in which the deprecated method/class should be removed
-     */
-    String deadline();
 }

@@ -13,22 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.internal.annotations;
+package dev.blocky.library.tixte.api.exceptions;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * This is an annotation, which tells the developers that a method/class/constructor/package is not documented yet.
- *
  * @author BlockyDotJar
  * @version v1.0.0
- * @since v1.0.0
+ * @since v1.0.0-alpha.1
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.PACKAGE, ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR } )
-public @interface Undocumented
+public class TixteWantsYourMoneyException extends Forbidden
 {
+    public TixteWantsYourMoneyException(@NotNull String message)
+    {
+        super(message);
+    }
 }

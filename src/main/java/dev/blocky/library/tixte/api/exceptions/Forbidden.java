@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  * @version v1.0.0
  * @since v1.0.0-alpha.1
  */
-public class Forbidden extends IllegalAccessException
+public class Forbidden extends HTTPException
 {
     public Forbidden(@NotNull String message)
     {

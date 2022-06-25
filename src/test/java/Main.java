@@ -1,23 +1,21 @@
 /**
  * Copyright 2022 Dominic (aka. BlockyDotJar)
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import dev.blocky.library.tixte.api.TixteClient;
-import dev.blocky.library.tixte.api.exceptions.Forbidden;
-import dev.blocky.library.tixte.api.exceptions.Unauthorized;
-import dev.blocky.library.tixte.internal.annotations.Undocumented;
+import dev.blocky.library.tixte.api.TixteClientBuilder;
+import dev.blocky.library.tixte.annotations.Undocumented;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -35,13 +33,13 @@ import java.nio.file.Paths;
 @Undocumented
 public class Main
 {
-    // private static final Logger logger = LoggerFactory.getLogger(Main.class);
-    private static final File file = new File("src/main/resources/secrets.json");
+    private static final File file = new File("C:\\Users\\Dominic\\Desktop\\Applications\\token\\secrets.json");
 
     @Undocumented
-    public static void main(@NotNull String[] args) throws IOException, Forbidden, Unauthorized {
-        TixteClient client = TixteClient.Builder.createClient(getAPIKey(), getSessionToken(), getDefaultDomain());
-        System.out.println( client.getRawTixteClient().deleteDomainRaw("reudiggenhund.is-from.space"));
+    public static void main(@NotNull String[] args) throws IOException
+    {
+        TixteClient client = TixteClientBuilder.createClient(getAPIKey(), getSessionToken(), getDefaultDomain());
+        System.out.println(client.getRawTixteClient().getRawSize());
     }
 
     @NotNull

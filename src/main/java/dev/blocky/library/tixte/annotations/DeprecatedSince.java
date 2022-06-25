@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.internal.annotations;
+package dev.blocky.library.tixte.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is an annotation, which tells the developers that a method/class should be finish in the future.
+ * This is an annotation, which tells the developers since when a method/class is deprecated.
  *
  * @author BlockyDotJar
  * @version v1.0.0
@@ -29,10 +29,10 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.TYPE, ElementType.METHOD } )
-public @interface Deadline
+public @interface DeprecatedSince
 {
     /**
-     * @return The version, in which the <b>new</b> method/class should be finished
+     * @return The version, since when the method/class is deprecated
      */
     String version();
 }
