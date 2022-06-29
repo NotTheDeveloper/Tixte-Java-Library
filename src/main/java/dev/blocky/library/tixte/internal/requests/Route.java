@@ -19,7 +19,7 @@ import dev.blocky.library.tixte.annotations.Undocumented;
 
 /**
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.0-alpha.1
  * @since v1.0.0-alpha.3
  */
 @Undocumented

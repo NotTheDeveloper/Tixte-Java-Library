@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.0-alpha.3
  * @since v1.0.0-alpha.1
  */
 @Undocumented

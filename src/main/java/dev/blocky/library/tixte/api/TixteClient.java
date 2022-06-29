@@ -17,10 +17,11 @@ package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dev.blocky.library.tixte.annotations.Undocumented;
-import dev.blocky.library.tixte.internal.ratelimit.RateLimitInterceptor;
-import dev.blocky.library.tixte.internal.requests.ErrorResponse;
+import dev.blocky.library.tixte.internal.interceptor.ErrorResponseInterceptor;
+import dev.blocky.library.tixte.internal.interceptor.RateLimitInterceptor;
 import dev.blocky.library.tixte.internal.utils.TixteLogger;
 import okhttp3.*;
+import org.conscrypt.Conscrypt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -32,6 +33,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.security.Security;
 import java.util.Objects;
 
 import static dev.blocky.library.tixte.internal.requests.Route.Account.*;
@@ -49,12 +51,12 @@ import static dev.blocky.library.tixte.internal.requests.Route.SLASH;
  * @since v1.0.0-alpha.1
  */
 @Undocumented
-public strictfp class TixteClient extends ErrorResponse
+public strictfp class TixteClient
 {
     private final transient Logger logger = TixteLogger.getLog(TixteClient.class);
     private final transient Dispatcher dispatcher = new Dispatcher();
+    private final transient OkHttpClient client;
     private final transient String apiKey;
-    private transient volatile OkHttpClient client;
     private transient volatile String url, directURL, deletionURL, domain;
     private transient volatile String sessionToken, defaultDomain;
     private transient volatile Request request;
@@ -86,8 +88,11 @@ public strictfp class TixteClient extends ErrorResponse
 
         client = new OkHttpClient.Builder()
                 .addInterceptor(new RateLimitInterceptor())
+                .addInterceptor(new ErrorResponseInterceptor())
                 .dispatcher(dispatcher)
                 .build();
+
+        Security.insertProviderAt(Conscrypt.newProvider(), 1);
     }
 
     @Undocumented
@@ -110,8 +115,11 @@ public strictfp class TixteClient extends ErrorResponse
 
         client = new OkHttpClient.Builder()
                 .addInterceptor(new RateLimitInterceptor())
+                .addInterceptor(new ErrorResponseInterceptor())
                 .dispatcher(dispatcher)
                 .build();
+
+        Security.insertProviderAt(Conscrypt.newProvider(), 1);
     }
 
     @Undocumented
@@ -128,8 +136,11 @@ public strictfp class TixteClient extends ErrorResponse
 
         client = new OkHttpClient.Builder()
                 .addInterceptor(new RateLimitInterceptor())
+                .addInterceptor(new ErrorResponseInterceptor())
                 .dispatcher(dispatcher)
                 .build();
+
+        Security.insertProviderAt(Conscrypt.newProvider(), 1);
     }
 
     @NotNull
@@ -1098,7 +1109,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1119,7 +1129,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1147,8 +1156,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1177,8 +1184,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1211,8 +1216,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1241,8 +1244,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1272,8 +1273,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1304,8 +1303,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1340,8 +1337,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1372,8 +1367,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                return response.body().string();
             }
         }
@@ -1403,8 +1396,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1435,8 +1426,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1471,8 +1460,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1503,8 +1490,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1527,8 +1512,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1544,7 +1527,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1565,7 +1547,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1591,7 +1572,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1607,7 +1587,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1628,7 +1607,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1644,7 +1622,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1660,8 +1637,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
-
                 return response.body().string();
             }
         }
@@ -1684,7 +1659,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1712,7 +1686,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1735,7 +1708,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1763,7 +1735,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1785,7 +1756,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1812,7 +1782,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1828,7 +1797,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1844,7 +1812,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1860,7 +1827,6 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
                 return response.body().string();
             }
         }
@@ -1883,7 +1849,209 @@ public strictfp class TixteClient extends ErrorResponse
 
             try (Response response = client.newCall(request).execute())
             {
-                checkResponse(response);
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String setEmbedTitleRaw(@NotNull String title) throws IOException
+        {
+            if (title.isEmpty())
+            {
+                throw new IllegalArgumentException("\"title\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + CONFIG_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .patch(RequestBody.create(
+                            "{ \"embed\": { \"description\": \"" + getTixteConfig().getEmbedDescription() + "\", " +
+                                    "\"title\": \"" + title + "\", " +
+                                    "\"theme_color\": \"" + getTixteConfig().getEmbedThemeColor() + "\", " +
+                                    "\"author_name\": \"" + getTixteConfig().getEmbedAuthorName() + "\", " +
+                                    "\"author_url\": \"" + getTixteConfig().getEmbedAuthorURL() + "\", " +
+                                    "\"provider_name\": \"" + getTixteConfig().getEmbedProviderName() + "\", " +
+                                    "\"provider_url\": \"" + getTixteConfig().getEmbedProviderURL() + "\" } }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String setEmbedThemeColorRaw(@NotNull String themeColor) throws IOException
+        {
+            if (themeColor.isEmpty())
+            {
+                throw new IllegalArgumentException("\"themeColor\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + CONFIG_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .patch(RequestBody.create(
+                            "{ \"embed\": { \"description\": \"" + getTixteConfig().getEmbedDescription() + "\", " +
+                                    "\"title\": \"" + getTixteConfig().getEmbedTitle() + "\", " +
+                                    "\"theme_color\": \"" + themeColor + "\", " +
+                                    "\"author_name\": \"" + getTixteConfig().getEmbedAuthorName() + "\", " +
+                                    "\"author_url\": \"" + getTixteConfig().getEmbedAuthorURL() + "\", " +
+                                    "\"provider_name\": \"" + getTixteConfig().getEmbedProviderName() + "\", " +
+                                    "\"provider_url\": \"" + getTixteConfig().getEmbedProviderURL() + "\" } }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String setEmbedAuthorNameRaw(@NotNull String authorName) throws IOException
+        {
+            if (authorName.isEmpty())
+            {
+                throw new IllegalArgumentException("\"authorName\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + CONFIG_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .patch(RequestBody.create(
+                            "{ \"embed\": { \"description\": \"" + getTixteConfig().getEmbedDescription() + "\", " +
+                                    "\"title\": \"" + getTixteConfig().getEmbedTitle() + "\", " +
+                                    "\"theme_color\": \"" + getTixteConfig().getEmbedThemeColor() + "\", " +
+                                    "\"author_name\": \"" + authorName + "\", " +
+                                    "\"author_url\": \"" + getTixteConfig().getEmbedAuthorURL() + "\", " +
+                                    "\"provider_name\": \"" + getTixteConfig().getEmbedProviderName() + "\", " +
+                                    "\"provider_url\": \"" + getTixteConfig().getEmbedProviderURL() + "\" } }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String setEmbedAuthorURLRaw(@NotNull String authorURL) throws IOException
+        {
+            if (authorURL.isEmpty())
+            {
+                throw new IllegalArgumentException("\"authorURL\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + CONFIG_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .patch(RequestBody.create(
+                            "{ \"embed\": { \"description\": \"" + getTixteConfig().getEmbedDescription() + "\", " +
+                                    "\"title\": \"" + getTixteConfig().getEmbedTitle() + "\", " +
+                                    "\"theme_color\": \"" + getTixteConfig().getEmbedThemeColor() + "\", " +
+                                    "\"author_name\": \"" + getTixteConfig().getEmbedAuthorName() + "\", " +
+                                    "\"author_url\": \"" + authorURL + "\", " +
+                                    "\"provider_name\": \"" + getTixteConfig().getEmbedProviderName() + "\", " +
+                                    "\"provider_url\": \"" + getTixteConfig().getEmbedProviderURL() + "\" } }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String setEmbedProviderNameRaw(@NotNull String providerName) throws IOException
+        {
+            if (providerName.isEmpty())
+            {
+                throw new IllegalArgumentException("\"providerName\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + CONFIG_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .patch(RequestBody.create(
+                            "{ \"embed\": { \"description\": \"" + getTixteConfig().getEmbedDescription() + "\", " +
+                                    "\"title\": \"" + getTixteConfig().getEmbedTitle() + "\", " +
+                                    "\"theme_color\": \"" + getTixteConfig().getEmbedThemeColor() + "\", " +
+                                    "\"author_name\": \"" + getTixteConfig().getEmbedAuthorName() + "\", " +
+                                    "\"author_url\": \"" + getTixteConfig().getEmbedAuthorURL() + "\", " +
+                                    "\"provider_name\": \"" + providerName + "\", " +
+                                    "\"provider_url\": \"" + getTixteConfig().getEmbedProviderURL() + "\" } }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String setEmbedProviderURLRaw(@NotNull String providerURL) throws IOException
+        {
+            if (providerURL.isEmpty())
+            {
+                throw new IllegalArgumentException("\"providerURL\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + CONFIG_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .patch(RequestBody.create(
+                            "{ \"embed\": { \"description\": \"" + getTixteConfig().getEmbedDescription() + "\", " +
+                                    "\"title\": \"" + getTixteConfig().getEmbedTitle() + "\", " +
+                                    "\"theme_color\": \"" + getTixteConfig().getEmbedThemeColor() + "\", " +
+                                    "\"author_name\": \"" + getTixteConfig().getEmbedAuthorName() + "\", " +
+                                    "\"author_url\": \"" + getTixteConfig().getEmbedAuthorURL() + "\", " +
+                                    "\"provider_name\": \"" + getTixteConfig().getEmbedProviderName() + "\", " +
+                                    "\"provider_url\": \"" + providerURL + "\" } }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
+                return response.body().string();
+            }
+        }
+
+        @NotNull
+        @Undocumented
+        public String setEmbedDescriptionRaw(@NotNull String description) throws IOException
+        {
+            if (description.isEmpty())
+            {
+                throw new IllegalArgumentException("\"description\" cannot be undefined.");
+            }
+
+            request = new Request.Builder()
+                    .url(BASE_URL + CONFIG_ENDPOINT)
+                    .addHeader("Authorization", apiKey)
+                    .patch(RequestBody.create(
+                            "{ \"embed\": { \"description\": \"" + description + "\", " +
+                                    "\"title\": \"" + getTixteConfig().getEmbedTitle() + "\", " +
+                                    "\"theme_color\": \"" + getTixteConfig().getEmbedThemeColor() + "\", " +
+                                    "\"author_name\": \"" + getTixteConfig().getEmbedAuthorName() + "\", " +
+                                    "\"author_url\": \"" + getTixteConfig().getEmbedAuthorURL() + "\", " +
+                                    "\"provider_name\": \"" + getTixteConfig().getEmbedProviderName() + "\", " +
+                                    "\"provider_url\": \"" + getTixteConfig().getEmbedProviderURL() + "\" } }",
+                            MediaType.get("application/json")))
+                    .build();
+
+            try (Response response = client.newCall(request).execute())
+            {
                 return response.body().string();
             }
         }

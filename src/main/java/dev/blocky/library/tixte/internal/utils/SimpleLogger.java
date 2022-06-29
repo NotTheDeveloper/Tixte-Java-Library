@@ -37,7 +37,7 @@ import java.util.Properties;
  * A custom {@link SimpleLogger} (From slf4j-simple).
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.0-alpha.1
  * @since v1.0.0-alpha.3
  */
 class SimpleLogger extends MarkerIgnoringBase

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import dev.blocky.library.tixte.annotations.Undocumented;
 import dev.blocky.library.tixte.api.TixteClient;
 import dev.blocky.library.tixte.api.TixteClientBuilder;
-import dev.blocky.library.tixte.annotations.Undocumented;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -39,7 +40,7 @@ public class Main
     public static void main(@NotNull String[] args) throws IOException
     {
         TixteClient client = TixteClientBuilder.createClient(getAPIKey(), getSessionToken(), getDefaultDomain());
-        System.out.println(client.getRawTixteClient().getRawSize());
+        System.out.println(client.getRawTixteClient().setEmbedProviderNameRaw("Test"));
     }
 
     @NotNull
