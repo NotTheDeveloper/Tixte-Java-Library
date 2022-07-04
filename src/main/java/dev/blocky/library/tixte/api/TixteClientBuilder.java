@@ -26,12 +26,10 @@ import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import org.conscrypt.Conscrypt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.security.Security;
 import java.util.Objects;
 
 /**
@@ -144,9 +142,6 @@ public class TixteClientBuilder
                         .build();
                 break;
         }
-
-        Security.insertProviderAt(Conscrypt.newProvider(), 1);
-
         return new TixteClient();
     }
     @NotNull
