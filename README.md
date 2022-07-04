@@ -1,5 +1,5 @@
 [github-packages-shield]: https://img.shields.io/github/v/release/BlockyDotJar/Tixte-Java-Library
-[github-packages]: https://github.com/BlockyDotJar/Tixte-Java-Library/packages/1365003
+[github-packages]: https://github.com/BlockyDotJar/Tixte-Java-Library/packages/1520119
 
 ## Tixte Java Library
 
