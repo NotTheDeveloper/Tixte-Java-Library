@@ -94,8 +94,10 @@ public class Embed
     private volatile int length = -1;
     private final transient String description, color;
 
+    @Undocumented
     public Embed(@Nullable String authorName, @Nullable String authorUrl, @Nullable String title, @Nullable String description,
-          @Nullable String color, @Nullable String providerName, @Nullable String providerUrl) throws IOException {
+          @Nullable String color, @Nullable String providerName, @Nullable String providerUrl) throws IOException
+    {
         this.authorName = authorName;
         this.authorUrl = authorUrl;
         this.title = title;

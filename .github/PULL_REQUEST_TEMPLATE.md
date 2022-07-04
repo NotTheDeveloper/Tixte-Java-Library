@@ -4,10 +4,10 @@
 
 <!--
   There are several guidelines you should follow in order for your
-  Pull Request to be merged.
+  pull request to be merged.
 -->
 
-- [ ] I have checked the PRs for upcoming features/bug fixes.
+- [ ] I have checked the prs for upcoming features/bug fixes.
 - [ ] I have read the [contributing guidelines][contributing].
 
 <!--
@@ -19,14 +19,14 @@
 ### Changes
 
 - [ ] Internal code
-- [ ] Library interface (affecting end-user code) 
+- [ ] Library interface (affecting end-user code)
 - [ ] Documentation
 - [ ] Other: \_____ <!-- Insert other type here -->
 
 <!-- Replace "NaN" with an issue number if this is a response to an issue -->
 
-Closes Issue: NaN
+Closes issue: NaN
 
 ## Description
 
-Replace this sentence with general description of what your Pull Request does.
+Replace this sentence with general description of what your pull request does.

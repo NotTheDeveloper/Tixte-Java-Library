@@ -38,7 +38,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.4.0</version>
                 <configuration>
-                    <javadocExecutable>C:\Program Files\Java\jdk1.8.0_321\bin\javadoc</javadocExecutable>
+                    <javadocExecutable>C:\Program Files\Java\jdk1.8.0_333\bin\javadoc</javadocExecutable>
                 </configuration>
                 <executions>
                     <execution>
@@ -78,7 +78,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <fork>true</fork>
-                    <executable>C:\Program Files\Java\jdk1.8.0_321\bin\javac</executable>
+                    <executable>C:\Program Files\Java\jdk1.8.0_333\bin\javac</executable>
                 </configuration>
             </plugin>
             <plugin>

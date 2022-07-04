@@ -69,13 +69,19 @@ public class EmbedEditor
     /**
      * Returns a {@link Embed embed} that has been checked as being valid for sending.
      *
+     * @param accountType The type of account that is sending the embed
+     *
      * @throws java.lang.IllegalStateException
      *         If the embed is empty. Can be checked with {@link #isEmpty()}.
+     * @throws IOException If the request could not be executed due to cancellation,
+     *         a connectivity problem or timeout. Because networks can fail during an exchange,
+     *         it is possible that the remote server accepted the request before the failure.
      *
      * @return The built, sendable {@link Embed embed}
      */
     @NotNull
-    public Embed build(@NotNull AccountType accountType) throws IOException {
+    public Embed build(@NotNull AccountType accountType) throws IOException
+    {
         if (isEmpty())
         {
             throw new IllegalStateException("Cannot build an empty embed!");
