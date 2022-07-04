@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.internal.utils;
+package dev.blocky.library.tixte.internal.utils.logging;
 
 import dev.blocky.library.tixte.annotations.Undocumented;
 import org.slf4j.helpers.FormattingTuple;

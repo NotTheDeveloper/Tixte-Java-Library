@@ -15,7 +15,7 @@
  */
 package dev.blocky.library.tixte.internal.interceptor;
 
-import dev.blocky.library.tixte.internal.utils.Network;
+import dev.blocky.library.tixte.internal.requests.Network;
 import okhttp3.CacheControl;
 import okhttp3.Interceptor;
 import okhttp3.Request;

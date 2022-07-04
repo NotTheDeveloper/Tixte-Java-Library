@@ -15,8 +15,11 @@
  */
 
 import dev.blocky.library.tixte.annotations.Undocumented;
+import dev.blocky.library.tixte.api.AccountType;
+import dev.blocky.library.tixte.api.EmbedEditor;
 import dev.blocky.library.tixte.api.TixteClient;
 import dev.blocky.library.tixte.api.TixteClientBuilder;
+import dev.blocky.library.tixte.api.enums.UserCachePolicy;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -34,13 +37,22 @@ import java.nio.file.Paths;
 @Undocumented
 public class Main
 {
-    private static final File file = new File("C:\\Users\\Dominic\\Desktop\\Applications\\token\\secrets.json");
+    private static final File file = new File("C:\\Users\\Dominic\\Desktop\\Applications lel\\token\\secrets.json");
 
     @Undocumented
     public static void main(@NotNull String[] args) throws IOException
     {
-        TixteClient client = TixteClientBuilder.createClient(getAPIKey(), getSessionToken(), getDefaultDomain());
-        System.out.println(client.getRawTixteClient().setEmbedProviderNameRaw("Test"));
+        TixteClient client = TixteClientBuilder
+                .createClient(getAPIKey(), getSessionToken(), getDefaultDomain())
+                .build(UserCachePolicy.ALL);
+
+        EmbedEditor editor = client.getEmbedEditor();
+        editor.setAuthor("Cool Author", "https://www.google.com")
+                .setTitle("nice title")
+                .setDescription("cool description")
+                .setColor("#5d6dfd")
+                .setProvider("Cool Provider", "https://tryitands.ee")
+                .build(AccountType.CLIENT);
     }
 
     @NotNull
