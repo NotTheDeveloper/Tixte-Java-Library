@@ -18,12 +18,21 @@ package dev.blocky.library.tixte.api.exceptions;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * Exception thrown when a Tixte API-request is made and the server returns a 404 (Not Found) response.
+ *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-alpha.1
  */
 public class NotFound extends HTTPException
 {
+
+    /**
+     * Constructs an {@link HTTPException HTTPException} for the response code {@code 404} with the specified detail message.
+     * <br>A detail message is a String that describes this particular exception.
+     *
+     * @param message The detail message.
+     */
     public NotFound(@NotNull String message)
     {
         super(message);

@@ -28,10 +28,10 @@ import java.io.IOException;
  * Handles tixte caches using an {@link Interceptor}.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.1
  * @since v1.0.0-alpha.3
  */
-public class ForceCacheInterceptor implements Interceptor
+public strictfp class ForceCacheInterceptor implements Interceptor
 {
 
     @NotNull

@@ -15,163 +15,264 @@
  */
 package dev.blocky.library.tixte.api;
 
-import dev.blocky.library.tixte.annotations.Undocumented;
-import dev.blocky.library.tixte.api.entities.Embed;
-import dev.blocky.library.tixte.api.entities.SelfUser;
-import dev.blocky.library.tixte.api.entities.User;
-import dev.blocky.library.tixte.api.exceptions.HTTPException;
-import dev.blocky.library.tixte.api.systems.DomainSystem;
-import dev.blocky.library.tixte.api.systems.FileSystem;
-import okhttp3.Response;
+import dev.blocky.library.tixte.api.enums.CachePolicy;
+import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.CheckReturnValue;
+import com.google.errorprone.annotations.CheckReturnValue;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
 
-
 /**
+ * The core of Tixte4J.
+ * <br>Acts as a getting system of Tixte4J.
+ * <br>All parts of the API can be accessed starting from this class.
+ *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-alpha.1
  */
-@Undocumented
 public class TixteClient
 {
 
-    @Undocumented
+    /**
+     * Instantiates a <b>new</b> Tixte-Client.
+     */
     TixteClient()
     {
     }
 
-    @Undocumented
-    public boolean awaitTermination(long timeout, @Nullable TimeUnit unit) throws InterruptedException
-    {
-        return client.dispatcher().executorService().awaitTermination(timeout, unit == null ? TimeUnit.SECONDS : unit);
-    }
-
-    @Undocumented
-    public boolean awaitTermination(long timeout) throws InterruptedException
-    {
-        return client.dispatcher().executorService().awaitTermination(timeout, TimeUnit.SECONDS);
-    }
-
-    @Undocumented
-    public void shutdown()
-    {
-        client.dispatcher().executorService().shutdown();
-    }
-
-    @Undocumented
-    public void shutdownNow()
-    {
-        client.dispatcher().executorService().shutdownNow();
-    }
-
-    @Nullable
-    @Undocumented
-    public String getHeader() throws IOException
-    {
-        try (Response response = client.newCall(request).execute())
-        {
-            return Optional.ofNullable(response.headers().toString()).orElseThrow(() -> new HTTPException("No headers found. Probably because you use this method before a request is made."));
-        }
-    }
-
+    /**
+     * Gets the API-key, you specified with {@link TixteClientBuilder#create(String)}.
+     *
+     * @return The API-key, you specified with {@link TixteClientBuilder#create(String)}.
+     */
     @NotNull
-    @Undocumented
-    public static RawResponseData getRawResponseData()
-    {
-        return new RawResponseData();
-    }
-
-    @NotNull
-    @Undocumented
     public String getAPIKey()
     {
         return apiKey;
     }
 
+    /**
+     * Gets the session-token, you specified with {@link TixteClientBuilder#setSessionToken(String)}.
+     * <br>Note that you must specify a session-token before using this method.
+     *
+     * @return The session-token, you specified with {@link TixteClientBuilder#setSessionToken(String)}.
+     */
     @Nullable
-    @Undocumented
-    public String getSessionToken()
+    @CheckReturnValue
+    public Optional<String> getSessionToken()
     {
-        return Optional.ofNullable(sessionToken).orElseThrow(() -> new IllegalStateException("\"sessionToken\" is undefined."));
+        return Optional.ofNullable(sessionToken);
     }
 
+    /**
+     * Gets the default domain, you specified with {@link TixteClientBuilder#setDefaultDomain(String)}.
+     * <br>Note that you must specify a default domain before using this method.
+     *
+     * @return The default domain, you specified with {@link TixteClientBuilder#setDefaultDomain(String)}.
+     */
     @Nullable
-    @Undocumented
-    public String getDefaultDomain()
+    @CheckReturnValue
+    public Optional<String> getDefaultDomain()
     {
-        return Optional.ofNullable(defaultDomain).orElseThrow(() -> new IllegalStateException("\"defaultDomain\" is undefined."));
+        return Optional.ofNullable(defaultDomain);
     }
 
+    /**
+     * Represents the raw response data from Tixte API-requests.
+     *
+     * @return Instantiates a <b>new</b> Raw-Response.
+     */
     @NotNull
-    @Undocumented
+    public static RawResponseData getRawResponseData()
+    {
+        return new RawResponseData();
+    }
+
+    /**
+     * Represents your Tixte user-account.
+     *
+     * @return Instantiates a <b>new</b> Self-User.
+     */
+    @NotNull
     public SelfUser getSelfUser()
     {
         return new SelfUser();
     }
 
+    /**
+     * Represents a Tixte user-account.
+     *
+     * @param userName  A specific user-name
+     *
+     * @return Instantiates a <b>new</b> user.
+     */
     @Nullable
-    @Undocumented
     @CheckReturnValue
     public User getUserByName(@NotNull String userName)
     {
         return new User(userName);
     }
 
+    /**
+     * Represents a Tixte user-account.
+     *
+     * @param userId A specific user-id.
+     *
+     * @return Instantiates a <b>new</b> user.
+     */
     @Nullable
-    @Undocumented
     @CheckReturnValue
     public User getUserById(@NotNull String userId)
     {
         return new User(userId);
     }
 
+    /**
+     * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
+     *
+     * @return Instantiates a <b>new</b> File-System.
+     */
     @NotNull
-    @Undocumented
-    public FileSystem getFileSystem()
+    public MyFiles getFileSystem()
     {
-        return new FileSystem();
+        return new MyFiles();
     }
 
+    /**
+     * Represents the 'Domains' tab of the Tixte dashboard and everything else what Tixte offers you with domains.
+     *
+     * @return Instantiates a <b>new</b> Domain-System.
+     */
     @NotNull
-    @Undocumented
-    public DomainSystem getDomainSystem()
+    public Domains getDomainSystem()
     {
-        return new DomainSystem();
+        return new Domains();
     }
 
+    /**
+     * Builder system used to build {@link Embed embeds}.
+     *
+     * @return A <b>new</b> {@link EmbedEditor} instance, which can be used to create {@link Embed embeds}.
+     */
     @NotNull
-    @Undocumented
     public EmbedEditor getEmbedEditor()
     {
         return new EmbedEditor();
     }
 
+    /**
+     * Builder system used to build {@link Embed embeds}.
+     *
+     * @param editor The existing editor.
+     *
+     * @return An {@link EmbedEditor} using fields from an existing editor.
+     */
     @Nullable
-    @Undocumented
-    public EmbedEditor getEmbedEditor(@Nullable EmbedEditor builder)
+    @CheckReturnValue
+    public EmbedEditor getEmbedEditor(@Nullable EmbedEditor editor)
     {
-        return new EmbedEditor(builder);
+        return new EmbedEditor(editor);
     }
 
+    /**
+     * Builder system used to build {@link Embed embeds}.
+     *
+     * @param embed The embed.
+     *
+     * @return An {@link EmbedEditor} using fields in an existing embed.
+     */
     @Nullable
-    @Undocumented
+    @CheckReturnValue
     public EmbedEditor getEmbedEditor(@Nullable Embed embed)
     {
         return new EmbedEditor(embed);
     }
 
+    /**
+     * Represents the 'Page Design' tab of the Tixte dashboard.
+     *
+     * @return Instantiates a <b>new</b> Page-Design.
+     */
     @NotNull
-    @Undocumented
     public PageDesign getPageDesign()
     {
         return new PageDesign();
+    }
+
+    /**
+     * Gets the current {@link CachePolicy}.
+     * <br>The {@link CachePolicy} can be set by using {@link TixteClientBuilder#setCachePolicy(CachePolicy)}.
+     * <br>The default {@link CachePolicy} is {@link CachePolicy#DEFAULT}.
+     *
+     * @return The current {@link CachePolicy}.
+     */
+    @NotNull
+    public CachePolicy getCachePolicy()
+    {
+        return policy;
+    }
+
+    /**
+     * An HTTP request.
+     * <br>Instances of this class are immutable if their {@link Request#body()} is {@code null} or itself immutable.
+     * <br>Note that you must send a request to an endpoint before using this method.
+     *
+     * @return An HTTP request.
+     */
+    @Nullable
+    @CheckReturnValue
+    public Optional<Request> getRequest()
+    {
+        return Optional.ofNullable(request);
+    }
+
+    /**
+     * Gets the HTTP headers of the request.
+     * <br>Note that you must send a request to an endpoint before using this method.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @return The HTTP headers of the request.
+     */
+    @Nullable
+    @CheckReturnValue
+    public Optional<String> getHeader() throws IOException
+    {
+        try (Response response = client.newCall(request).execute())
+        {
+            return Optional.ofNullable(response.headers().toString());
+        }
+    }
+
+    /**
+     * Closes the cache and deletes all of its stored values.
+     * <br>This will delete all files in the cache directory including files that weren't created by the cache.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     */
+    public void pruneCache() throws IOException
+    {
+        try (Cache cache = client.cache())
+        {
+            cache.delete();
+        }
+    }
+
+    /**
+     * Cancel all calls currently enqueued or executing.
+     * <br>Includes calls executed both {@link Call#execute()} and {@link Call#enqueue(Callback)}.
+     */
+    public void cancelRequests()
+    {
+        client.dispatcher().cancelAll();
     }
 }

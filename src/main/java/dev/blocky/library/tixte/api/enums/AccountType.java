@@ -13,19 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.api;
-
-import dev.blocky.library.tixte.annotations.Undocumented;
+package dev.blocky.library.tixte.api.enums;
 
 /**
+ * Represents Discord account-types.
+ *
+ * @see #BOT
+ * @see #CLIENT
+ *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-beta.1
  */
-@Undocumented
 public enum AccountType
 {
+    /**
+     * Represents a Discord bot-account.
+     */
     BOT,
+
+    /**
+     * Represents a Discord user-account.
+     */
     CLIENT
 }
 

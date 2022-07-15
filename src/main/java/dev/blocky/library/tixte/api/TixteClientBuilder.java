@@ -15,8 +15,7 @@
  */
 package dev.blocky.library.tixte.api;
 
-import dev.blocky.library.tixte.annotations.Undocumented;
-import dev.blocky.library.tixte.api.enums.UserCachePolicy;
+import dev.blocky.library.tixte.api.enums.CachePolicy;
 import dev.blocky.library.tixte.internal.interceptor.CacheInterceptor;
 import dev.blocky.library.tixte.internal.interceptor.ErrorResponseInterceptor;
 import dev.blocky.library.tixte.internal.interceptor.ForceCacheInterceptor;
@@ -30,186 +29,169 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.util.Objects;
-
 /**
- * Used to create new {@link TixteClient} instances.
+ * Used to create <b>new</b> {@link TixteClient} instances.
+ * <br>
+ * <br>A single {@link TixteClientBuilder} can be reused multiple times.
+ * <br>Each call to {@link #build()} creates a <b>new</b> {@link TixteClient} instance using the same information.
  *
  * @author BlockyDotJar
- * @version v1.0.0-alpha.3
+ * @version v1.1.0
  * @since v1.0.0-alpha.1
  */
 public class TixteClientBuilder
 {
-    private final transient Logger logger = TixteLogger.getLog(TixteClient.class);
-    private final transient Dispatcher dispatcher = new Dispatcher();
-    static volatile String sessionToken, defaultDomain;
-    static volatile OkHttpClient client;
-    static volatile Request request;
-    static volatile String apiKey;
+    private final Logger logger = TixteLogger.getLog(TixteClient.class);
+    private final Dispatcher dispatcher = new Dispatcher();
+    static String apiKey, sessionToken, defaultDomain;
+    static CachePolicy policy;
+    static OkHttpClient client;
+    static Request request;
 
-    @Undocumented
-    TixteClientBuilder(@NotNull String apiKey, @Nullable String sessionToken, @Nullable String defaultDomain)
-    {
-        TixteClientBuilder.apiKey = apiKey;
-        TixteClientBuilder.sessionToken = sessionToken;
-        TixteClientBuilder.defaultDomain = defaultDomain;
-
-        Checks.notEmpty(apiKey, "apiKey");
-        Checks.noWhitespace(apiKey, "apiKey");
-
-        if (sessionToken.isEmpty() || sessionToken == null)
-        {
-            logger.warn("\"sessionToken\" is undefined.");
-        }
-
-        Checks.noWhitespace(sessionToken, "sessionToken");
-
-        if (defaultDomain.isEmpty() || defaultDomain == null)
-        {
-            logger.warn("\"defaultDomain\" is undefined.");
-        }
-
-        Checks.noWhitespace(defaultDomain, "defaultDomain");
-    }
-
-    @Undocumented
-    TixteClientBuilder(@NotNull String apiKey, @Nullable String sessionToken)
-    {
-        TixteClientBuilder.apiKey = apiKey;
-        TixteClientBuilder.sessionToken = sessionToken;
-
-        Checks.notEmpty(apiKey, "apiKey");
-        Checks.noWhitespace(apiKey, "apiKey");
-
-        if (sessionToken.isEmpty() || sessionToken == null)
-        {
-            logger.warn("\"sessionToken\" is undefined.");
-        }
-
-        Checks.noWhitespace(sessionToken, "sessionToken");
-    }
-
-    @Undocumented
-    TixteClientBuilder(@NotNull String apiKey)
-    {
-        TixteClientBuilder.apiKey = apiKey;
-
-        Checks.notEmpty(apiKey, "apiKey");
-        Checks.noWhitespace(apiKey, "apiKey");
-    }
-
+    /**
+     * Creates a <b>new</b> {@link TixteClientBuilder} instance by initializing the builder with your API-key.
+     * <br>
+     * There also will be set a policy which decides whether there should be created a cache or not.
+     * <br>This will be called throughout Tixte4J when data gets constructed or modified and allows for a dynamically
+     * adjusting cache.
+     * <br>When {@link dev.blocky.library.tixte.api.TixteClient#pruneCache() TixteClient#pruneCache()} is called, the
+     * configured policy will be used to unload any data that the policy has decided not to cache.
+     * <br>If null the cache-policy will be set to {@link CachePolicy#DEFAULT DEFAULT}.
+     *
+     * @param apiKey The API-key to use.
+     * @param policy The cache-policy, which should be used.
+     *
+     * @return Instantiates a <b>new</b> Tixte-Client-Builder.
+     */
     @NotNull
-    @Undocumented
-    public TixteClient build(@Nullable UserCachePolicy policy)
+    public TixteClientBuilder create(@NotNull String apiKey, @Nullable CachePolicy policy)
+    {
+        Checks.notEmpty(apiKey, "apiKey");
+        Checks.noWhitespace(apiKey, "apiKey");
+
+        if (policy == null)
+        {
+            policy = CachePolicy.DEFAULT;
+            logger.info("'policy' equals null, setting to DEFAULT");
+        }
+
+        TixteClientBuilder.apiKey = apiKey;
+        TixteClientBuilder.policy = policy;
+        return this;
+    }
+
+    /**
+     * Creates a <b>new</b> {@link TixteClientBuilder} instance by initializing the builder with your API-key.
+     *
+     * @param apiKey The API-key to use.
+     *
+     * @return Instantiates a <b>new</b> Tixte-Client-Builder.
+     */
+    @NotNull
+    public TixteClientBuilder create(@NotNull String apiKey)
+    {
+        return create(apiKey, null);
+    }
+
+    /**
+     * Creates a <b>new</b> {@link TixteClientBuilder} instance by initializing the builder with your session-token.
+     *
+     * @param sessionToken The session-token to use.
+     *
+     * @return Instantiates a <b>new</b> Tixte-Client-Builder.
+     */
+    @NotNull
+    public TixteClientBuilder setSessionToken(@NotNull String sessionToken)
+    {
+        Checks.notEmpty(sessionToken, "sessionToken");
+        Checks.noWhitespace(sessionToken, "sessionToken");
+
+        TixteClientBuilder.sessionToken = sessionToken;
+        return this;
+    }
+
+    /**
+     * Creates a <b>new</b> {@link TixteClientBuilder} instance by initializing the builder with your default domain.
+     *
+     * @param defaultDomain The default domain to use.
+     *
+     * @return Instantiates a <b>new</b> Tixte-Client-Builder.
+     */
+    @NotNull
+    public TixteClientBuilder setDefaultDomain(@NotNull String defaultDomain)
+    {
+        Checks.notEmpty(defaultDomain, "defaultDomain");
+        Checks.noWhitespace(defaultDomain, "defaultDomain");
+
+        TixteClientBuilder.defaultDomain = defaultDomain;
+        return this;
+    }
+
+    /**
+     * Policy which decides whether there should be created a cache or not.
+     * <br>This will be called throughout Tixte4J when data gets constructed or modified and allows for a dynamically
+     * adjusting cache.
+     * <br>When {@link dev.blocky.library.tixte.api.TixteClient#pruneCache() TixteClient#pruneCache()} is called, the
+     * configured policy will be used to unload any data that the policy has decided not to cache.
+     * <br>If null the cache-policy will be set to {@link CachePolicy#DEFAULT DEFAULT}.
+     *
+     * @param policy The cache-policy, which should be used.
+     *
+     * @return Instantiates a <b>new</b> Tixte-Client-Builder.
+     */
+    @NotNull
+    public TixteClientBuilder setCachePolicy(@Nullable CachePolicy policy)
+    {
+        if (policy == null)
+        {
+            policy = CachePolicy.DEFAULT;
+            logger.info("'policy' equals null, setting to DEFAULT");
+        }
+
+        TixteClientBuilder.policy = policy;
+        return this;
+    }
+
+    /**
+     * Builds a <b>new</b> {@link TixteClient} instance and uses the provided token to start the login process.
+     * <br>In this method there will be set a rate-limit for max. 100 requests per host.
+     * <br>Here also will be built a {@link OkHttpClient} instance, in which every interceptor will be set.
+     * <br>You can also set the {@link CachePolicy} by calling {@link #setCachePolicy(CachePolicy)}, which will be used here.
+     *
+     * @return A {@link TixteClient} instance that has started the login process.
+     */
+    @NotNull
+    public TixteClient build()
     {
         dispatcher.setMaxRequestsPerHost(100);
 
-        Checks.notNull(policy, "policy");
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .dispatcher(dispatcher)
+                .addInterceptor(new RateLimitInterceptor())
+                .addInterceptor(new ErrorResponseInterceptor());
 
         switch (policy)
         {
             case DEFAULT:
-                client = new OkHttpClient.Builder()
-                        .addInterceptor(new RateLimitInterceptor())
-                        .addInterceptor(new ErrorResponseInterceptor())
-                        .dispatcher(dispatcher)
-                        .build();
+                client = builder.build();
                 break;
-            case ONLY_FORCE:
-                client = new OkHttpClient.Builder()
-                        .addInterceptor(new RateLimitInterceptor())
-                        .addInterceptor(new ErrorResponseInterceptor())
+            case ONLY_FORCE_CACHE:
+                client = builder
                         .addInterceptor(new ForceCacheInterceptor())
-                        .dispatcher(dispatcher)
                         .build();
                 break;
-            case ONLY_NETWORK:
-                client = new OkHttpClient.Builder()
-                        .addInterceptor(new RateLimitInterceptor())
-                        .addInterceptor(new ErrorResponseInterceptor())
+            case ONLY_NETWORK_CACHE:
+                client = builder
                         .addNetworkInterceptor(new CacheInterceptor())
-                        .dispatcher(dispatcher)
                         .build();
                 break;
             case ALL:
-                client = new OkHttpClient.Builder()
-                        .addInterceptor(new RateLimitInterceptor())
-                        .addInterceptor(new ErrorResponseInterceptor())
+                client = builder
                         .addInterceptor(new ForceCacheInterceptor())
                         .addNetworkInterceptor(new CacheInterceptor())
-                        .dispatcher(dispatcher)
                         .build();
                 break;
         }
         return new TixteClient();
-    }
-    @NotNull
-    @Undocumented
-    public static TixteClientBuilder createClient(@NotNull String apiKey, @Nullable String sessionKey, @Nullable String defaultDomain)
-    {
-        return new TixteClientBuilder(apiKey, sessionKey, defaultDomain);
-    }
-
-    @NotNull
-    @Undocumented
-    public static TixteClientBuilder createClient(@NotNull String apiKey, @Nullable String sessionKey)
-    {
-        return new TixteClientBuilder(apiKey, sessionKey);
-    }
-
-    @NotNull
-    @Undocumented
-    public static TixteClientBuilder createClient(@NotNull String apiKey)
-    {
-        return new TixteClientBuilder(apiKey);
-    }
-
-    @NotNull
-    @Undocumented
-    public TixteClientBuilder setSessionToken(@NotNull String sessionToken)
-    {
-        TixteClientBuilder.sessionToken = sessionToken;
-        return this;
-    }
-
-    @NotNull
-    @Undocumented
-    public TixteClientBuilder setDefaultDomain(@NotNull String defaultDomain)
-    {
-        TixteClientBuilder.defaultDomain = defaultDomain;
-        return this;
-    }
-
-    @Override
-    public boolean equals(@Nullable Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        TixteClientBuilder that = (TixteClientBuilder) o;
-
-        return dispatcher.equals(that.dispatcher);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(dispatcher);
-    }
-
-    @Override
-    public String toString()
-    {
-        return "TixteClientBuilder{" +
-                "dispatcher=" + dispatcher +
-                '}';
     }
 }

@@ -16,9 +16,10 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import dev.blocky.library.tixte.annotations.Undocumented;
+import dev.blocky.library.tixte.api.enums.AccountType;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import okhttp3.*;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,27 +29,40 @@ import java.io.IOException;
 import java.net.URI;
 
 import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
-import static dev.blocky.library.tixte.internal.requests.Route.Account.*;
+import static dev.blocky.library.tixte.internal.requests.Route.Account.ACCOUNT_ENDPOINT;
+import static dev.blocky.library.tixte.internal.requests.Route.Account.USERS_ENDPOINT;
 import static dev.blocky.library.tixte.internal.requests.Route.BASE_URL;
 import static dev.blocky.library.tixte.internal.requests.Route.Config.CONFIG_ENDPOINT;
 import static dev.blocky.library.tixte.internal.requests.Route.Domain.ACCOUNT_DOMAINS_ENDPOINT;
 import static dev.blocky.library.tixte.internal.requests.Route.Domain.DOMAINS_ENDPOINT;
 import static dev.blocky.library.tixte.internal.requests.Route.File.*;
-import static dev.blocky.library.tixte.internal.requests.Route.File.PAGE;
 import static dev.blocky.library.tixte.internal.requests.Route.Resources.GENERATE_DOMAIN_ENDPOINT;
 import static dev.blocky.library.tixte.internal.requests.Route.SLASH;
 
 /**
+ * Represents the raw response data from Tixte API-requests.
+ *
  * @author BlockyDotJar
  * @version v1.0.0
  * @since v1.0.0-beta.1
  */
-@Undocumented
-public class RawResponseData
+public strictfp class RawResponseData
 {
 
+    /**
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see MyFiles#getUsedSize() MyFiles#getUsedSize()
+     * @see MyFiles#getLimit() MyFiles#getLimit()
+     * @see MyFiles#getPremiumTier() MyFiles#getPremiumTier()
+     * @see SelfUser#hasTixteTurboSubscription() SelfUser#hasTixteTurboSubscription()
+     * @see SelfUser#hasTixteTurboChargedSubscription() SelfUser#hasTixteTurboChargedSubscription()
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
     public String getRawSize() throws IOException
     {
         request = new Request.Builder()
@@ -62,8 +76,29 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param page The page you want to get the xyz from.
+     * 
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *                      
+     * @see MyFiles#getTotalUploadCount() 
+     * @see MyFiles#getResults(int)
+     * @see MyFiles#getPermissionLevel(int, int) 
+     * @see MyFiles#getExtension(int, int) 
+     * @see MyFiles#getSize(int, int) 
+     * @see MyFiles#getUploadDate(int, int) 
+     * @see MyFiles#getName(int, int) 
+     * @see MyFiles#getDomain(int, int) 
+     * @see MyFiles#getMimeType(int, int) 
+     * @see MyFiles#getExpirationTime(int, int) 
+     * @see MyFiles#getAssetId(int, int) 
+     * @see MyFiles#getType(int, int) 
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
     public String getRawUploads(int page) throws IOException
     {
         Checks.notNegative(page, "page");
@@ -79,8 +114,18 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param file The file to be uploaded.
+     * 
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *                      
+     * @see MyFiles#uploadFile(File) 
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
     public String uploadFileRaw(@NotNull File file) throws IOException
     {
         if (!file.exists())
@@ -100,16 +145,26 @@ public class RawResponseData
                 )
                 .build();
 
-        try (
-                Response response = client.newCall(request).execute())
+        try (Response response = client.newCall(request).execute())
         {
             return response.body().string();
         }
     }
 
+    /**
+     * @param file The file to be uploaded.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *                      
+     * @see MyFiles#uploadPrivateFile(File)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String uploadFilePrivateRaw(@NotNull File file) throws IOException
+    @ApiStatus.Experimental
+    public String uploadPrivateFileRaw(@NotNull File file) throws IOException
     {
         if (!file.exists())
         {
@@ -135,8 +190,19 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param file The file to be uploaded.
+     * @param domain The domain to upload the file to.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *                      
+     * @see MyFiles#uploadFile(File, String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
     public String uploadFileRaw(@NotNull File file, @NotNull String domain) throws IOException
     {
         if (!file.exists())
@@ -165,9 +231,21 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param file The file to be uploaded.
+     * @param domain The domain to upload the file to.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see MyFiles#uploadPrivateFile(File, String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String uploadFilePrivateRaw(@NotNull File file, @NotNull String domain) throws IOException
+    @ApiStatus.Experimental
+    public String uploadPrivateFileRaw(@NotNull File file, @NotNull String domain) throws IOException
     {
         if (!file.exists())
         {
@@ -196,8 +274,18 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param filePath The {@link URI} to initialize the file, which should be uploaded.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see MyFiles#uploadFile(URI)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
     public String uploadFileRaw(@NotNull URI filePath) throws IOException
     {
         File file = new File(filePath);
@@ -225,9 +313,20 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param filePath The {@link URI} to initialize the file, which should be uploaded.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see MyFiles#uploadPrivateFile(URI)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String uploadFilePrivateRaw(@NotNull URI filePath) throws IOException
+    @ApiStatus.Experimental
+    public String uploadPrivateFileRaw(@NotNull URI filePath) throws IOException
     {
         File file = new File(filePath);
 
@@ -255,8 +354,19 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param filePath The {@link URI} to initialize the file, which should be uploaded.
+     * @param domain The domain to upload the file to.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see MyFiles#uploadFile(URI, String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
     public String uploadFileRaw(@NotNull URI filePath, @NotNull String domain) throws IOException
     {
         File file = new File(filePath);
@@ -287,9 +397,21 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param filePath The {@link URI} to initialize the file, which should be uploaded.
+     * @param domain The domain to upload the file to.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see MyFiles#uploadPrivateFile(URI, String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String uploadFilePrivateRaw(@NotNull URI filePath, @NotNull String domain) throws IOException
+    @ApiStatus.Experimental
+    public String uploadPrivateFileRaw(@NotNull URI filePath, @NotNull String domain) throws IOException
     {
         File file = new File(filePath);
 
@@ -320,18 +442,28 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param filePath The string to initialize the file, which should be uploaded.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see MyFiles#uploadFile(String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
     public String uploadFileRaw(@NotNull String filePath) throws IOException
     {
+        Checks.notEmpty(filePath, "filePath");
+
         File file = new File(filePath);
 
         if (!file.exists())
         {
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
-
-        Checks.notEmpty(filePath, "filePath");
 
         request = new Request.Builder()
                 .url(BASE_URL + UPLOAD_ENDPOINT)
@@ -351,18 +483,29 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param filePath The string to initialize the file, which should be uploaded.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see MyFiles#uploadPrivateFile(String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String uploadFilePrivateRaw(@NotNull String filePath) throws IOException
+    @ApiStatus.Experimental
+    public String uploadPrivateFileRaw(@NotNull String filePath) throws IOException
     {
+        Checks.notEmpty(filePath, "filePath");
+
         File file = new File(filePath);
 
         if (!file.exists())
         {
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
-
-        Checks.notEmpty(filePath, "filePath");
 
         request = new Request.Builder()
                 .url(BASE_URL + UPLOAD_ENDPOINT)
@@ -383,18 +526,29 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param filePath The string to initialize the file, which should be uploaded.
+     * @param domain The domain to upload the file to.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see MyFiles#uploadFile(String, String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
     public String uploadFileRaw(@NotNull String filePath, @NotNull String domain) throws IOException
     {
+        Checks.notEmpty(filePath, "filePath");
+
         File file = new File(filePath);
 
         if (!file.exists())
         {
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
-
-        Checks.notEmpty(filePath, "filePath");
 
         Checks.notEmpty(domain, "domain");
         Checks.noWhitespace(domain, "domain");
@@ -417,18 +571,30 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param filePath The string to initialize the file, which should be uploaded.
+     * @param domain The domain to upload the file to.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see MyFiles#uploadPrivateFile(String, String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String uploadFilePrivateRaw(@NotNull String filePath, @NotNull String domain) throws IOException
+    @ApiStatus.Experimental
+    public String uploadPrivateFileRaw(@NotNull String filePath, @NotNull String domain) throws IOException
     {
+        Checks.notEmpty(filePath, "filePath");
+
         File file = new File(filePath);
 
         if (!file.exists())
         {
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
-
-        Checks.notEmpty(filePath, "filePath");
 
         Checks.notEmpty(domain, "domain");
         Checks.noWhitespace(domain, "domain");
@@ -452,8 +618,18 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param fileId The ID of the file as a string.
+     * 
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *                      
+     * @see MyFiles#deleteFile(String) 
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
     @CanIgnoreReturnValue
     public String deleteFileRaw(@NotNull String fileId) throws IOException
     {
@@ -472,9 +648,59 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param password The password of your Tixte account.
+     * 
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *                      
+     * @see MyFiles#purgeFiles(String) 
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String getRawUserInfo() throws IOException
+    @CanIgnoreReturnValue
+    public String purgeFilesRaw(@NotNull String password) throws IOException
+    {
+        Checks.notEmpty(password, "password");
+        Checks.noWhitespace(password, "password");
+
+        request = new Request.Builder()
+                .url(BASE_URL + FILE_ENDPOINT)
+                .addHeader("Authorization", sessionToken)
+                .delete(RequestBody.create("{ \"password\": \"" + password + "\", \"purge\": true }",
+                        MediaType.parse("application/json")))
+                .build();
+
+        try (Response response = client.newCall(request).execute())
+        {
+            return response.body().string();
+        }
+    }
+
+    /**
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *                      
+     * @see MyFiles#getUploadRegion() 
+     * @see SelfUser#getUsername() 
+     * @see SelfUser#getId() 
+     * @see SelfUser#getEmail() 
+     * @see SelfUser#getAvatarId() 
+     * @see SelfUser#getFlagCount() 
+     * @see SelfUser#getPremiumTier() 
+     * @see SelfUser#getPhoneNumber() 
+     * @see SelfUser#getLastLogin() 
+     * @see SelfUser#hasMFAEnabled() 
+     * @see SelfUser#isEmailVerified() 
+     * @see SelfUser#getUploadRegion() 
+     *
+     * @return The raw response of the request.
+     */
+    @NotNull
+    public String getUserInfoRaw() throws IOException
     {
         request = new Request.Builder()
                 .url(BASE_URL + ACCOUNT_ENDPOINT)
@@ -487,9 +713,22 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param userData A user-id oder user-name.
+     * 
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *                      
+     * @see User#getFlagCount() 
+     * @see User#getAvatarId() 
+     * @see User#getId() 
+     * @see User#getUsername() 
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String getRawUserInfo(@NotNull String userData) throws IOException
+    public String getUserInfoRaw(@NotNull String userData) throws IOException
     {
         Checks.notEmpty(userData, "userData");
         Checks.noWhitespace(userData, "userData");
@@ -505,35 +744,20 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see Domains#getUploadCount(int)
+     * @see Domains#getDomainName(int) 
+     * @see Domains#getOwnerId(int) 
+     * @see Domains#getDomainCount() 
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String getRawUserInfo(@NotNull String userData, @NotNull String sessionToken) throws IOException
-    {
-        Checks.notEmpty(userData, "userData");
-        Checks.noWhitespace(userData, "userData");
-
-        Checks.notEmpty(sessionToken, "sessionToken");
-        Checks.noWhitespace(sessionToken, "sessionToken");
-
-        if (userData.isEmpty())
-        {
-            throw new IllegalArgumentException("\"userData\" cannot be undefined.");
-        }
-
-        request = new Request.Builder()
-                .url(BASE_URL + USERS_ENDPOINT + userData)
-                .addHeader("Authorization", sessionToken)
-                .build();
-
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
-    }
-
-    @NotNull
-    @Undocumented
-    public String getRawUserDomains() throws IOException
+    public String getUserDomainsRaw() throws IOException
     {
         request = new Request.Builder()
                 .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
@@ -546,27 +770,19 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see Domains#getUsableDomains(int)
+     * @see Domains#getUsableDomainCount()
+     * @see Domains#isActive(int)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String getRawUserDomains(@NotNull String sessionToken) throws IOException
-    {
-        Checks.notEmpty(sessionToken, "sessionToken");
-        Checks.noWhitespace(sessionToken, "sessionToken");
-
-        request = new Request.Builder()
-                .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
-                .addHeader("Authorization", sessionToken)
-                .build();
-
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
-    }
-
-    @NotNull
-    @Undocumented
-    public String getRawOwnedDomains() throws IOException
+    public String getUsableDomainsRaw() throws IOException
     {
         request = new Request.Builder()
                 .url(BASE_URL + DOMAINS_ENDPOINT)
@@ -579,9 +795,17 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see Domains#generateDomain()
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String generateRawDomain() throws IOException
+    public String generateDomainRaw() throws IOException
     {
         request = new Request.Builder()
                 .url(BASE_URL + GENERATE_DOMAIN_ENDPOINT)
@@ -594,8 +818,19 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param domainName The domain name.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see Domains#addSubdomain(String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
+    @CanIgnoreReturnValue
     public String addSubdomainRaw(@NotNull String domainName) throws IOException
     {
         Checks.notEmpty(domainName, "domainName");
@@ -614,31 +849,19 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param domainName The domain name.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see Domains#addCustomDomain(String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String addSubdomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException
-    {
-        Checks.notEmpty(domainName, "domainName");
-        Checks.noWhitespace(domainName, "domainName");
-
-        Checks.notEmpty(sessionToken, "sessionToken");
-        Checks.noWhitespace(sessionToken, "sessionToken");
-
-        request = new Request.Builder()
-                .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
-                .addHeader("Authorization", sessionToken)
-                .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": false }",
-                        MediaType.get("application/json")))
-                .build();
-
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
-    }
-
-    @NotNull
-    @Undocumented
+    @CanIgnoreReturnValue
     public String addCustomDomainRaw(@NotNull String domainName) throws IOException
     {
         Checks.notEmpty(domainName, "domainName");
@@ -657,31 +880,18 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param domainName The domain name.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see Domains#deleteDomain(String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String addCustomDomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException
-    {
-        Checks.notEmpty(domainName, "domainName");
-        Checks.noWhitespace(domainName, "domainName");
-
-        Checks.notEmpty(sessionToken, "sessionToken");
-        Checks.noWhitespace(sessionToken, "sessionToken");
-
-        request = new Request.Builder()
-                .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
-                .addHeader("Authorization", sessionToken)
-                .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": true }",
-                        MediaType.get("application/json")))
-                .build();
-
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
-    }
-
-    @NotNull
-    @Undocumented
     public String deleteDomainRaw(@NotNull String domainName) throws IOException
     {
         Checks.notEmpty(domainName, "domainName");
@@ -699,31 +909,17 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see SelfUser#getAPIKeyBySessionToken()
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String deleteDomainRaw(@NotNull String domainName, @NotNull String sessionToken) throws IOException
-    {
-        Checks.notEmpty(domainName, "domainName");
-        Checks.noWhitespace(domainName, "domainName");
-
-        Checks.notEmpty(sessionToken, "sessionToken");
-        Checks.noWhitespace(sessionToken, "sessionToken");
-
-        request = new Request.Builder()
-                .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT + SLASH + domainName)
-                .addHeader("Authorization", sessionToken)
-                .delete()
-                .build();
-
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
-    }
-
-    @NotNull
-    @Undocumented
-    public String getRawAPIKeyBySessionToken() throws IOException
+    public String getAPIKeyBySessionTokenRaw() throws IOException
     {
         request = new Request.Builder()
                 .url(BASE_URL + ACCOUNT_ENDPOINT + "/keys")
@@ -736,27 +932,24 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see EmbedEditor#getEmbedDescription()
+     * @see EmbedEditor#getEmbedAuthorName()
+     * @see EmbedEditor#getEmbedAuthorURL()
+     * @see EmbedEditor#getEmbedTitle()
+     * @see EmbedEditor#getEmbedProviderName()
+     * @see EmbedEditor#getEmbedProviderURL()
+     * @see EmbedEditor#getEmbedThemeColor()
+     * @see PageDesign#getCustomCSS()
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
-    public String getRawAPIKeyBySessionToken(@NotNull String sessionToken) throws IOException
-    {
-        Checks.notEmpty(sessionToken, "sessionToken");
-        Checks.noWhitespace(sessionToken, "sessionToken");
-
-        request = new Request.Builder()
-                .url(BASE_URL + KEYS_ENDPOINT)
-                .addHeader("Authorization", sessionToken)
-                .build();
-
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
-    }
-
-    @NotNull
-    @Undocumented
-    public String getRawConfig() throws IOException
+    public String getConfigRaw() throws IOException
     {
         request = new Request.Builder()
                 .url(BASE_URL + CONFIG_ENDPOINT)
@@ -769,8 +962,18 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param customCSS The custom CSS code for your page design.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see PageDesign#setCustomCSS(String)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
     @CanIgnoreReturnValue
     public String setCustomCSSRaw(@NotNull String customCSS) throws IOException
     {
@@ -787,8 +990,24 @@ public class RawResponseData
         }
     }
 
+    /**
+     * @param authorName The author name to be built.
+     * @param authorURL The author url to be built.
+     * @param title The title to be built.
+     * @param description The description to be built.
+     * @param color The color to be built.
+     * @param providerName The provider name to be built.
+     * @param providerURL The provider url to be built.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see Embed#Embed(String, String, String, String, String, String, String, AccountType)
+     *
+     * @return The raw response of the request.
+     */
     @NotNull
-    @Undocumented
     @CanIgnoreReturnValue
     public String setEmbedRaw(@Nullable String description, @Nullable String title, @Nullable String color,
                               @Nullable String authorName, @Nullable String authorURL, @Nullable String providerName,

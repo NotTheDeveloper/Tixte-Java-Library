@@ -15,24 +15,26 @@
  */
 package dev.blocky.library.tixte.annotations;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * This is an annotation, which tells the developers that a method/class should be finish in the future.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-alpha.1
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.TYPE, ElementType.METHOD } )
+@Retention(RUNTIME)
+@Target( { TYPE, METHOD } )
 public @interface Deadline
 {
     /**
-     * @return The version, in which the <b>new</b> method/class should be finished
+     * @return The version, in which the <b>new</b> method/class should be finished.
      */
     String version();
 }

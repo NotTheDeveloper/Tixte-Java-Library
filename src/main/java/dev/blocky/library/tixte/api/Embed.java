@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.api.entities;
+package dev.blocky.library.tixte.api;
 
-import dev.blocky.library.tixte.annotations.Undocumented;
-import dev.blocky.library.tixte.api.AccountType;
-import dev.blocky.library.tixte.api.EmbedEditor;
-import dev.blocky.library.tixte.internal.utils.Checks;
+import com.google.errorprone.annotations.CheckReturnValue;
+import dev.blocky.library.tixte.api.enums.AccountType;
+import dev.blocky.library.tixte.internal.utils.Helpers;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -26,49 +26,51 @@ import java.io.IOException;
 import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
 
 /**
+ * Represents an embed displayed by Discord.
+ * <br>This class has many possibilities for null values, so be careful!
+ *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-beta.1
  */
-@Undocumented
 public class Embed
 {
     /**
      * The maximum length an embed title can have.
      *
-     * @see EmbedEditor#setTitle(String) EmbedEditor.setTitle(title)
+     * @see EmbedEditor#setTitle(String)
      */
-    public static final int TITLE_MAX_LENGTH = 256;
+    static final int TITLE_MAX_LENGTH = 256;
 
     /**
      * The maximum length the author name of an embed can have.
      *
-     * @see EmbedEditor#setAuthorName(String) (String) EmbedEditor.setAuthor(title)
-     * @see EmbedEditor#setAuthor(String, String) EmbedEditor.setAuthor(title, url)
+     * @see EmbedEditor#setAuthorName(String)
+     * @see EmbedEditor#setAuthor(String, String)
      */
-    public static final int AUTHOR_MAX_LENGTH = 256;
+    static final int AUTHOR_MAX_LENGTH = 256;
 
     /**
      * The maximum length the provider name of an embed can have.
      *
-     * @see EmbedEditor#setProviderName(String) EmbedEditor.setProvider(title)
-     * @see EmbedEditor#setProvider(String, String) EmbedEditor.setProvider(title, url)
+     * @see EmbedEditor#setProviderName(String)
+     * @see EmbedEditor#setProvider(String, String)
      */
-    public static final int PROVIDER_MAX_LENGTH = 256;
+    static final int PROVIDER_MAX_LENGTH = 256;
 
     /**
      * The maximum length the description of an embed can have.
      *
-     * @see EmbedEditor#setDescription(CharSequence) EmbedEditor.setDescription(text)
+     * @see EmbedEditor#setDescription(CharSequence)
      */
-    public static final int DESCRIPTION_MAX_LENGTH = 4096;
+    static final int DESCRIPTION_MAX_LENGTH = 4096;
 
     /**
      * The maximum length any URL can have inside an embed.
      *
-     * @see EmbedEditor#setAuthor(String, String) EmbedEditor.setAuthor(text, url)
+     * @see EmbedEditor#setAuthor(String, String)
      */
-    public static final int URL_MAX_LENGTH = 2000;
+    static final int URL_MAX_LENGTH = 2000;
 
     /**
      * The maximum amount of total visible characters an embed can have.
@@ -77,7 +79,7 @@ public class Embed
      * @see EmbedEditor#setDescription(CharSequence)
      * @see EmbedEditor#setTitle(String)
      */
-    public static final int EMBED_MAX_LENGTH_BOT = 6000;
+    static final int EMBED_MAX_LENGTH_BOT = 6000;
 
     /**
      * The maximum amount of total visible characters an embed can have.
@@ -86,17 +88,33 @@ public class Embed
      * @see EmbedEditor#setDescription(CharSequence)
      * @see EmbedEditor#setTitle(String)
      */
-    public static final int EMBED_MAX_LENGTH_CLIENT = 2000;
+    static final int EMBED_MAX_LENGTH_CLIENT = 2000;
 
-    private final transient String authorName, authorUrl, title;
-    private final transient String providerName, providerURL;
-    private final transient Object mutex = new Object();
-    private volatile int length = -1;
-    private final transient String description, color;
+    private final String authorName, authorUrl, title;
+    private final String providerName, providerURL;
+    private final String description, color;
+    private final Object mutex = new Object();
+    private final AccountType accountType;
+    private int length = -1;
 
-    @Undocumented
+    /**
+     * Instantiates a <b>new</b> embed.
+     *
+     * @param authorName   The author name to be built.
+     * @param authorUrl    The author url to be built.
+     * @param title        The title to be built.
+     * @param description  The description to be built.
+     * @param color        The color to be built.
+     * @param providerName The provider name to be built.
+     * @param providerUrl  The provider url to be built.
+     * @param accountType  The account type to be built.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     */
     public Embed(@Nullable String authorName, @Nullable String authorUrl, @Nullable String title, @Nullable String description,
-          @Nullable String color, @Nullable String providerName, @Nullable String providerUrl) throws IOException
+          @Nullable String color, @Nullable String providerName, @Nullable String providerUrl, @Nullable AccountType accountType) throws IOException
     {
         this.authorName = authorName;
         this.authorUrl = authorUrl;
@@ -105,16 +123,19 @@ public class Embed
         this.color = color;
         this.providerName = providerName;
         this.providerURL = providerUrl;
+        this.accountType = accountType;
 
         getRawResponseData().setEmbedRaw(description, title, color, authorName, authorUrl, providerName, providerUrl);
     }
 
     /**
-     * The title of the embed. Typically, this will be the html title of the webpage that is being embedded.
+     * The title of the embed.
+     * <br>Typically, this will be the html title of the webpage that is being embedded.
      *
-     * @return Possibly-null String containing the title of the embedded resource.
+     * @return Possibly-null string containing the title of the embedded resource.
      */
     @Nullable
+    @CheckReturnValue
     public String getTitle()
     {
         return title;
@@ -125,9 +146,10 @@ public class Embed
      * <br>This is provided only if Discord could find a description for the embedded resource using the provided url.
      * <br>Commonly, this is null. Be careful when using it.
      *
-     * @return Possibly-null String containing a description of the embedded resource
+     * @return Possibly-null string containing a description of the embedded resource.
      */
     @Nullable
+    @CheckReturnValue
     public String getDescription()
     {
         return description;
@@ -140,6 +162,7 @@ public class Embed
      * @return The name on the creator of the embedded content.
      */
     @Nullable
+    @CheckReturnValue
     public String getAuthorName()
     {
         return authorName;
@@ -152,6 +175,7 @@ public class Embed
      * @return The url to a website from the creator of the embedded content.
      */
     @Nullable
+    @CheckReturnValue
     public String getAuthorURL()
     {
         return authorUrl;
@@ -164,6 +188,7 @@ public class Embed
      * @return The name on the provider of the embedded content.
      */
     @Nullable
+    @CheckReturnValue
     public String getProviderName()
     {
         return providerName;
@@ -176,6 +201,7 @@ public class Embed
      * @return The url to a website of the embedded content.
      */
     @Nullable
+    @CheckReturnValue
     public String getProviderURL()
     {
         return providerURL;
@@ -185,29 +211,32 @@ public class Embed
      * The color of the stripe on the side of the embed.
      * <br>If the color equals null, this will return {@code #ffffff} (no color).
      *
-     * @return Possibly-null Color.
+     * @return Possibly-null color.
      */
     @Nullable
+    @CheckReturnValue
     public String getColor()
     {
         return color != null ? color : "#ffffff";
     }
 
+
     /**
-     * The raw hex color value for this embed.
-     * <br>Defaults to {@code 0xffffff} if no color is set.
+     * Gets the current account type.
+     * <br>If null, the account type will be set to {@link AccountType#CLIENT CLIENT}.
      *
-     * @return The raw hex color value or default
+     * @return The current account type.
      */
-    public String getColorRaw()
+    @NotNull
+    public AccountType getAccountType()
     {
-        return color;
+        return accountType;
     }
 
     /**
      * The total amount of characters that is displayed when this embed is displayed by the Discord client.
      *
-     * <p>The total character limit is defined by {@link #EMBED_MAX_LENGTH_BOT} as {@value #EMBED_MAX_LENGTH_BOT}.
+     * <br>The total character limit is defined by {@link #EMBED_MAX_LENGTH_BOT} as {@value #EMBED_MAX_LENGTH_BOT}.
      *
      * @return A never-negative sum of all displayed text characters.
      */
@@ -229,17 +258,17 @@ public class Embed
 
             if (title != null)
             {
-                length += Checks.codePointLength(title);
+                length += Helpers.codePointLength(title);
             }
 
             if (description != null)
             {
-                length += Checks.codePointLength(description.trim());
+                length += Helpers.codePointLength(description.trim());
             }
 
             if (authorName != null)
             {
-                length += Checks.codePointLength(authorName);
+                length += Helpers.codePointLength(authorName);
             }
             return length;
         }

@@ -15,20 +15,21 @@
  */
 package dev.blocky.library.tixte.annotations;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * This is an annotation, which tells the developers that a method/class/constructor/package is not documented yet.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.PACKAGE, ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR } )
+@Retention(RUNTIME)
+@Target( { PACKAGE, TYPE, METHOD, CONSTRUCTOR } )
 public @interface Undocumented
 {
 }

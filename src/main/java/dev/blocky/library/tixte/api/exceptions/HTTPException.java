@@ -18,12 +18,21 @@ package dev.blocky.library.tixte.api.exceptions;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * Exception used for handling HTTP errors.
+ *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-alpha.1
  */
 public class HTTPException extends RuntimeException
 {
+
+    /**
+     * Constructs a {@link HTTPException} with the specified detail message.
+     * <br>A detail message is a String that describes this particular exception.
+     *
+     * @param message The detail message.
+     */
     public HTTPException(@NotNull String message)
     {
         super(message);

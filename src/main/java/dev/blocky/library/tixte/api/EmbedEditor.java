@@ -15,12 +15,15 @@
  */
 package dev.blocky.library.tixte.api;
 
-import dev.blocky.library.tixte.annotations.Undocumented;
-import dev.blocky.library.tixte.api.entities.Embed;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import dev.blocky.library.tixte.api.enums.AccountType;
 import dev.blocky.library.tixte.internal.utils.Checks;
+import dev.blocky.library.tixte.internal.utils.Helpers;
+import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
@@ -28,38 +31,42 @@ import java.util.regex.Pattern;
 import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
 
 /**
+ * Builder system used to build {@link Embed embeds}.
+ *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-beta.1
  */
-@Undocumented
 public class EmbedEditor
 {
-    private final Pattern URL_PATTERN = Pattern.compile("\\s*(https?|attachment)://\\S+\\s*", Pattern.CASE_INSENSITIVE);
+    private final Pattern URL_PATTERN = Pattern.compile("\\s*(https?|attachment)://\\S+\\s*",
+            Pattern.CASE_INSENSITIVE);
+    private final Logger logger = TixteLogger.getLog(EmbedEditor.class);
     private final StringBuilder description = new StringBuilder();
-    private String authorName, authorURL, title;
     private String providerName, providerURL, color;
+    private String authorName, authorURL, title;
+    private AccountType accountType;
 
     /**
-     * Constructs a new EmbedEditor instance, which can be used to create {@link Embed embeds}.
+     * Constructs a <b>new</b> {@link EmbedEditor} instance, which can be used to create {@link Embed embeds}.
      * <br>Every part of an embed can be removed or cleared by providing {@code null} to the setter method.
      */
     EmbedEditor() { }
 
     /**
-     * Creates an EmbedEditor using fields from an existing builder.
+     * Creates an {@link EmbedEditor} using fields from an existing editor.
      *
-     * @param  builder The existing builder
+     * @param editor The existing editor.
      */
-    EmbedEditor(@Nullable EmbedEditor builder)
+    EmbedEditor(@Nullable EmbedEditor editor)
     {
-        copyFrom(builder);
+        copyFrom(editor);
     }
 
     /**
-     * Creates an EmbedEditor using fields in an existing embed.
+     * Creates an {@link EmbedEditor} using fields in an existing embed.
      *
-     * @param  embed The existing embed
+     * @param embed The existing embed.
      */
     EmbedEditor(@Nullable Embed embed)
     {
@@ -69,7 +76,7 @@ public class EmbedEditor
     /**
      * Returns a {@link Embed embed} that has been checked as being valid for sending.
      *
-     * @param accountType The type of account that is sending the embed
+     * @param accountType The type of account that is sending the embed.
      *
      * @throws java.lang.IllegalStateException
      *         If the embed is empty. Can be checked with {@link #isEmpty()}.
@@ -77,11 +84,17 @@ public class EmbedEditor
      *         a connectivity problem or timeout. Because networks can fail during an exchange,
      *         it is possible that the remote server accepted the request before the failure.
      *
-     * @return The built, sendable {@link Embed embed}
+     * @return The built, sendable {@link Embed embed}.
      */
     @NotNull
     public Embed build(@NotNull AccountType accountType) throws IOException
     {
+        if (accountType == null)
+        {
+            accountType = AccountType.CLIENT;
+            logger.info("'accountType' equals null, setting to CLIENT");
+        }
+
         if (isEmpty())
         {
             throw new IllegalStateException("Cannot build an empty embed!");
@@ -89,29 +102,54 @@ public class EmbedEditor
 
         if (description.length() > Embed.DESCRIPTION_MAX_LENGTH)
         {
-            throw new IllegalStateException(Checks.format("Description is longer than %d! Please limit your input!", Embed.DESCRIPTION_MAX_LENGTH));
+            throw new IllegalStateException(Helpers.format("Description is longer than %d! Please limit your input!",
+                    Embed.DESCRIPTION_MAX_LENGTH));
         }
 
         if (length() > Embed.EMBED_MAX_LENGTH_BOT && accountType == AccountType.BOT)
         {
-            throw new IllegalStateException("Cannot build an embed with more than " + Embed.EMBED_MAX_LENGTH_BOT + " characters!");
+            throw new IllegalStateException("Cannot build an embed with more than " + Embed.EMBED_MAX_LENGTH_BOT +
+                    " characters!");
         }
 
         if (length() > Embed.EMBED_MAX_LENGTH_CLIENT && accountType == AccountType.CLIENT)
         {
-            throw new IllegalStateException("Cannot build an embed with more than " + Embed.EMBED_MAX_LENGTH_CLIENT + " characters!");
+            throw new IllegalStateException("Cannot build an embed with more than " + Embed.EMBED_MAX_LENGTH_CLIENT +
+                    " characters!");
         }
 
-        final String description = this.description.length() < 1 ? null : this.description.toString();
+        String description = this.description.length() < 1 ? null : this.description.toString();
+        
+        this.accountType = accountType;
 
-        return new Embed(authorName, authorURL, title, description, color, providerName, providerURL);
+        return new Embed(authorName, authorURL, title, description, color, providerName, providerURL, accountType);
     }
 
     /**
-     * Resets this builder to default state.
+     * Returns a {@link Embed embed} that has been checked as being valid for sending.
+     * <br>The account type is set to {@link AccountType#CLIENT}.
+     *
+     * @throws java.lang.IllegalStateException
+     *         If the embed is empty. Can be checked with {@link #isEmpty()}.
+     * @throws IOException If the request could not be executed due to cancellation,
+     *         a connectivity problem or timeout. Because networks can fail during an exchange,
+     *         it is possible that the remote server accepted the request before the failure.
+     *
+     * @return The built, sendable {@link Embed embed}.
+     */
+    @NotNull
+    @CanIgnoreReturnValue
+    public Embed build() throws IOException
+    {
+        this.accountType = AccountType.CLIENT;
+        return build(AccountType.CLIENT);
+    }
+
+    /**
+     * Resets this editor to default state.
      * <br>All parts will be either empty or null after this method has returned.
      *
-     * @return The current EmbedEditor with default values
+     * @return The current {@link EmbedEditor} with default values.
      */
     @NotNull
     public EmbedEditor clear()
@@ -123,26 +161,28 @@ public class EmbedEditor
         color = null;
         providerName = null;
         providerURL = null;
+        accountType = null;
         return this;
     }
 
     /**
-     * Copies the data from the given builder into this builder.
-     * <br>All the parts of the given builder will be applied to this one.
+     * Copies the data from the given editor into this editor.
+     * <br>All the parts of the given editor will be applied to this one.
      *
-     * @param  builder The existing builder
+     * @param editor The existing editor.
      */
-    public void copyFrom(@Nullable EmbedEditor builder)
+    public void copyFrom(@Nullable EmbedEditor editor)
     {
-        if (builder != null)
+        if (editor != null)
         {
-            setDescription(builder.description.toString());
-            this.authorName = builder.authorName;
-            this.authorURL = builder.authorURL;
-            this.title = builder.title;
-            this.color = builder.color;
-            this.providerName = builder.providerName;
-            this.providerURL = builder.providerURL;
+            setDescription(editor.description.toString());
+            this.authorName = editor.authorName;
+            this.authorURL = editor.authorURL;
+            this.title = editor.title;
+            this.color = editor.color;
+            this.providerName = editor.providerName;
+            this.providerURL = editor.providerURL;
+            this.accountType = editor.accountType;
         }
     }
 
@@ -150,7 +190,7 @@ public class EmbedEditor
      * Copies the data from the given embed into this builder.
      * <br>All the parts of the given embed will be applied to this builder.
      *
-     * @param  embed The existing embed
+     * @param embed The existing embed.
      */
     public void copyFrom(@Nullable Embed embed)
     {
@@ -160,16 +200,18 @@ public class EmbedEditor
             this.authorName = embed.getAuthorName();
             this.authorURL = embed.getAuthorURL();
             this.title = embed.getTitle();
-            this.color = embed.getColorRaw();
+            this.color = embed.getColor();
             this.providerName = embed.getProviderName();
             this.providerURL = embed.getProviderURL();
+            this.accountType = embed.getAccountType();
         }
     }
 
     /**
      * Checks if the given embed is empty. Empty embeds will throw an exception if built.
      *
-     * @return <b>true</b> - If the embed is empty and cannot be built
+     * @return <b>true</b> - If the embed is empty and cannot be built.
+     *         <br><b>false</b> - If the embed is not empty and can be built.
      */
     public boolean isEmpty()
     {
@@ -187,7 +229,7 @@ public class EmbedEditor
      * The overall length of the current EmbedEditor in displayed characters.
      * <br>Represents the {@link Embed#getLength() Embed.getLength()} value.
      *
-     * @return Length of the current builder state
+     * @return Length of the current editor state.
      */
     public int length()
     {
@@ -208,18 +250,18 @@ public class EmbedEditor
     /**
      * Sets the title of the embed.
      *
-     * <p><b><a href="https://raw.githubusercontent.com/DV8FromTheWorld/JDA/assets/assets/docs/embeds/04-setTitle.png">Example</a></b>
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
      *
-     * @param  title The title of the embed
+     * @param title The title of the embed.
      *
      * @throws java.lang.IllegalArgumentException
      *         <ul>
-     *             <li>If the provided {@code title} is an empty String.</li>
+     *             <li>If the provided {@code title} is an empty string.</li>
      *             <li>If the character limit for {@code title}, defined by {@link Embed#TITLE_MAX_LENGTH} as {@value Embed#TITLE_MAX_LENGTH},
      *             is exceeded.</li>
      *         </ul>
      *
-     * @return The builder after the title has been set
+     * @return The editor after the title has been set.
      */
     @NotNull
     public EmbedEditor setTitle(@Nullable String title)
@@ -227,11 +269,13 @@ public class EmbedEditor
         if (title == null)
         {
             this.title = null;
+            logger.info("'title' equals null, setting to null");
         }
         else
         {
             Checks.notEmpty(title, "Title");
-            Checks.check(title.length() <= Embed.TITLE_MAX_LENGTH, "Title cannot be longer than %d characters.", Embed.TITLE_MAX_LENGTH);
+            Checks.check(title.length() <= Embed.TITLE_MAX_LENGTH, "Title cannot be longer than %d characters.",
+                    Embed.TITLE_MAX_LENGTH);
 
             this.title = title;
         }
@@ -239,17 +283,18 @@ public class EmbedEditor
     }
 
     /**
-     * Sets the description of the embed. This is where the main chunk of text for an embed is typically placed.
+     * Sets the description of the embed.
+     * <br>This is where the main chunk of text for an embed is typically placed.
      *
-     * <p><b><a href="https://raw.githubusercontent.com/DV8FromTheWorld/JDA/assets/assets/docs/embeds/05-setDescription.png">Example</a></b>
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
      *
-     * @param  description The description of the embed, {@code null} to reset
+     * @param description The description of the embed, {@code null} to reset.
      *
      * @throws java.lang.IllegalArgumentException
      *         If {@code description} is longer than {@value Embed#DESCRIPTION_MAX_LENGTH} characters,
-     *         as defined by {@link Embed#DESCRIPTION_MAX_LENGTH}
+     *         as defined by {@link Embed#DESCRIPTION_MAX_LENGTH}.
      *
-     * @return The builder after the description has been set
+     * @return The editor after the description has been set.
      */
     @NotNull
     public final EmbedEditor setDescription(@Nullable CharSequence description)
@@ -264,22 +309,24 @@ public class EmbedEditor
     }
 
     /**
-     * Appends to the description of the embed. This is where the main chunk of text for an embed is typically placed.
+     * Appends to the description of the embed.
+     * <br>This is where the main chunk of text for an embed is typically placed.
      *
-     * <p><b><a href="https://raw.githubusercontent.com/DV8FromTheWorld/JDA/assets/assets/docs/embeds/05-setDescription.png">Example</a></b>
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
      *
-     * @param  description The string to append to the description of the embed
+     * @param description The string to append to the description of the embed.
      *
      * @throws java.lang.IllegalArgumentException
      *         <ul>
      *             <li>If the provided {@code description} String is null.</li>
-     *             <li>If the character limit for {@code description}, defined by {@link Embed#DESCRIPTION_MAX_LENGTH} as {@value Embed#DESCRIPTION_MAX_LENGTH},
-     *             is exceeded.</li>
+     *             <li>If the character limit for {@code description}, defined by {@link Embed#DESCRIPTION_MAX_LENGTH}
+     *             as {@value Embed#DESCRIPTION_MAX_LENGTH}, is exceeded.</li>
      *         </ul>
      *
-     * @return The builder after the description has been set
+     * @return The editor after the description has been set.
      */
     @NotNull
+    @CanIgnoreReturnValue
     public EmbedEditor appendDescription(@NotNull CharSequence description)
     {
         Checks.notNull(description, "description");
@@ -292,11 +339,11 @@ public class EmbedEditor
     /**
      * Sets the color of the embed.
      *
-     * <p><b><a href="https://raw.githubusercontent.com/DV8FromTheWorld/JDA/assets/assets/docs/embeds/02-setColor.png" target="_blank">Example</a></b>
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
      *
-     * @param  hexColor The {@link java.awt.Color Color} of the embed or {@code null} to use no color
+     * @param hexColor The {@link java.awt.Color color} as a string of the embed or {@code null} to use no color.
      *
-     * @return The builder after the color has been set
+     * @return The editor after the color has been set.
      */
     @NotNull
     public EmbedEditor setColor(@Nullable String hexColor)
@@ -306,19 +353,21 @@ public class EmbedEditor
     }
 
     /**
-     * Sets the author of the embed. The author appears in the top left of the embed and can have a small
-     * image beside it along with the author's name being made clickable by way of providing an url.
-     * This convenience method just sets the name.
+     * Sets the author of the embed.
+     * <br>The author appears in the top left of the embed and can have a small image beside it along with the author's
+     * name being made clickable by way of providing an url.
+     * <br>This convenience method just sets the name.
      *
-     * <p><b><a href="https://raw.githubusercontent.com/DV8FromTheWorld/JDA/assets/assets/docs/embeds/03-setAuthor.png">Example</a></b>
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
      *
-     * @param  authorName The name of the author of the embed. If this is not set, the author will not appear in the embed
+     * @param authorName The name of the author of the embed.
+     *                   If this is not set, the author will not appear in the embed.
      *
      * @throws java.lang.IllegalArgumentException
      *         If {@code name} is longer than {@value Embed#AUTHOR_MAX_LENGTH} characters,
-     *         as defined by {@link Embed#AUTHOR_MAX_LENGTH}
+     *         as defined by {@link Embed#AUTHOR_MAX_LENGTH}.
      *
-     * @return The builder after the author has been set
+     * @return The editor after the author has been set.
      */
     @NotNull
     public EmbedEditor setAuthorName(@Nullable String authorName)
@@ -327,25 +376,27 @@ public class EmbedEditor
     }
 
     /**
-     * Sets the author of the embed. The author appears in the top left of the embed and can have a small
-     * image beside it along with the author's name being made clickable by way of providing an url.
-     * This convenience method just sets the name and the url.
+     * Sets the author of the embed.
+     * <br>The author appears in the top left of the embed and can have a small image beside it along with the author's
+     * name being made clickable by way of providing an url.
+     * <br>This convenience method sets the name and the url.
      *
-     * <p><b><a href="https://raw.githubusercontent.com/DV8FromTheWorld/JDA/assets/assets/docs/embeds/03-setAuthor.png">Example</a></b>
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
      *
-     * @param  authorName The name of the author of the embed. If this is not set, the author will not appear in the embed
-     * @param  authorURL The url of the author of the embed
+     * @param  authorName The name of the author of the embed.
+     *                    If this is not set, the author will not appear in the embed.
+     * @param  authorURL The url of the author of the embed.
      *
      * @throws java.lang.IllegalArgumentException
      *         <ul>
-     *             <li>If the character limit for {@code name}, defined by {@link Embed#AUTHOR_MAX_LENGTH} as {@value Embed#AUTHOR_MAX_LENGTH},
-     *             is exceeded.</li>
-     *             <li>If the character limit for {@code url}, defined by {@link Embed#URL_MAX_LENGTH} as {@value Embed#URL_MAX_LENGTH},
-     *             is exceeded.</li>
+     *             <li>If the character limit for {@code name}, defined by {@link Embed#AUTHOR_MAX_LENGTH} as
+     *             {@value Embed#AUTHOR_MAX_LENGTH}, is exceeded.</li>
+     *             <li>If the character limit for {@code url}, defined by {@link Embed#URL_MAX_LENGTH} as
+     *             {@value Embed#URL_MAX_LENGTH}, is exceeded.</li>
      *             <li>If the provided {@code url} is not a properly formatted http or https url.</li>
      *         </ul>
      *
-     * @return The builder after the author has been set
+     * @return The editor after the author has been set.
      */
     @NotNull
     public EmbedEditor setAuthor(@Nullable String authorName, @Nullable String authorURL)
@@ -353,10 +404,12 @@ public class EmbedEditor
         if (authorName == null)
         {
             this.authorName = null;
+            logger.info("'authorName' equals null, setting to null");
         }
         else
         {
-            Checks.check(authorName.length() <= Embed.AUTHOR_MAX_LENGTH, "Name cannot be longer than %d characters.", Embed.AUTHOR_MAX_LENGTH);
+            Checks.check(authorName.length() <= Embed.AUTHOR_MAX_LENGTH, "Name cannot be longer than %d characters.",
+                    Embed.AUTHOR_MAX_LENGTH);
             urlCheck(authorURL);
 
             this.authorName = authorName;
@@ -368,13 +421,14 @@ public class EmbedEditor
     /**
      * Sets the provider of the embed.
      *
-     * @param  providerName The name of the provider of the embed. If this is not set, the provider will not appear in the embed
+     * @param  providerName The name of the provider of the embed.
+     *                      If this is not set, the provider will not appear in the embed.
      *
      * @throws java.lang.IllegalArgumentException
      *         If {@code name} is longer than {@value Embed#PROVIDER_MAX_LENGTH} characters,
-     *         as defined by {@link Embed#PROVIDER_MAX_LENGTH}
+     *         as defined by {@link Embed#PROVIDER_MAX_LENGTH}.
      *
-     * @return The builder after the provider has been set
+     * @return The editor after the provider has been set.
      */
     @NotNull
     public EmbedEditor setProviderName(@Nullable String providerName)
@@ -384,21 +438,22 @@ public class EmbedEditor
 
     /**
      * Sets the provider of the embed.
-     * This convenience method just sets the name and the url.
+     * This convenience method sets the name and the url.
      *
-     * @param  providerName The name of the provider of the embed. If this is not set, the provider will not appear in the embed
-     * @param  providerURL The url of the provider of the embed
+     * @param  providerName The name of the provider of the embed.
+     *                      If this is not set, the provider will not appear in the embed.
+     * @param  providerURL The url of the provider of the embed.
      *
      * @throws java.lang.IllegalArgumentException
      *         <ul>
-     *             <li>If the character limit for {@code name}, defined by {@link Embed#PROVIDER_MAX_LENGTH} as {@value Embed#PROVIDER_MAX_LENGTH},
-     *             is exceeded.</li>
-     *             <li>If the character limit for {@code url}, defined by {@link Embed#URL_MAX_LENGTH} as {@value Embed#URL_MAX_LENGTH},
-     *             is exceeded.</li>
+     *             <li>If the character limit for {@code name}, defined by {@link Embed#PROVIDER_MAX_LENGTH} as
+     *             {@value Embed#PROVIDER_MAX_LENGTH}, is exceeded.</li>
+     *             <li>If the character limit for {@code url}, defined by {@link Embed#URL_MAX_LENGTH} as
+     *             {@value Embed#URL_MAX_LENGTH}, is exceeded.</li>
      *             <li>If the provided {@code url} is not a properly formatted http or https url.</li>
      *         </ul>
      *
-     * @return The builder after the author has been set
+     * @return The editor after the author has been set.
      */
     @NotNull
     public EmbedEditor setProvider(@Nullable String providerName, @Nullable String providerURL)
@@ -406,10 +461,12 @@ public class EmbedEditor
         if (providerName == null)
         {
             this.providerName = null;
+            logger.info("'providerName' equals null, setting to null");
         }
         else
         {
-            Checks.check(providerName.length() <= Embed.PROVIDER_MAX_LENGTH, "Name cannot be longer than %d characters.", Embed.PROVIDER_MAX_LENGTH);
+            Checks.check(providerName.length() <= Embed.PROVIDER_MAX_LENGTH, "Name cannot be longer than %d characters.",
+                    Embed.PROVIDER_MAX_LENGTH);
             urlCheck(providerURL);
 
             this.providerName = providerName;
@@ -418,90 +475,140 @@ public class EmbedEditor
         return this;
     }
 
-    @Undocumented
     private void urlCheck(@Nullable String url)
     {
         if (url != null)
         {
-            Checks.check(url.length() <= Embed.URL_MAX_LENGTH, "URL cannot be longer than %d characters.", Embed.URL_MAX_LENGTH);
+            Checks.check(url.length() <= Embed.URL_MAX_LENGTH, "URL cannot be longer than %d characters.",
+                    Embed.URL_MAX_LENGTH);
             Checks.check(URL_PATTERN.matcher(url).matches(), "URL must be a valid http(s) or attachment url.");
         }
     }
 
+    /**
+     * The title of the embed.
+     * <br>Typically, this will be the html title of the webpage that is being embedded.
+     * <br>The only difference between this and {@link Embed#getTitle()} is that this method gets the current title
+     * of the Tixte 'Embed Editor' page, while {@link Embed#getTitle()} only gets the current value of the variable.
+     *
+     * @return Possibly-empty string containing the title of the embedded resource.
+     */
     @NotNull
-    @Undocumented
     public String getEmbedTitle() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawConfig());
+        JSONObject json = new JSONObject(getRawResponseData().getConfigRaw());
         JSONObject data = json.getJSONObject("data");
         JSONObject embed = data.getJSONObject("embed");
 
         return embed.getString("title");
     }
 
+    /**
+     * The description of the embedded resource.
+     * <br>This is provided only if Discord could find a description for the embedded resource using the provided url.
+     * <br>Commonly, this is null. Be careful when using it.
+     * <br>The only difference between this and {@link Embed#getDescription()} is that this method gets the current description
+     * of the Tixte 'Embed Editor' page, while {@link Embed#getDescription()} only gets the current value of the variable.
+     *
+     * @return Possibly-empty string containing a description of the embedded resource.
+     */
     @NotNull
-    @Undocumented
-    public String getEmbedThemeColor() throws IOException
+    public String getEmbedDescription() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawConfig());
+        JSONObject json = new JSONObject(getRawResponseData().getConfigRaw());
         JSONObject data = json.getJSONObject("data");
         JSONObject embed = data.getJSONObject("embed");
 
-        return embed.getString("theme_color");
+        return embed.getString("description");
     }
 
+    /**
+     * The name on the creator of the embedded content.
+     * <br>This is typically used to represent the account on the providing site.
+     * <br>The only difference between this and {@link Embed#getAuthorName()} is that this method gets the current author name
+     * of the Tixte 'Embed Editor' page, while {@link Embed#getAuthorName()} only gets the current value of the variable.
+     *
+     * @return The name on the creator of the embedded content.
+     */
     @NotNull
-    @Undocumented
     public String getEmbedAuthorName() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawConfig());
+        JSONObject json = new JSONObject(getRawResponseData().getConfigRaw());
         JSONObject data = json.getJSONObject("data");
         JSONObject embed = data.getJSONObject("embed");
 
         return embed.getString("author_name");
     }
 
+    /**
+     * The url to a website from the creator of the embedded content.
+     * <br>This is typically used to represent the account on the providing site.
+     * <br>The only difference between this and {@link Embed#getAuthorURL()}is that this method gets the current author url
+     * of the Tixte 'Embed Editor' page, while {@link Embed#getAuthorURL()} only gets the current value of the variable.
+     *
+     * @return The url to a website from the creator of the embedded content.
+     */
     @NotNull
-    @Undocumented
     public String getEmbedAuthorURL() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawConfig());
+        JSONObject json = new JSONObject(getRawResponseData().getConfigRaw());
         JSONObject data = json.getJSONObject("data");
         JSONObject embed = data.getJSONObject("embed");
 
         return embed.getString("author_url");
     }
 
+    /**
+     * The name on the provider of the embedded content.
+     * <br>This is typically used to represent the account on the providing site.
+     * <br>The only difference between this and {@link Embed#getProviderName()} is that this method gets the current provider name
+     * of the Tixte 'Embed Editor' page, while {@link Embed#getProviderName()} only gets the current value of the variable.
+     *
+     * @return The name on the provider of the embedded content.
+     */
     @NotNull
-    @Undocumented
     public String getEmbedProviderName() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawConfig());
+        JSONObject json = new JSONObject(getRawResponseData().getConfigRaw());
         JSONObject data = json.getJSONObject("data");
         JSONObject embed = data.getJSONObject("embed");
 
         return embed.getString("provider_name");
     }
 
+    /**
+     * The url to a website of the embedded content.
+     * <br>This is typically used to represent the account on the providing site.
+     * <br>The only difference between this and {@link Embed#getProviderURL()} is that this method gets the current provider url
+     * of the Tixte 'Embed Editor' page, while {@link Embed#getProviderURL()} only gets the current value of the variable.
+     *
+     * @return The url to a website of the embedded content.
+     */
     @NotNull
-    @Undocumented
     public String getEmbedProviderURL() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawConfig());
+        JSONObject json = new JSONObject(getRawResponseData().getConfigRaw());
         JSONObject data = json.getJSONObject("data");
         JSONObject embed = data.getJSONObject("embed");
 
         return embed.getString("provider_url");
     }
 
+    /**
+     * The color of the stripe on the side of the embed.
+     * <br>If the color equals null, this will return {@code #ffffff} (no color).
+     * <br>The only difference between this and {@link Embed#getColor()} is that this method gets the current theme color
+     * of the Tixte 'Embed Editor' page, while {@link Embed#getColor()} only gets the current value of the variable.
+     *
+     * @return Possibly-empty color.
+     */
     @NotNull
-    @Undocumented
-    public String getEmbedDescription() throws IOException
+    public String getEmbedThemeColor() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawConfig());
+        JSONObject json = new JSONObject(getRawResponseData().getConfigRaw());
         JSONObject data = json.getJSONObject("data");
         JSONObject embed = data.getJSONObject("embed");
 
-        return embed.getString("description");
+        return embed.getString("theme_color");
     }
 }

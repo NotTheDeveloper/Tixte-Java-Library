@@ -18,12 +18,21 @@ package dev.blocky.library.tixte.api.exceptions;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * Exception thrown when a request is made to a Tixte API-endpoint that is not allowed.
+ *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-alpha.1
  */
 public class Forbidden extends HTTPException
 {
+
+    /**
+     * Constructs an {@link HTTPException HTTPException} for the response code {@code 403} with the specified detail message.
+     * <br>A detail message is a String that describes this particular exception.
+     *
+     * @param message The detail message.
+     */
     public Forbidden(@NotNull String message)
     {
         super(message);

@@ -15,39 +15,63 @@
  */
 package dev.blocky.library.tixte.internal.utils;
 
-import dev.blocky.library.tixte.annotations.Undocumented;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
 
 /**
  * Utility class for handling errors.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-beta.1
  */
 public class Checks
 {
-    @Undocumented
+    /**
+     * The boolean, which should be checked.
+     * <br>If the boolean value is false, an {@link IllegalArgumentException} will be thrown.
+     *
+     * @param expression The expression, which should be checked.
+     * @param message    The message for the exception.
+     */
     @Contract("false, _ -> fail")
-    public static void check(final boolean expression, final String message)
+    public static void check(boolean expression, @NotNull String message)
     {
         if (!expression)
+        {
             throw new IllegalArgumentException(message);
+        }
     }
 
-    @Undocumented
+    /**
+     * The boolean, which should be checked.
+     * <br>If the boolean value is false, an {@link IllegalArgumentException}, which contains a formatted string, will
+     * be thrown.
+     *
+     * @param expression The expression, which should be checked.
+     * @param format    A format string.
+     * @param args      Arguments referenced by the format specifiers in the format string. If there are more arguments
+     *                  than format specifiers, the extra arguments are ignored. The number of arguments is variable and
+     *                  may be zero. The maximum number of arguments is limited by the maximum dimension of a Java array as
+     *                  defined by <i> The Java™ Virtual Machine Specification</i>. The behaviour on a {@code null} argument
+     *                  depends on the conversion.
+     */
     @Contract("false, _, _ -> fail")
-    public static void check(final boolean expression, final String message, final Object arg)
+    public static void check(boolean expression, @NotNull String format, @NotNull Object... args)
     {
         if (!expression)
-            throw new IllegalArgumentException(String.format(message, arg));
+        {
+            throw new IllegalArgumentException(String.format(format, args));
+        }
     }
 
-    @Undocumented
+    /**
+     * If the given object is null, there will be thrown an {@link IllegalArgumentException}.
+     *
+     * @param argument The argument, which should be checked.
+     * @param name     The name of the object.
+     */
     @Contract("null, _ -> fail")
     public static void notNull(@Nullable Object argument, @NotNull String name)
     {
@@ -57,73 +81,53 @@ public class Checks
         }
     }
 
-    @Undocumented
+    /**
+     * If the given object is null, there will be thrown an {@link IllegalArgumentException} and if the given
+     * {@link CharSequence} is empty, there will be thrown an {@link IllegalStateException}.
+     *
+     * @param argument The argument, which should be checked.
+     * @param name     The name of the object.
+     */
     @Contract("null, _ -> fail")
     public static void notEmpty(@Nullable CharSequence argument, @NotNull String name)
     {
         notNull(argument, name);
 
-        if (isEmpty(argument))
+        if (Helpers.isEmpty(argument))
         {
-            throw new IllegalStateException("\"" + name + "\" cannot be undefined.");
+            throw new IllegalStateException("\"" + name + "\" may not be empty.");
         }
     }
 
-    @Undocumented
+    /**
+     * If the given object is null, there will be thrown an {@link IllegalArgumentException} and if the given
+     * {@link CharSequence} contains whitespaces, there will be thrown an {@link IllegalStateException}.
+     *
+     * @param argument The argument, which should be checked.
+     * @param name     The name of the object.
+     */
     @Contract("null, _ -> fail")
     public static void noWhitespace(@Nullable CharSequence argument, @NotNull String name)
     {
         notNull(argument, name);
 
-        if (containsWhitespace(argument))
+        if (Helpers.containsWhitespace(argument))
         {
-            throw new IllegalArgumentException("\"" + name + "\" may not contain blanks. Provided: \"" + argument + "\"");
+            throw new IllegalStateException("\"" + name + "\" may not contain blanks. Provided: \"" + argument + "\"");
         }
     }
 
-    @Undocumented
+    /**
+     * If the given integer is below 0, there will be thrown an {@link IllegalStateException}.
+     *
+     * @param number  The number, which should be checked.
+     * @param name    The name of the object.
+     */
     public static void notNegative(int number, @NotNull String name)
     {
         if (number < 0)
         {
-            throw new IllegalStateException("\"" + name + "\" cannot be under 0.");
+            throw new IllegalStateException("\"" + name + "\" may not be negative.");
         }
-    }
-
-    @Undocumented
-    static boolean isEmpty(@NotNull CharSequence seq)
-    {
-        return seq == null || seq.length() == 0;
-    }
-
-    @Undocumented
-    static boolean containsWhitespace(@NotNull CharSequence charSequence)
-    {
-        if (isEmpty(charSequence))
-        {
-            return false;
-        }
-
-        for (int i = 0; i < charSequence.length(); i++)
-        {
-            if (Character.isWhitespace(charSequence.charAt(i)))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Nullable
-    @Undocumented
-    public static String format(String format, Object... args)
-    {
-        return String.format(Locale.ROOT, format, args);
-    }
-
-    @Undocumented
-    public static int codePointLength(@NotNull String string)
-    {
-        return string.codePointCount(0, string.length());
     }
 }

@@ -15,36 +15,48 @@
  */
 package dev.blocky.library.tixte.internal.requests;
 
-import dev.blocky.library.tixte.annotations.Undocumented;
-
 /**
+ * Utility class for creating {@link okhttp3.Request requests}.
+ *
  * @author BlockyDotJar
- * @version v1.0.0-alpha.1
+ * @version v1.0.1
  * @since v1.0.0-alpha.3
  */
-@Undocumented
 public class Route
 {
-
     public static final String
             BASE_URL = "https://api.tixte.com/v1",
             SLASH = "/";
 
-    @Undocumented
+    /**
+     * Constructs a <br>new</b> {@link Route}.
+     * <br>This is a private constructor, because it should not be accessed for other classes.
+     */
     private Route()
     {
     }
 
-    @Undocumented
+    /**
+     * Represents every account endpoint of the Tixte API.
+     *
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-alpha.3
+     */
     public static class Account
     {
         public static final String
                 ACCOUNT_ENDPOINT = "/users/@me",
-                USERS_ENDPOINT = "/users/",
-                KEYS_ENDPOINT = "/users/@me/keys/";
+                USERS_ENDPOINT = "/users/";
     }
 
-    @Undocumented
+    /**
+     * Represents every domain endpoint of the Tixte API.
+     *
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-alpha.3
+     */
     public static class Domain
     {
         public static final String
@@ -52,7 +64,13 @@ public class Route
                 DOMAINS_ENDPOINT = "/domains";
     }
 
-    @Undocumented
+    /**
+     * Represents every file endpoint of the Tixte API.
+     *
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-alpha.3
+     */
     public static class File
     {
         public static final String
@@ -62,14 +80,26 @@ public class Route
                 UPLOAD_ENDPOINT = "/upload";
     }
 
-    @Undocumented
+    /**
+     * Represents every resource endpoint of the Tixte API.
+     *
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-alpha.3
+     */
     public static class Resources
     {
         public static final String
                 GENERATE_DOMAIN_ENDPOINT = "/resources/generate-domain";
     }
 
-    @Undocumented
+    /**
+     * Represents every config endpoint of the Tixte API.
+     *
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-alpha.3
+     */
     public static class Config
     {
         public static final String

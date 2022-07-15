@@ -18,12 +18,21 @@ package dev.blocky.library.tixte.api.exceptions;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * Exception thrown when a 500 response code is returned from the Tixte server.
+ *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-alpha.1
  */
 public class TixteServerError extends HTTPException
 {
+
+    /**
+     * Constructs an {@link HTTPException HTTPException} for the response code {@code 500} with the specified detail message.
+     * <br>A detail message is a String that describes this particular exception.
+     *
+     * @param message The detail message.
+     */
     public TixteServerError(@NotNull String message)
     {
         super(message);

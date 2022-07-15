@@ -51,9 +51,12 @@ body:
         
         The provided text will be rendered as Java code, so you don't have to provide a code block for it.
       render: Java
-      placeholder: 'TixteClient client = TixteClientBuilder
-                    .createClient(getAPIKey(), getSessionToken(), getDefaultDomain())
-                    .build(UserCachePolicy.ALL);'
+      placeholder: 'TixteClient client = new TixteClientBuilder()
+                            .create(getAPIKey())
+                            .setSessionToken(getSessionToken())
+                            .setDefaultDomain(getDefaultDomain())
+                            .setCachePolicy(CachePolicy.ALL)
+                            .build();'
     validations:
       required: true
   - type: textarea

@@ -15,7 +15,7 @@
  */
 package dev.blocky.library.tixte.internal.requests;
 
-import dev.blocky.library.tixte.annotations.Undocumented;
+import dev.blocky.library.tixte.internal.utils.Checks;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -27,29 +27,48 @@ import java.net.SocketAddress;
  * Utility class for handling network connectivity.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-alpha.3
  */
 public strictfp class Network
 {
-    private final transient String hostName;
-    private final transient int port;
+    private final String hostName;
+    private final int port;
 
-    @Undocumented
+    /**
+     * Constructs a <br>new</b> {@link Network}.
+     * <br>This is a private constructor, because it should not be accessed for other classes.
+     */
     private Network(@NotNull String hostName, int port)
     {
+        Checks.notEmpty(hostName, "hostName");
+        Checks.noWhitespace(hostName, "hostName");
+
+        Checks.notNegative(port, "port");
+
         this.hostName = hostName;
         this.port = port;
     }
 
+    /**
+     * Creates a network connection.
+     *
+     * @param hostName The host name
+     * @param port     The port number
+     * @return Creates a <b>new</b> network.
+     */
     @NotNull
-    @Undocumented
     public static Network createNetwork(@NotNull String hostName, int port)
     {
         return new Network(hostName, port);
     }
 
-    @Undocumented
+    /**
+     * Checks if you can connect to internet or not.
+     *
+     * @return  <b>true</b> - If you can connect to internet.
+     *          <br><b>false</b> - If you cannot connect to internet.
+     */
     public boolean isInternetAvailable()
     {
         try

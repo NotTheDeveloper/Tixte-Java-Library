@@ -15,85 +15,86 @@
  */
 package dev.blocky.library.tixte.internal.utils.logging;
 
+import com.google.errorprone.annotations.CheckReturnValue;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
- * This class serves as a LoggerFactory for Tixte4J's internals.
- * <br>It will either return a Logger from a SLF4J implementation via {@link org.slf4j.LoggerFactory} if present,
- * or an instance of a custom {@link SimpleLogger} (From slf4j-simple).
- * <p>
- * It also has the utility method {@link #getLazyString(LazyEvaluation)} which is used to lazily construct Strings for Logging.
+ * This class serves as a {@link org.slf4j.LoggerFactory} for Tixte4J's internals.
+ * <br>It will either return a logger from a SLF4J implementation via {@link org.slf4j.LoggerFactory} if present,
+ * or an instance of a custom {@link SimpleLogger}. (from slf4j-simple)
+ * <br>It also has the utility method {@link #getLazyString(LazyEvaluation)} which is used to lazily construct strings for logging.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-alpha.3
  */
 public class TixteLogger
 {
     /**
-     * Marks whether or not a SLF4J <code>StaticLoggerBinder</code> (pre 1.8.x) or
-     * <code>SLF4JServiceProvider</code> implementation (1.8.x+) was found. If false, JDA will use its fallback logger.
+     * Marks whether a SLF4J {@code StaticLoggerBinder} (pre 1.8.x) or
+     * {@code SLF4JServiceProvider} implementation (1.8.x+) was found.
+     * <br>If false, Tixte4J will use its fallback logger.
      * <br>This variable is initialized during static class initialization.
      */
     public static final boolean SLF4J_ENABLED;
     private static final Map<String, Logger> LOGS = new CaseInsensitiveMap<>();
 
+    /**
+     * Constructs a <br>new</b> {@link TixteLogger}.
+     * <br>This is a private constructor, because it should not be accessed for other classes.
+     */
     private TixteLogger() { }
 
     static
     {
-        boolean tmp;
-
+        boolean SLF4J;
         try
         {
             Class.forName("org.slf4j.impl.StaticLoggerBinder");
 
-            tmp = true;
+            SLF4J = true;
         }
         catch (ClassNotFoundException eStatic)
         {
-            // there was no static logger binder (SLF4J pre-1.8.x)
+            // There was no static logger binder (SLF4J pre-1.8.x)
 
             try
             {
                 Class<?> serviceProviderInterface = Class.forName("org.slf4j.spi.SLF4JServiceProvider");
 
-                // check if there is a service implementation for the service, indicating a provider for SLF4J 1.8.x+ is installed
-                tmp = ServiceLoader.load(serviceProviderInterface).iterator().hasNext();
+                // Check if there is a service implementation for the service, indicating a provider for SLF4J 1.8.x+ is installed
+                SLF4J = ServiceLoader.load(serviceProviderInterface).iterator().hasNext();
             }
             catch (ClassNotFoundException eService)
             {
-                // there was no service provider interface (SLF4J 1.8.x+)
+                // There was no service provider interface (SLF4J 1.8.x+)
 
-                //prints warning of missing implementation
+                // Prints warning of missing implementation
                 LoggerFactory.getLogger(TixteLogger.class);
 
-                tmp = false;
+                SLF4J = false;
             }
         }
-        SLF4J_ENABLED = tmp;
+        SLF4J_ENABLED = SLF4J;
     }
 
     /**
      * Will get the {@link org.slf4j.Logger} with the given log-name
      * or create and cache a fallback logger if there is no SLF4J implementation present.
-     * <p>
-     * The fallback logger will be an instance of a slightly modified version of SLF4Js SimpleLogger.
+     * <br>The fallback logger will be an instance of a slightly modified version of SLF4J's {@code SimpleLogger}.
      *
-     * @param  name
-     *         The name of the Logger
+     * @param name The name of the logger.
      *
-     * @return Logger with given log name
+     * @return Logger with given log name.
      */
     @NotNull
     public static Logger getLog(@NotNull String name)
@@ -101,21 +102,21 @@ public class TixteLogger
         synchronized (LOGS)
         {
             if (SLF4J_ENABLED)
+            {
                 return LoggerFactory.getLogger(name);
+            }
             return LOGS.computeIfAbsent(name, SimpleLogger::new);
         }
     }
 
     /**
-     * Will get the {@link org.slf4j.Logger} for the given Class
+     * Will get the {@link org.slf4j.Logger} for the given class
      * or create and cache a fallback logger if there is no SLF4J implementation present.
-     * <p>
-     * The fallback logger will be an instance of a slightly modified version of SLF4Js SimpleLogger.
+     * <br>The fallback logger will be an instance of a slightly modified version of SLF4J's {@code SimpleLogger}.
      *
-     * @param  clazz
-     *         The class used for the Logger name
+     * @param clazz The class used for the logger name.
      *
-     * @return Logger for given Class
+     * @return Logger for given class.
      */
     @NotNull
     public static Logger getLog(@NotNull Class<?> clazz)
@@ -123,20 +124,22 @@ public class TixteLogger
         synchronized (LOGS)
         {
             if (SLF4J_ENABLED)
+            {
                 return LoggerFactory.getLogger(clazz);
+            }
             return LOGS.computeIfAbsent(clazz.getName(), (n) -> new SimpleLogger(clazz.getSimpleName()));
         }
     }
 
     /**
-     * Utility function to enable logging of complex statements more efficiently (lazy).
+     * Utility function to enable logging of complex statements more efficiently. (lazy)
      *
-     * @param  lazyLambda
-     *         The Supplier used when evaluating the expression
+     * @param lazyLambda The supplier used when evaluating the expression.
      *
-     * @return An Object that can be passed to SLF4J's logging methods as lazy parameter
+     * @return An object that can be passed to SLF4J's logging methods as lazy parameter.
      */
     @Nullable
+    @CheckReturnValue
     public static Object getLazyString(@NotNull LazyEvaluation lazyLambda)
     {
         return new Object()
@@ -152,17 +155,17 @@ public class TixteLogger
                 {
                     StringWriter sw = new StringWriter();
                     ex.printStackTrace(new PrintWriter(sw));
-                    return "Error while evaluating lazy String... " + sw;
+                    return "Error while evaluating lazy string... " + sw;
                 }
             }
         };
     }
 
     /**
-     * Functional interface used for {@link #getLazyString(LazyEvaluation)} to lazily construct a String.
+     * Functional interface used for {@link #getLazyString(LazyEvaluation)} to lazily construct a string.
      *
      * @author BlockyDotJar
-     * @version v1.0.0
+     * @version v1.1.0
      * @since v1.0.0-alpha.3
      */
     @FunctionalInterface
@@ -171,14 +174,11 @@ public class TixteLogger
 
         /**
          * This method is used by {@link #getLazyString(LazyEvaluation)}
-         * when SLF4J requests String construction.
-         * <br>The String returned by this is used to construct the log message.
+         * when SLF4J requests string construction.
+         * <br>The string returned by this is used to construct the log message.
          *
-         * @throws IOException
-         *         To allow lazy evaluation of methods that might throw exceptions
-         *
-         * @return The String for log message
+         * @return The string for log message.
          */
-        String getString() throws IOException;
+        String getString();
     }
 }
