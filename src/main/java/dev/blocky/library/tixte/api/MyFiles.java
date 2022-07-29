@@ -15,17 +15,17 @@
  */
 package dev.blocky.library.tixte.api;
 
+import com.google.errorprone.annotations.CheckReturnValue;
+import dev.blocky.library.tixte.internal.requests.json.DataArray;
+import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.utils.Checks;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Objects;
 import java.util.Optional;
 
 import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
@@ -59,8 +59,8 @@ public class MyFiles
      */
     public long getUsedSize() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawSize());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawSize());
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("used");
     }
@@ -79,8 +79,8 @@ public class MyFiles
      */
     public long getLimit() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawSize());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawSize());
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("limit");
     }
@@ -119,8 +119,8 @@ public class MyFiles
      */
     public int getPremiumTier() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawSize());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawSize());
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("premium_tier");
     }
@@ -136,8 +136,8 @@ public class MyFiles
      */
     public int getTotalUploadCount() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(0));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(0));
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("total");
     }
@@ -156,8 +156,8 @@ public class MyFiles
      */
     public int getResults(int page) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(page));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("results");
     }
@@ -187,11 +187,11 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(page));
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("uploads");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("uploads");
 
-        return array.getJSONObject(index).getInt("permission_level");
+        return array.getDataObject(index).getInt("permission_level");
     }
 
     /**
@@ -223,11 +223,11 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(page));
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("uploads");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("uploads");
 
-        return array.getJSONObject(index).getString("extension");
+        return array.getDataObject(index).getString("extension");
     }
 
     /**
@@ -255,11 +255,11 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(page));
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("uploads");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("uploads");
 
-        return array.getJSONObject(index).getInt("size");
+        return array.getDataObject(index).getInt("size");
     }
 
     /**
@@ -291,11 +291,11 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(page));
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("uploads");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("uploads");
 
-        return array.getJSONObject(index).getString("uploaded_at");
+        return array.getDataObject(index).getString("uploaded_at");
     }
 
     /**
@@ -324,11 +324,11 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(page));
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("uploads");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("uploads");
 
-        return array.getJSONObject(index).getString("domain");
+        return array.getDataObject(index).getString("domain");
     }
 
     /**
@@ -357,11 +357,11 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(page));
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("uploads");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("uploads");
 
-        return array.getJSONObject(index).getString("name");
+        return array.getDataObject(index).getString("name");
     }
 
     /**
@@ -395,11 +395,11 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(page));
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("uploads");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("uploads");
 
-        return array.getJSONObject(index).getString("mimetype");
+        return array.getDataObject(index).getString("mimetype");
     }
 
     /**
@@ -432,11 +432,11 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(page));
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("uploads");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("uploads");
 
-        return array.getJSONObject(index).isNull("expiration") ? "": array.getJSONObject(index).getString("expiration");
+        return array.getDataObject(index).isNull("expiration") ? "": array.getDataObject(index).getString("expiration");
     }
 
     /**
@@ -465,11 +465,11 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(page));
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("uploads");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("uploads");
 
-        return array.getJSONObject(index).getString("asset_id");
+        return array.getDataObject(index).getString("asset_id");
     }
 
     /**
@@ -503,11 +503,11 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        JSONObject json = new JSONObject(getRawResponseData().getRawUploads(page));
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("uploads");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("uploads");
 
-        return array.getJSONObject(index).getInt("type");
+        return array.getDataObject(index).getInt("type");
     }
 
     /**
@@ -602,8 +602,8 @@ public class MyFiles
     @NotNull
     public String getUploadRegion() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getString("upload_region");
     }
@@ -615,6 +615,7 @@ public class MyFiles
      * @return The url of the current uploaded file.
      */
     @Nullable
+    @CheckReturnValue
     public Optional<String> getURL()
     {
         return Optional.ofNullable(url);
@@ -627,6 +628,7 @@ public class MyFiles
      * @return The direct-url of the current uploaded file.
      */
     @Nullable
+    @CheckReturnValue
     public Optional<String> getDirectURL()
     {
         return Optional.ofNullable(directURL);
@@ -639,6 +641,7 @@ public class MyFiles
      * @return The deletion-url of the current uploaded file.
      */
     @Nullable
+    @CheckReturnValue
     public Optional<String> getDeletionURL()
     {
         return Optional.ofNullable(deletionURL);
@@ -671,8 +674,8 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull File file) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadFileRaw(file));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(file));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -695,8 +698,6 @@ public class MyFiles
      * you initialize the client with a domain by calling {@link TixteClientBuilder#setDefaultDomain(String)}.
      * <br>But if you don't want to use the default domain, you can use another domain by calling
      * {@link #uploadPrivateFile(File, String)} instead.
-     * <br>
-     * <br>Because this is an experimental feature, and it is not yet very stable, this could throw some exceptions.
      *
      * @param file The file to be uploaded.
      *
@@ -707,11 +708,10 @@ public class MyFiles
      * @return The current instance of this class.
      */
     @NotNull
-    @ApiStatus.Experimental
     public MyFiles uploadPrivateFile(@NotNull File file) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadPrivateFileRaw(file));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(file));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -746,8 +746,8 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull File file, @NotNull String domain) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadFileRaw(file, domain));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(file, domain));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -769,8 +769,6 @@ public class MyFiles
      * <br>If you want to use the default domain, you don't have to call this method, you can call
      * {@link #uploadPrivateFile(File)} instead.
      * <br>Note that you must have initialized the client with a default domain before you can use this method.
-     * <br>
-     * <br>Because this is an experimental feature, and it is not yet very stable, this could throw some exceptions.
      *
      * @param file The file to be uploaded.
      * @param domain The domain to upload the file to.
@@ -782,11 +780,10 @@ public class MyFiles
      * @return The current instance of this class.
      */
     @NotNull
-    @ApiStatus.Experimental
     public MyFiles uploadPrivateFile(@NotNull File file, @NotNull String domain) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadPrivateFileRaw(file, domain));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(file, domain));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -821,8 +818,8 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull URI filePath) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadFileRaw(filePath));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(filePath));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -845,8 +842,6 @@ public class MyFiles
      * you initialize the client with a domain by calling {@link TixteClientBuilder#setDefaultDomain(String)}.
      * <br>But if you don't want to use the default domain, you can use another domain by calling
      * {@link #uploadPrivateFile(URI, String)} instead.
-     * <br>
-     * <br>Because this is an experimental feature, and it is not yet very stable, this could throw some exceptions.
      *
      * @param filePath The {@link URI} to initialize the file, which should be uploaded.
      *
@@ -857,11 +852,10 @@ public class MyFiles
      * @return The current instance of this class.
      */
     @NotNull
-    @ApiStatus.Experimental
     public MyFiles uploadPrivateFile(@NotNull URI filePath) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadPrivateFileRaw(filePath));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(filePath));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -896,8 +890,8 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull URI filePath, @NotNull String domain) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadFileRaw(filePath, domain));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(filePath, domain));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -919,8 +913,6 @@ public class MyFiles
      * <br>If you want to use the default domain, you don't have to call this method, you can call
      * {@link #uploadPrivateFile(URI)} instead.
      * <br>Note that you must have initialized the client with a default domain before you can use this method.
-     * <br>
-     * <br>Because this is an experimental feature, and it is not yet very stable, this could throw some exceptions.
      *
      * @param filePath The {@link URI} to initialize the file, which should be uploaded.
      * @param domain The domain to upload the file to.
@@ -932,11 +924,10 @@ public class MyFiles
      * @return The current instance of this class.
      */
     @NotNull
-    @ApiStatus.Experimental
     public MyFiles uploadPrivateFile(@NotNull URI filePath, @NotNull String domain) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadPrivateFileRaw(filePath, domain));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(filePath, domain));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -971,8 +962,8 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull String filePath) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadFileRaw(filePath));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(filePath));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -995,8 +986,6 @@ public class MyFiles
      * you initialize the client with a domain by calling {@link TixteClientBuilder#setDefaultDomain(String)}.
      * <br>But if you don't want to use the default domain, you can use another domain by calling
      * {@link #uploadPrivateFile(String, String)} instead.
-     * <br>
-     * <br>Because this is an experimental feature, and it is not yet very stable, this could throw some exceptions.
      *
      * @param filePath The string to initialize the file, which should be uploaded.
      *
@@ -1007,11 +996,10 @@ public class MyFiles
      * @return The current instance of this class.
      */
     @NotNull
-    @ApiStatus.Experimental
     public MyFiles uploadPrivateFile(@NotNull String filePath) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadPrivateFileRaw(filePath));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(filePath));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -1046,8 +1034,8 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull String filePath, @NotNull String domain) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadFileRaw(filePath, domain));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(filePath, domain));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -1069,8 +1057,6 @@ public class MyFiles
      * <br>If you want to use the default domain, you don't have to call this method, you can call
      * {@link #uploadPrivateFile(String)} instead.
      * <br>Note that you must have initialized the client with a default domain before you can use this method.
-     * <br>
-     * <br>Because this is an experimental feature, and it is not yet very stable, this could throw some exceptions.
      *
      * @param filePath The string to initialize the file, which should be uploaded.
      * @param domain The domain to upload the file to.
@@ -1082,11 +1068,10 @@ public class MyFiles
      * @return The current instance of this class.
      */
     @NotNull
-    @ApiStatus.Experimental
     public MyFiles uploadPrivateFile(@NotNull String filePath, @NotNull String domain) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().uploadPrivateFileRaw(filePath, domain));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(filePath, domain));
+        DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
         directURL = data.getString("direct_url");
@@ -1139,5 +1124,53 @@ public class MyFiles
     {
         getRawResponseData().purgeFilesRaw(password);
         return this;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        MyFiles myFiles = (MyFiles) o;
+
+        return Objects.equals(url, myFiles.url) && Objects.equals(directURL, myFiles.directURL) &&
+                Objects.equals(deletionURL, myFiles.deletionURL);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(new MyFiles());
+    }
+
+    @NotNull
+    @Override
+    public String toString()
+    {
+        try
+        {
+            return "MyFiles{" +
+                    "used=" + getUsedSize() + ", " +
+                    "limit=" + getLimit() + ", " +
+                    "remaining=" + getRemainingSize() + ", " +
+                    "premium_tier=" + getPremiumTier() + ", " +
+                    "total=" + getTotalUploadCount() + ", " +
+                    "url='" + url + "', " +
+                    "directURL='" + directURL + "', " +
+                    "deletionURL='" + deletionURL + '\'' +
+                    '}';
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

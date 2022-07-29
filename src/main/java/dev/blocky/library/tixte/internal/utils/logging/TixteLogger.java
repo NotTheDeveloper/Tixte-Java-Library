@@ -48,11 +48,7 @@ public class TixteLogger
     public static final boolean SLF4J_ENABLED;
     private static final Map<String, Logger> LOGS = new CaseInsensitiveMap<>();
 
-    /**
-     * Constructs a <br>new</b> {@link TixteLogger}.
-     * <br>This is a private constructor, because it should not be accessed for other classes.
-     */
-    private TixteLogger() { }
+    TixteLogger() { }
 
     static
     {

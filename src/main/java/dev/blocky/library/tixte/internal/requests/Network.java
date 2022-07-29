@@ -35,11 +35,7 @@ public strictfp class Network
     private final String hostName;
     private final int port;
 
-    /**
-     * Constructs a <br>new</b> {@link Network}.
-     * <br>This is a private constructor, because it should not be accessed for other classes.
-     */
-    private Network(@NotNull String hostName, int port)
+    Network(@NotNull String hostName, int port)
     {
         Checks.notEmpty(hostName, "hostName");
         Checks.noWhitespace(hostName, "hostName");

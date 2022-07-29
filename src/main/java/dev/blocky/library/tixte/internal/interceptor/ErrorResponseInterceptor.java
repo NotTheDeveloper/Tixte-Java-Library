@@ -16,11 +16,11 @@
 package dev.blocky.library.tixte.internal.interceptor;
 
 import dev.blocky.library.tixte.api.exceptions.*;
+import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -41,11 +41,11 @@ public class ErrorResponseInterceptor implements Interceptor
         Request request = chain.request();
         Response response = chain.proceed(request);
 
-        JSONObject json = new JSONObject(response.peekBody(2048).string());
+        DataObject json = DataObject.fromJson(response.peekBody(2048).string());
 
         if (!response.isSuccessful())
         {
-            JSONObject error = json.getJSONObject("error");
+            DataObject error = json.getDataObject("error");
 
             switch (response.code())
             {
@@ -60,7 +60,7 @@ public class ErrorResponseInterceptor implements Interceptor
                 case 429:
                     throw new TixteServerError("We got rate-limited: " + error.getString("message"));
                 case 500:
-                    throw new TixteServerError("Internal Server Error: " + error.toString());
+                    throw new TixteServerError("Internal Server Error: " + error.getString("message"));
                 default:
                     throw new HTTPException("HTTP Error: " + error.getString("code") + ", " + error.getString("message"));
             }

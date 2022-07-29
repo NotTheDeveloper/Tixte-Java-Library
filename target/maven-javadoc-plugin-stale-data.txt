@@ -28,10 +28,8 @@
 'tixte4j 1.0.0-beta.2 API'
 dev.blocky.library.tixte.annotations
 dev.blocky.library.tixte.api
-dev.blocky.library.tixte.api.entities
 dev.blocky.library.tixte.api.enums
 dev.blocky.library.tixte.api.exceptions
-dev.blocky.library.tixte.api.systems
 dev.blocky.library.tixte.internal.interceptor
 dev.blocky.library.tixte.internal.requests
 dev.blocky.library.tixte.internal.utils
@@ -42,10 +40,9 @@ dev.blocky.library.tixte.internal.utils.logging
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/annotations/package-info.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/annotations/ReplaceWith.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/annotations/Undocumented.java'
+'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/Domains.java'
+'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/Embed.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/EmbedEditor.java'
-'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/entities/Embed.java'
-'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/entities/SelfUser.java'
-'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/entities/User.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/enums/AccountType.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/enums/CachePolicy.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/exceptions/Forbidden.java'
@@ -54,12 +51,13 @@ dev.blocky.library.tixte.internal.utils.logging
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/exceptions/TixteServerError.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/exceptions/TixteWantsYourMoneyException.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/exceptions/Unauthorized.java'
+'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/MyFiles.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/PageDesign.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/RawResponseData.java'
-'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/systems/Domains.java'
-'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/systems/MyFiles.java'
+'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/SelfUser.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/TixteClient.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/TixteClientBuilder.java'
+'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/api/User.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/internal/interceptor/CacheInterceptor.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/internal/interceptor/ErrorResponseInterceptor.java'
 'C:/Users/Dominic/IdeaProjects/TixteJavaLibrary/src/main/java/dev/blocky/library/tixte/internal/interceptor/ForceCacheInterceptor.java'
@@ -83,18 +81,18 @@ C:\Users\Dominic\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0
 C:\Users\Dominic\.m2\repository\com\google\errorprone\error_prone_annotations\2.14.0\error_prone_annotations-2.14.0.jar = 1654772863393
 C:\Users\Dominic\.m2\repository\org\apache\commons\commons-collections4\4.4\commons-collections4-4.4.jar = 1630836766851
 C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\src\main\java = 1653841186215
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\generated-sources\annotations = 1657813620900
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\allclasses-frame.html = 1657813629280
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\allclasses-noframe.html = 1657813629283
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\constant-values.html = 1657813628946
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\deprecated-list.html = 1657813629276
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\help-doc.html = 1657813629294
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\index-all.html = 1657813629270
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\index.html = 1657813629286
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\overview-frame.html = 1657813628841
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\overview-summary.html = 1657813629290
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\overview-tree.html = 1657813629238
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\package-list = 1657813628838
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\script.js = 1657813629300
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\serialized-form.html = 1657813628957
-C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\stylesheet.css = 1657813629297
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\generated-sources\annotations = 1657898390198
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\allclasses-frame.html = 1657898398265
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\allclasses-noframe.html = 1657898398268
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\constant-values.html = 1657898397954
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\deprecated-list.html = 1657898398261
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\help-doc.html = 1657898398278
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\index-all.html = 1657898398256
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\index.html = 1657898398272
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\overview-frame.html = 1657898397866
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\overview-summary.html = 1657898398275
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\overview-tree.html = 1657898398221
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\package-list = 1657898397863
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\script.js = 1657898398282
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\serialized-form.html = 1657898397964
+C:\Users\Dominic\IdeaProjects\TixteJavaLibrary\target\apidocs\stylesheet.css = 1657898398281

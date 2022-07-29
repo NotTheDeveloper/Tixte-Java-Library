@@ -15,13 +15,14 @@
  */
 package dev.blocky.library.tixte.api;
 
+import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
@@ -207,7 +208,7 @@ public class TixteClient
     /**
      * Gets the current {@link CachePolicy}.
      * <br>The {@link CachePolicy} can be set by using {@link TixteClientBuilder#setCachePolicy(CachePolicy)}.
-     * <br>The default {@link CachePolicy} is {@link CachePolicy#DEFAULT}.
+     * <br>The default {@link CachePolicy} is {@link CachePolicy#NONE}.
      *
      * @return The current {@link CachePolicy}.
      */
@@ -274,5 +275,24 @@ public class TixteClient
     public void cancelRequests()
     {
         client.dispatcher().cancelAll();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(new TixteClient());
+    }
+
+    @NotNull
+    @Override
+    public String toString()
+    {
+        return "TixteClient{" +
+                "API_KEY='" + getAPIKey() + "', " +
+                "SESSION_TOKEN='" + getSessionToken() + "', " +
+                "DEFAULT_DOMAIN='" + getDefaultDomain() + "', " +
+                "policy=" + policy +  ", " +
+                "request=" + request +
+                '}';
     }
 }

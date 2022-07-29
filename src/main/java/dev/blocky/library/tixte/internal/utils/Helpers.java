@@ -99,4 +99,54 @@ public final class Helpers
     {
         return string.codePointCount(0, string.length());
     }
+
+    /**
+     * Parses the string argument as a signed decimal long. The characters in the string must all be decimal digits,
+     * except that the first character may be an ASCII minus sign '-' {@code ('\u002D')} to indicate a negative value or an ASCII
+     * plus sign '+' {@code ('\u002B')} to indicate a positive value.
+     *
+     * @param input A string containing the long representation to be parsed.
+     *
+     * @return The long represented by the argument in decimal.
+     */
+    public static long parseLong(@NotNull String input)
+    {
+        if (input.startsWith("-"))
+        {
+            return Long.parseLong(input);
+        }
+        else
+        {
+            return Long.parseUnsignedLong(input);
+        }
+    }
+
+    /**
+     * This method counts the number of occurrences of the given character in the given string.
+     * <br>If the given {@link CharSequence} is {@code null} or empty, this method will return {@code 0}.
+     *
+     * @param seq The {@link CharSequence} to be searched.
+     * @param c The character to count.
+     *
+     * @return The number of occurrences of the given character in the given string.
+     */
+    public static int countMatches(@NotNull CharSequence seq, char c)
+    {
+        if (isEmpty(seq))
+        {
+            return 0;
+        }
+
+        int count = 0;
+
+        for (int i = 0; i < seq.length(); i++)
+        {
+            if (seq.charAt(i) == c)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
 }

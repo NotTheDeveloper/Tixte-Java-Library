@@ -15,12 +15,13 @@
  */
 package dev.blocky.library.tixte.api;
 
+import com.google.errorprone.annotations.CheckReturnValue;
+import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONObject;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import java.io.IOException;
+import java.util.Objects;
 
 import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
 
@@ -52,8 +53,8 @@ public class SelfUser
      */
     public boolean isEmailVerified() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getBoolean("email_verified");
     }
@@ -71,8 +72,8 @@ public class SelfUser
     @CheckReturnValue
     public String getPhoneNumber() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.isNull("phone") ? "": data.getString("phone");
     }
@@ -91,8 +92,8 @@ public class SelfUser
     @NotNull
     public String getLastLogin() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getString("last_login");
     }
@@ -108,8 +109,8 @@ public class SelfUser
      */
     public int getFlagCount() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("flags");
     }
@@ -125,8 +126,8 @@ public class SelfUser
      */
     public int getPremiumTier() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("premium_tier");
     }
@@ -143,8 +144,8 @@ public class SelfUser
      */
     public boolean hasMFAEnabled() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getBoolean("mfa_enabled");
     }
@@ -161,8 +162,8 @@ public class SelfUser
     @NotNull
     public String getId() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getString("id");
     }
@@ -181,8 +182,8 @@ public class SelfUser
     @CheckReturnValue
     public String getAvatarId() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.isNull("avatar") ? "": data.getString("avatar");
     }
@@ -199,8 +200,8 @@ public class SelfUser
     @NotNull
     public String getUploadRegion() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getString("upload_region");
     }
@@ -219,8 +220,8 @@ public class SelfUser
     @CheckReturnValue
     public String getEmail() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.isNull("email") ? "": data.getString("email");
     }
@@ -237,8 +238,8 @@ public class SelfUser
     @NotNull
     public String getUsername() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getString("username");
     }
@@ -256,8 +257,8 @@ public class SelfUser
     @CheckReturnValue
     public String getAPIKeyBySessionToken() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getAPIKeyBySessionTokenRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getAPIKeyBySessionTokenRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getString("api_key");
     }
@@ -292,8 +293,8 @@ public class SelfUser
      */
     public boolean hasTixteTurboSubscription() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawSize());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawSize());
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("premium_tier") == 1;
     }
@@ -310,9 +311,45 @@ public class SelfUser
      */
     public boolean hasTixteTurboChargedSubscription() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getRawSize());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getRawSize());
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("premium_tier") == 2;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(new SelfUser());
+    }
+
+    @NotNull
+    @Override
+    public String toString()
+    {
+        try
+        {
+            return "SelfUser{" +
+                    "email_verified=" + isEmailVerified() + ", " +
+                    "phone='" + getPhoneNumber() + "', " +
+                    "last_login='" + getLastLogin() + "', " +
+                    "flags=" + getFlagCount() + ", " +
+                    "premium_tier=" + getPremiumTier() + ", " +
+                    "mfa_enabled=" + hasMFAEnabled() + ", " +
+                    "id='" + getId() + "', " +
+                    "avatar='" + getAvatarId() + "', " +
+                    "upload_region='" + getUploadRegion() + "', " +
+                    "email='" + getEmail() + "', " +
+                    "username='" + getUsername() + "', " +
+                    "apiKey='" + getAPIKeyBySessionToken() + "', " +
+                    "hasTixteSubscription=" + hasTixteSubscription() + ", " +
+                    "hasTixteTurboSubscription=" + hasTixteTurboSubscription() + ", " +
+                    "hasTixteTurboChargedSubscription=" + hasTixteTurboChargedSubscription() +
+                    '}';
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

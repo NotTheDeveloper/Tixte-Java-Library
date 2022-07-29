@@ -17,6 +17,7 @@ package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dev.blocky.library.tixte.api.enums.AccountType;
+import dev.blocky.library.tixte.internal.requests.Route;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import okhttp3.*;
 import org.jetbrains.annotations.ApiStatus;
@@ -27,23 +28,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Objects;
 
 import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
-import static dev.blocky.library.tixte.internal.requests.Route.Account.ACCOUNT_ENDPOINT;
-import static dev.blocky.library.tixte.internal.requests.Route.Account.USERS_ENDPOINT;
-import static dev.blocky.library.tixte.internal.requests.Route.BASE_URL;
-import static dev.blocky.library.tixte.internal.requests.Route.Config.CONFIG_ENDPOINT;
-import static dev.blocky.library.tixte.internal.requests.Route.Domain.ACCOUNT_DOMAINS_ENDPOINT;
-import static dev.blocky.library.tixte.internal.requests.Route.Domain.DOMAINS_ENDPOINT;
-import static dev.blocky.library.tixte.internal.requests.Route.File.*;
-import static dev.blocky.library.tixte.internal.requests.Route.Resources.GENERATE_DOMAIN_ENDPOINT;
-import static dev.blocky.library.tixte.internal.requests.Route.SLASH;
+import static dev.blocky.library.tixte.internal.requests.Method.DELETE;
+import static dev.blocky.library.tixte.internal.requests.Method.PATCH;
 
 /**
  * Represents the raw response data from Tixte API-requests.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v2.0.0
  * @since v1.0.0-beta.1
  */
 public strictfp class RawResponseData
@@ -65,15 +60,9 @@ public strictfp class RawResponseData
     @NotNull
     public String getRawSize() throws IOException
     {
-        request = new Request.Builder()
-                .url(BASE_URL + SIZE_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .build();
+        Route.CompiledRoute route = Route.Self.GET_UPLOAD_SIZE.compile();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return request(route, false, null);
     }
 
     /**
@@ -103,15 +92,9 @@ public strictfp class RawResponseData
     {
         Checks.notNegative(page, "page");
 
-        request = new Request.Builder()
-                .url(BASE_URL + FILE_ENDPOINT + PAGE + page)
-                .addHeader("Authorization", apiKey)
-                .build();
+        Route.CompiledRoute route = Route.Self.GET_UPLOADS.compile();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return request(route, false, null);
     }
 
     /**
@@ -133,22 +116,14 @@ public strictfp class RawResponseData
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", defaultDomain)
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(null, multipartBody, false);
     }
 
     /**
@@ -171,23 +146,14 @@ public strictfp class RawResponseData
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", defaultDomain)
-                .addHeader("type", "2")
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(null, multipartBody, true);
     }
 
     /**
@@ -213,22 +179,14 @@ public strictfp class RawResponseData
         Checks.notEmpty(domain, "domain");
         Checks.noWhitespace(domain, "domain");
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", domain)
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(domain, multipartBody, false);
     }
 
     /**
@@ -255,23 +213,14 @@ public strictfp class RawResponseData
         Checks.notEmpty(domain, "domain");
         Checks.noWhitespace(domain, "domain");
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", domain)
-                .addHeader("type", "2")
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(domain, multipartBody, true);
     }
 
     /**
@@ -295,22 +244,14 @@ public strictfp class RawResponseData
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", defaultDomain)
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(null, multipartBody, false);
     }
 
     /**
@@ -335,23 +276,14 @@ public strictfp class RawResponseData
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", defaultDomain)
-                .addHeader("type", "2")
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(null, multipartBody, true);
     }
 
     /**
@@ -376,25 +308,14 @@ public strictfp class RawResponseData
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
 
-        Checks.notEmpty(domain, "domain");
-        Checks.noWhitespace(domain, "domain");
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", domain)
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(domain, multipartBody, false);
     }
 
     /**
@@ -423,23 +344,14 @@ public strictfp class RawResponseData
         Checks.notEmpty(domain, "domain");
         Checks.noWhitespace(domain, "domain");
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", domain)
-                .addHeader("type", "2")
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(domain, multipartBody, true);
     }
 
     /**
@@ -465,22 +377,14 @@ public strictfp class RawResponseData
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", defaultDomain)
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(null, multipartBody, false);
     }
 
     /**
@@ -507,23 +411,14 @@ public strictfp class RawResponseData
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", defaultDomain)
-                .addHeader("type", "2")
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(null, multipartBody, true);
     }
 
     /**
@@ -553,22 +448,14 @@ public strictfp class RawResponseData
         Checks.notEmpty(domain, "domain");
         Checks.noWhitespace(domain, "domain");
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", domain)
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(domain,multipartBody, false);
     }
 
     /**
@@ -599,23 +486,14 @@ public strictfp class RawResponseData
         Checks.notEmpty(domain, "domain");
         Checks.noWhitespace(domain, "domain");
 
-        request = new Request.Builder()
-                .url(BASE_URL + UPLOAD_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .addHeader("domain", domain)
-                .addHeader("type", "2")
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(file, MediaType.get("multipart/form-data")))
-                        .build()
-                )
+        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return postFile(domain, multipartBody, true);
     }
 
     /**
@@ -636,16 +514,9 @@ public strictfp class RawResponseData
         Checks.notEmpty(fileId, "fileId");
         Checks.noWhitespace(fileId, "fileId");
 
-        request = new Request.Builder()
-                .url(BASE_URL + FILE_ENDPOINT + SLASH + fileId)
-                .addHeader("Authorization", apiKey)
-                .delete()
-                .build();
+        Route.CompiledRoute route = Route.Self.DELETE_FILE.compile(fileId);
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return request(route, false, null);
     }
 
     /**
@@ -666,17 +537,12 @@ public strictfp class RawResponseData
         Checks.notEmpty(password, "password");
         Checks.noWhitespace(password, "password");
 
-        request = new Request.Builder()
-                .url(BASE_URL + FILE_ENDPOINT)
-                .addHeader("Authorization", sessionToken)
-                .delete(RequestBody.create("{ \"password\": \"" + password + "\", \"purge\": true }",
-                        MediaType.parse("application/json")))
-                .build();
+        Route.CompiledRoute route = Route.Self.DELETE_FILE.compile();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        RequestBody requestBody = RequestBody.create("{ \"password\": \"" + password + "\", \"purge\": true }",
+                MediaType.parse("application/json"));
+
+        return request(route, true, requestBody);
     }
 
     /**
@@ -702,15 +568,9 @@ public strictfp class RawResponseData
     @NotNull
     public String getUserInfoRaw() throws IOException
     {
-        request = new Request.Builder()
-                .url(BASE_URL + ACCOUNT_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .build();
+        Route.CompiledRoute route = Route.Self.GET_SELF.compile();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return request(route, false, null);
     }
 
     /**
@@ -733,15 +593,9 @@ public strictfp class RawResponseData
         Checks.notEmpty(userData, "userData");
         Checks.noWhitespace(userData, "userData");
 
-        request = new Request.Builder()
-                .url(BASE_URL + USERS_ENDPOINT + userData)
-                .addHeader("Authorization", sessionToken)
-                .build();
+        Route.CompiledRoute route = Route.Users.GET_USER.compile(userData);
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return request(route, true, null);
     }
 
     /**
@@ -759,15 +613,9 @@ public strictfp class RawResponseData
     @NotNull
     public String getUserDomainsRaw() throws IOException
     {
-        request = new Request.Builder()
-                .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
-                .addHeader("Authorization", sessionToken)
-                .build();
+        Route.CompiledRoute route = Route.Self.GET_DOMAINS.compile();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return request(route, false, null);
     }
 
     /**
@@ -784,15 +632,9 @@ public strictfp class RawResponseData
     @NotNull
     public String getUsableDomainsRaw() throws IOException
     {
-        request = new Request.Builder()
-                .url(BASE_URL + DOMAINS_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .build();
+        Route.CompiledRoute route = Route.Domain.GET_DOMAINS.compile();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return request(route, false, null);
     }
 
     /**
@@ -807,15 +649,9 @@ public strictfp class RawResponseData
     @NotNull
     public String generateDomainRaw() throws IOException
     {
-        request = new Request.Builder()
-                .url(BASE_URL + GENERATE_DOMAIN_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .build();
+        Route.CompiledRoute route = Route.Resources.GET_GENERATED_DOMAIN.compile();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return request(route, false, null);
     }
 
     /**
@@ -836,17 +672,12 @@ public strictfp class RawResponseData
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
 
-        request = new Request.Builder()
-                .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
-                .addHeader("Authorization", sessionToken)
-                .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": false }",
-                        MediaType.get("application/json")))
-                .build();
+        Route.CompiledRoute route = Route.Self.ADD_DOMAIN.compile(domainName);
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        RequestBody requestBody = RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": false }",
+                MediaType.get("application/json"));
+
+        return request(route, true, requestBody);
     }
 
     /**
@@ -867,17 +698,12 @@ public strictfp class RawResponseData
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
 
-        request = new Request.Builder()
-                .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT)
-                .addHeader("Authorization", sessionToken)
-                .patch(RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": true }",
-                        MediaType.get("application/json")))
-                .build();
+        Route.CompiledRoute route = Route.Self.ADD_DOMAIN.compile(domainName);
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        RequestBody requestBody = RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": true }",
+                MediaType.get("application/json"));
+
+        return request(route, true, requestBody);
     }
 
     /**
@@ -897,16 +723,9 @@ public strictfp class RawResponseData
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
 
-        request = new Request.Builder()
-                .url(BASE_URL + ACCOUNT_DOMAINS_ENDPOINT + SLASH + domainName)
-                .addHeader("Authorization", sessionToken)
-                .delete()
-                .build();
+        Route.CompiledRoute route = Route.Self.DELETE_DOMAIN.compile(domainName);
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return request(route, true, null);
     }
 
     /**
@@ -921,15 +740,9 @@ public strictfp class RawResponseData
     @NotNull
     public String getAPIKeyBySessionTokenRaw() throws IOException
     {
-        request = new Request.Builder()
-                .url(BASE_URL + ACCOUNT_ENDPOINT + "/keys")
-                .addHeader("Authorization", sessionToken)
-                .build();
+        Route.CompiledRoute route = Route.Self.GET_KEYS.compile();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return request(route, true, null);
     }
 
     /**
@@ -951,15 +764,9 @@ public strictfp class RawResponseData
     @NotNull
     public String getConfigRaw() throws IOException
     {
-        request = new Request.Builder()
-                .url(BASE_URL + CONFIG_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .build();
+        Route.CompiledRoute route = Route.Self.GET_CONFIG.compile();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        return request(route, false, null);
     }
 
     /**
@@ -977,17 +784,12 @@ public strictfp class RawResponseData
     @CanIgnoreReturnValue
     public String setCustomCSSRaw(@NotNull String customCSS) throws IOException
     {
-        request = new Request.Builder()
-                .url(BASE_URL + CONFIG_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .patch(RequestBody.create("{ \"custom_css\": \"" + customCSS + "\" }",
-                        MediaType.get("application/json")))
-                .build();
+        Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
-        try (Response response = client.newCall(request).execute())
-        {
-            return response.body().string();
-        }
+        RequestBody requestBody = RequestBody.create("{ \"custom_css\": \"" + customCSS + "\" }",
+                MediaType.get("application/json"));
+
+        return request(route, false, requestBody);
     }
 
     /**
@@ -1013,23 +815,91 @@ public strictfp class RawResponseData
                               @Nullable String authorName, @Nullable String authorURL, @Nullable String providerName,
                               @Nullable String providerURL) throws IOException
     {
-        request = new Request.Builder()
-                .url(BASE_URL + CONFIG_ENDPOINT)
-                .addHeader("Authorization", apiKey)
-                .patch(RequestBody.create(
-                        "{ \"embed\": { \"description\": \"" + description == null ? "" : description + "\", " +
-                                "\"title\": \"" + title == null ? "" : title + "\", " +
-                                "\"theme_color\": \"" + color == null ? "" : color + "\", " +
-                                "\"author_name\": \"" + authorName == null ? "" : authorName + "\", " +
-                                "\"author_url\": \"" + authorURL == null ? "" : authorURL + "\", " +
-                                "\"provider_name\": \"" + providerName == null ? "" : providerName + "\", " +
-                                "\"provider_url\": \"" + providerURL == null ? "" : providerURL + "\" } }",
-                        MediaType.get("application/json")))
+        Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
+
+        RequestBody requestBody = RequestBody.create(
+                "{ \"embed\": { \"description\": \"" + description == null ? "" : description + "\", " +
+                        "\"title\": \"" + title == null ? "" : title + "\", " +
+                        "\"theme_color\": \"" + color == null ? "" : color + "\", " +
+                        "\"author_name\": \"" + authorName == null ? "" : authorName + "\", " +
+                        "\"author_url\": \"" + authorURL == null ? "" : authorURL + "\", " +
+                        "\"provider_name\": \"" + providerName == null ? "" : providerName + "\", " +
+                        "\"provider_url\": \"" + providerURL == null ? "" : providerURL + "\" } }",
+                MediaType.get("application/json"));
+
+        return request(route, false, requestBody);
+    }
+
+    @Nullable
+    private String request(@NotNull Route.CompiledRoute route, boolean sessionTokenNeeded, @Nullable RequestBody requestBody) throws IOException
+    {
+        String BASE_URL = "https://api.tixte.com/v1/";
+
+        Request.Builder builder = new Request.Builder()
+                .url(BASE_URL + route.getCompiledRoute())
+                .addHeader("Authorization", sessionTokenNeeded ? sessionToken : apiKey);
+
+
+        if (requestBody == null)
+        {
+            switch (route.getMethod())
+            {
+                case GET:
+                    request = builder.build();
+                    break;
+                case DELETE:
+                    request = builder.delete().build();
+                    break;
+            }
+        }
+        else if (requestBody != null && route.getMethod().equals(DELETE))
+        {
+            request = builder.delete(requestBody).build();
+        }
+        else if (requestBody != null && route.getMethod().equals(PATCH))
+        {
+            request = builder.patch(requestBody).build();
+        }
+
+        try (Response response = client.newCall(request).execute())
+        {
+            return response.body().string();
+        }
+    }
+
+    @Nullable
+    private String postFile(@Nullable String domain, @NotNull MultipartBody multipartBody, boolean privateFile) throws IOException
+    {
+        String BASE_URL = "https://api.tixte.com/v1/";
+
+        Request.Builder builder = new Request.Builder()
+                .url(BASE_URL + Route.File.UPLOAD_FILE.getRoute())
+                .addHeader("Authorization", apiKey);
+
+        request = builder
+                .addHeader("domain", domain == null ? defaultDomain : domain)
+                .addHeader("type", privateFile ? "2" : "1")
+                .post(multipartBody)
                 .build();
 
         try (Response response = client.newCall(request).execute())
         {
             return response.body().string();
         }
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(new RawResponseData());
+    }
+
+    @NotNull
+    @Override
+    public String toString()
+    {
+        return "RawResponseData{" +
+                "Request='" + request.toString() + '\'' +
+                '}';
     }
 }

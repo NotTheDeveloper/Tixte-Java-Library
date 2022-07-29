@@ -15,11 +15,13 @@
  */
 package dev.blocky.library.tixte.api;
 
+import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
+import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
 
@@ -32,6 +34,8 @@ import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
  */
 public class PageDesign
 {
+    private String customCSS;
+
     /**
      * Instantiates a <b>new</b> Page-Design.
      */
@@ -51,18 +55,30 @@ public class PageDesign
     @NotNull
     public String getCustomCSS() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getConfigRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getConfigRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getString("custom_css");
     }
 
     /**
      * Sets the custom CSS code from the 'Page Design' tab of the Tixte dashboard.
-     * <br>Note that this method will throw an {@link dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException}
-     * if you don't own a Tixte turbo/turbo-charged subscription.
      *
      * @param customCSS The custom CSS code for your page design.
+     *
+     * @return The current instance of the PageDesign.
+     */
+    @NotNull
+    public PageDesign setCustomCSS(@Nullable String customCSS)
+    {
+        this.customCSS = customCSS;
+        return this;
+    }
+
+    /**
+     * Builds the custom CSS code from the 'Page Design' tab of the Tixte dashboard.
+     * <br>Note that this method will throw an {@link TixteWantsYourMoneyException}
+     * if you don't own a Tixte turbo/turbo-charged subscription.
      *
      * @throws IOException  If the request could not be executed due to cancellation,
      *                      a connectivity problem or timeout. Because networks can fail during an exchange,
@@ -70,10 +86,30 @@ public class PageDesign
      *
      * @return The current instance of the PageDesign.
      */
-    @NotNull
-    public PageDesign setCustomCSS(@Nullable String customCSS) throws IOException
+    public PageDesign build() throws IOException
     {
         getRawResponseData().setCustomCSSRaw(customCSS == null ? "" : customCSS);
         return this;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(new PageDesign());
+    }
+
+    @NotNull
+    @Override
+    public String toString()
+    {
+        try {
+            return "PageDesign{" +
+                    "custom_css='" + getCustomCSS() + '\'' +
+                    '}';
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

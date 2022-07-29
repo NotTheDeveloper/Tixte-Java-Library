@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
 
@@ -90,7 +91,7 @@ public class Embed
      */
     static final int EMBED_MAX_LENGTH_CLIENT = 2000;
 
-    private final String authorName, authorUrl, title;
+    private final String authorName, authorURL, title;
     private final String providerName, providerURL;
     private final String description, color;
     private final Object mutex = new Object();
@@ -101,7 +102,7 @@ public class Embed
      * Instantiates a <b>new</b> embed.
      *
      * @param authorName   The author name to be built.
-     * @param authorUrl    The author url to be built.
+     * @param authorURL    The author url to be built.
      * @param title        The title to be built.
      * @param description  The description to be built.
      * @param color        The color to be built.
@@ -113,11 +114,11 @@ public class Embed
      *                      a connectivity problem or timeout. Because networks can fail during an exchange,
      *                      it is possible that the remote server accepted the request before the failure.
      */
-    public Embed(@Nullable String authorName, @Nullable String authorUrl, @Nullable String title, @Nullable String description,
+    public Embed(@Nullable String authorName, @Nullable String authorURL, @Nullable String title, @Nullable String description,
           @Nullable String color, @Nullable String providerName, @Nullable String providerUrl, @Nullable AccountType accountType) throws IOException
     {
         this.authorName = authorName;
-        this.authorUrl = authorUrl;
+        this.authorURL = authorURL;
         this.title = title;
         this.description = description;
         this.color = color;
@@ -125,7 +126,7 @@ public class Embed
         this.providerURL = providerUrl;
         this.accountType = accountType;
 
-        getRawResponseData().setEmbedRaw(description, title, color, authorName, authorUrl, providerName, providerUrl);
+        getRawResponseData().setEmbedRaw(description, title, color, authorName, authorURL, providerName, providerUrl);
     }
 
     /**
@@ -178,7 +179,7 @@ public class Embed
     @CheckReturnValue
     public String getAuthorURL()
     {
-        return authorUrl;
+        return authorURL;
     }
 
     /**
@@ -272,5 +273,49 @@ public class Embed
             }
             return length;
         }
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        Embed embed = (Embed) o;
+
+        return length == embed.length && Objects.equals(authorName, embed.authorName) && Objects.equals(authorURL, embed.authorURL)
+                && Objects.equals(title, embed.title) && Objects.equals(providerName, embed.providerName) && Objects.equals(providerURL, embed.providerURL) &&
+                Objects.equals(description, embed.description) && color.equals(embed.color) && Objects.equals(mutex, embed.mutex) && accountType == embed.accountType;
+    }
+
+    @Override
+    public int hashCode() 
+    {
+        return Objects.hash(authorName, authorURL, title, providerName, providerURL, description, color, mutex, accountType, length);
+    }
+
+    @NotNull
+    @Override
+    public String toString()
+    {
+        return "Embed{" +
+                "authorName='" + authorName + "', " +
+                "authorURL='" + authorURL + "', " +
+                "title='" + title + "', " +
+                "providerName='" + providerName + "', " +
+                "providerURL='" + providerURL + "', " +
+                "description='" + description + "', " +
+                "color='" + color + "', " +
+                "mutex=" + mutex + ", " +
+                "accountType=" + accountType + ", " +
+                "length=" + length +
+                '}';
     }
 }

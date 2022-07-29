@@ -29,6 +29,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.util.Objects;
+
 /**
  * Used to create <b>new</b> {@link TixteClient} instances.
  * <br>
@@ -56,7 +58,7 @@ public class TixteClientBuilder
      * adjusting cache.
      * <br>When {@link dev.blocky.library.tixte.api.TixteClient#pruneCache() TixteClient#pruneCache()} is called, the
      * configured policy will be used to unload any data that the policy has decided not to cache.
-     * <br>If null the cache-policy will be set to {@link CachePolicy#DEFAULT DEFAULT}.
+     * <br>If null the cache-policy will be set to {@link CachePolicy#NONE NONE}.
      *
      * @param apiKey The API-key to use.
      * @param policy The cache-policy, which should be used.
@@ -68,12 +70,6 @@ public class TixteClientBuilder
     {
         Checks.notEmpty(apiKey, "apiKey");
         Checks.noWhitespace(apiKey, "apiKey");
-
-        if (policy == null)
-        {
-            policy = CachePolicy.DEFAULT;
-            logger.info("'policy' equals null, setting to DEFAULT");
-        }
 
         TixteClientBuilder.apiKey = apiKey;
         TixteClientBuilder.policy = policy;
@@ -133,7 +129,7 @@ public class TixteClientBuilder
      * adjusting cache.
      * <br>When {@link dev.blocky.library.tixte.api.TixteClient#pruneCache() TixteClient#pruneCache()} is called, the
      * configured policy will be used to unload any data that the policy has decided not to cache.
-     * <br>If null the cache-policy will be set to {@link CachePolicy#DEFAULT DEFAULT}.
+     * <br>If null the cache-policy will be set to {@link CachePolicy#NONE NONE}.
      *
      * @param policy The cache-policy, which should be used.
      *
@@ -142,18 +138,12 @@ public class TixteClientBuilder
     @NotNull
     public TixteClientBuilder setCachePolicy(@Nullable CachePolicy policy)
     {
-        if (policy == null)
-        {
-            policy = CachePolicy.DEFAULT;
-            logger.info("'policy' equals null, setting to DEFAULT");
-        }
-
         TixteClientBuilder.policy = policy;
         return this;
     }
 
     /**
-     * Builds a <b>new</b> {@link TixteClient} instance and uses the provided token to start the login process.
+     * Builds a <b>new</b> {@link TixteClient} instance and uses the provided API-key and session-token to start the login process.
      * <br>In this method there will be set a rate-limit for max. 100 requests per host.
      * <br>Here also will be built a {@link OkHttpClient} instance, in which every interceptor will be set.
      * <br>You can also set the {@link CachePolicy} by calling {@link #setCachePolicy(CachePolicy)}, which will be used here.
@@ -170,9 +160,15 @@ public class TixteClientBuilder
                 .addInterceptor(new RateLimitInterceptor())
                 .addInterceptor(new ErrorResponseInterceptor());
 
+        if (policy == null)
+        {
+            policy = CachePolicy.NONE;
+            logger.info("'policy' equals null, setting to NONE.");
+        }
+
         switch (policy)
         {
-            case DEFAULT:
+            case NONE:
                 client = builder.build();
                 break;
             case ONLY_FORCE_CACHE:
@@ -193,5 +189,23 @@ public class TixteClientBuilder
                 break;
         }
         return new TixteClient();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(new TixteClientBuilder());
+    }
+
+    @NotNull
+    @Override
+    public String toString()
+    {
+        return "TixteClientBuilder{" +
+                "API_KEY='" + apiKey+ "', " +
+                "SESSION_TOKEN='" + sessionToken + "', " +
+                "DEFAULT_DOMAIN='" + defaultDomain + "', " +
+                "policy=" + policy +
+                '}';
     }
 }

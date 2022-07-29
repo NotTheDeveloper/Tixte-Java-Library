@@ -26,7 +26,7 @@ package dev.blocky.library.tixte.api.enums;
  * <br>This can be configured with {@link dev.blocky.library.tixte.api.TixteClientBuilder#setCachePolicy(CachePolicy)
  * TixteClientBuilder#setCachePolicy(CachePolicy)}.
  *
- * @see #DEFAULT
+ * @see #NONE
  * @see #ALL
  * @see #ONLY_FORCE_CACHE
  * @see #ONLY_NETWORK_CACHE
@@ -41,7 +41,7 @@ public enum CachePolicy
      * Default cache-policy.
      * <br>Nothing will be cached.
      */
-    DEFAULT,
+    NONE,
 
     /**
      * Only force-cache cache-policy.

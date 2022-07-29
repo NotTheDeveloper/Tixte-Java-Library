@@ -15,14 +15,15 @@
  */
 package dev.blocky.library.tixte.api;
 
+import com.google.errorprone.annotations.CheckReturnValue;
+import dev.blocky.library.tixte.internal.requests.json.DataArray;
+import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
@@ -36,7 +37,7 @@ import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
  */
 public class Domains
 {
-    private String domain;
+    private String lastDeletedDomain;
 
     /**
      * Instantiates a <b>new</b> Domain-System.
@@ -56,8 +57,8 @@ public class Domains
      */
     public int getUsableDomainCount() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUsableDomainsRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUsableDomainsRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("count");
     }
@@ -84,13 +85,13 @@ public class Domains
     @CheckReturnValue
     public String getUsableDomains(int index) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUsableDomainsRaw());
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("domains");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUsableDomainsRaw());
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("domains");
 
         Checks.notNegative(index, "index");
 
-        return array.getJSONObject(index).getString("domain");
+        return array.getDataObject(index).getString("domain");
     }
 
     /**
@@ -113,13 +114,13 @@ public class Domains
      */
     public boolean isActive(int index) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUsableDomainsRaw());
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("domains");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUsableDomainsRaw());
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("domains");
 
         Checks.notNegative(index, "index");
 
-        return array.getJSONObject(index).getBoolean("active");
+        return array.getDataObject(index).getBoolean("active");
     }
 
     /**
@@ -133,8 +134,8 @@ public class Domains
      */
     public int getDomainCount() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserDomainsRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserDomainsRaw());
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("total");
     }
@@ -160,13 +161,13 @@ public class Domains
     @CheckReturnValue
     public String getOwnerId(int index) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserDomainsRaw());
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("domains");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserDomainsRaw());
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("domains");
 
         Checks.notNegative(index, "index");
 
-        return array.getJSONObject(index).getString("owner");
+        return array.getDataObject(index).getString("owner");
     }
 
     /**
@@ -190,13 +191,13 @@ public class Domains
     @CheckReturnValue
     public String getDomainName(int index) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserDomainsRaw());
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("domains");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserDomainsRaw());
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("domains");
 
         Checks.notNegative(index, "index");
 
-        return array.getJSONObject(index).getString("name");
+        return array.getDataObject(index).getString("name");
     }
 
     /**
@@ -218,18 +219,17 @@ public class Domains
      */
     public int getUploadCount(int index) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserDomainsRaw());
-        JSONObject data = json.getJSONObject("data");
-        JSONArray array = data.getJSONArray("domains");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserDomainsRaw());
+        DataObject data = json.getDataObject("data");
+        DataArray array = data.getArray("domains");
 
         Checks.notNegative(index, "index");
 
-        return array.getJSONObject(index).getInt("uploads");
+        return array.getDataObject(index).getInt("uploads");
     }
 
     /**
      * Generates you a random domain.
-     * <br>Note that this method also generates domains that you don't own.
      *
      * @throws IOException  If the request could not be executed due to cancellation,
      *                      a connectivity problem or timeout. Because networks can fail during an exchange,
@@ -240,10 +240,10 @@ public class Domains
     @NotNull
     public String generateDomain() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().generateDomainRaw());
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().generateDomainRaw());
+        DataObject data = json.getDataObject("data");
 
-        return data.getString("name") + "." + data.getString("domain");
+        return data.getString("name");
     }
 
     /**
@@ -256,7 +256,7 @@ public class Domains
     @CheckReturnValue
     public Optional<String> getLastDeletedDomain()
     {
-        return Optional.ofNullable(domain);
+        return Optional.ofNullable(lastDeletedDomain);
     }
 
     /**
@@ -276,6 +276,8 @@ public class Domains
      *
      * @return The current instance of the domain system.
      */
+    @Nullable
+    @CheckReturnValue
     public Domains addSubdomain(@NotNull String domainName) throws IOException
     {
         Checks.notEmpty(domainName, "domainName");
@@ -302,6 +304,8 @@ public class Domains
      *
      * @return The current instance of the domain system.
      */
+    @Nullable
+    @CheckReturnValue
     public Domains addCustomDomain(@NotNull String domainName) throws IOException
     {
         Checks.notEmpty(domainName, "domainName");
@@ -325,12 +329,38 @@ public class Domains
      *
      * @return The current instance of the domain system.
      */
+    @Nullable
+    @CheckReturnValue
     public Domains deleteDomain(@NotNull String domainName) throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().deleteDomainRaw(domainName));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().deleteDomainRaw(domainName));
+        DataObject data = json.getDataObject("data");
 
-        domain = data.getString("domain");
+        lastDeletedDomain = data.getString("domain");
         return this;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(new Domains());
+    }
+
+    @NotNull
+    @Override
+    public String toString()
+    {
+        try
+        {
+            return "Domains{" +
+                    "count=" + getUsableDomainCount() + ", " +
+                    "total=" + getDomainCount() + ", " +
+                    "lastDeletedDomain='" + lastDeletedDomain + '\'' +
+                    '}';
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

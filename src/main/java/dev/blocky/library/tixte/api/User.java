@@ -15,13 +15,14 @@
  */
 package dev.blocky.library.tixte.api;
 
+import com.google.errorprone.annotations.CheckReturnValue;
+import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONObject;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import java.io.IOException;
+import java.util.Objects;
 
 import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
 
@@ -60,8 +61,8 @@ public class User
      */
     public int getFlagCount() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw(userData));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw(userData));
+        DataObject data = json.getDataObject("data");
 
         return data.getInt("flags");
     }
@@ -79,8 +80,8 @@ public class User
     @CheckReturnValue
     public String getId() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw(userData));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw(userData));
+        DataObject data = json.getDataObject("data");
 
         return data.getString("id");
     }
@@ -99,8 +100,8 @@ public class User
     @CheckReturnValue
     public String getAvatarId() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw(userData));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw(userData));
+        DataObject data = json.getDataObject("data");
 
         return data.isNull("avatar") ? "": data.getString("avatar");
     }
@@ -118,10 +119,53 @@ public class User
     @CheckReturnValue
     public String getUsername() throws IOException
     {
-        JSONObject json = new JSONObject(getRawResponseData().getUserInfoRaw(userData));
-        JSONObject data = json.getJSONObject("data");
+        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw(userData));
+        DataObject data = json.getDataObject("data");
 
         return data.getString("username");
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        User user = (User) o;
+
+        return Objects.equals(userData, user.userData);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(new User(userData));
+    }
+
+    @NotNull
+    @Override
+    public String toString()
+    {
+        try
+        {
+            return "User{" +
+                    "flags=" + getFlagCount() + ", " +
+                    "id='" + getId() + "', " +
+                    "avatar='" + getAvatarId() + "', " +
+                    "username='" + getUsername() + '\'' +
+                    '}';
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }
 

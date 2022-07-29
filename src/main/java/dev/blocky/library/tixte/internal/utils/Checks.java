@@ -118,6 +118,19 @@ public class Checks
     }
 
     /**
+     * Checks, if the given input is not longer than the given length.
+     *
+     * @param input The string to get the number of unicode code points in the specified text range.
+     * @param length The maximum length of the string.
+     * @param name The name of the string.
+     */
+    public static void notLonger(@NotNull String input, int length, @NotNull String name)
+    {
+        notNull(input, name);
+        check(Helpers.codePointLength(input) <= length, "%s may not be longer than %d characters! Provided: \"%s\"", name, length, input);
+    }
+
+    /**
      * If the given integer is below 0, there will be thrown an {@link IllegalStateException}.
      *
      * @param number  The number, which should be checked.
