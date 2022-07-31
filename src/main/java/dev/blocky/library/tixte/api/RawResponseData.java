@@ -17,10 +17,10 @@ package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dev.blocky.library.tixte.api.enums.AccountType;
+import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
 import dev.blocky.library.tixte.internal.requests.Route;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import okhttp3.*;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Objects;
 
 import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
 import static dev.blocky.library.tixte.internal.requests.Method.DELETE;
@@ -44,6 +43,10 @@ import static dev.blocky.library.tixte.internal.requests.Method.PATCH;
 public strictfp class RawResponseData
 {
 
+    private RawResponseData()
+    {
+    }
+
     /**
      * @throws IOException  If the request could not be executed due to cancellation,
      *                      a connectivity problem or timeout. Because networks can fail during an exchange,
@@ -58,7 +61,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String getRawSize() throws IOException
+    public static String getSizeRaw() throws IOException
     {
         Route.CompiledRoute route = Route.Self.GET_UPLOAD_SIZE.compile();
 
@@ -88,7 +91,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String getRawUploads(int page) throws IOException
+    public static String getUploadsRaw(int page) throws IOException
     {
         Checks.notNegative(page, "page");
 
@@ -109,7 +112,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String uploadFileRaw(@NotNull File file) throws IOException
+    public static String uploadFileRaw(@NotNull File file) throws IOException
     {
         if (!file.exists())
         {
@@ -138,8 +141,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    @ApiStatus.Experimental
-    public String uploadPrivateFileRaw(@NotNull File file) throws IOException
+    public static String uploadPrivateFileRaw(@NotNull File file) throws IOException
     {
         if (!file.exists())
         {
@@ -169,7 +171,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String uploadFileRaw(@NotNull File file, @NotNull String domain) throws IOException
+    public static String uploadFileRaw(@NotNull File file, @NotNull String domain) throws IOException
     {
         if (!file.exists())
         {
@@ -202,8 +204,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    @ApiStatus.Experimental
-    public String uploadPrivateFileRaw(@NotNull File file, @NotNull String domain) throws IOException
+    public static String uploadPrivateFileRaw(@NotNull File file, @NotNull String domain) throws IOException
     {
         if (!file.exists())
         {
@@ -235,7 +236,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String uploadFileRaw(@NotNull URI filePath) throws IOException
+    public static String uploadFileRaw(@NotNull URI filePath) throws IOException
     {
         File file = new File(filePath);
 
@@ -266,8 +267,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    @ApiStatus.Experimental
-    public String uploadPrivateFileRaw(@NotNull URI filePath) throws IOException
+    public static String uploadPrivateFileRaw(@NotNull URI filePath) throws IOException
     {
         File file = new File(filePath);
 
@@ -299,7 +299,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String uploadFileRaw(@NotNull URI filePath, @NotNull String domain) throws IOException
+    public static String uploadFileRaw(@NotNull URI filePath, @NotNull String domain) throws IOException
     {
         File file = new File(filePath);
 
@@ -331,8 +331,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    @ApiStatus.Experimental
-    public String uploadPrivateFileRaw(@NotNull URI filePath, @NotNull String domain) throws IOException
+    public static String uploadPrivateFileRaw(@NotNull URI filePath, @NotNull String domain) throws IOException
     {
         File file = new File(filePath);
 
@@ -366,7 +365,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String uploadFileRaw(@NotNull String filePath) throws IOException
+    public static String uploadFileRaw(@NotNull String filePath) throws IOException
     {
         Checks.notEmpty(filePath, "filePath");
 
@@ -399,8 +398,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    @ApiStatus.Experimental
-    public String uploadPrivateFileRaw(@NotNull String filePath) throws IOException
+    public static String uploadPrivateFileRaw(@NotNull String filePath) throws IOException
     {
         Checks.notEmpty(filePath, "filePath");
 
@@ -434,7 +432,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String uploadFileRaw(@NotNull String filePath, @NotNull String domain) throws IOException
+    public static String uploadFileRaw(@NotNull String filePath, @NotNull String domain) throws IOException
     {
         Checks.notEmpty(filePath, "filePath");
 
@@ -471,8 +469,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    @ApiStatus.Experimental
-    public String uploadPrivateFileRaw(@NotNull String filePath, @NotNull String domain) throws IOException
+    public static String uploadPrivateFileRaw(@NotNull String filePath, @NotNull String domain) throws IOException
     {
         Checks.notEmpty(filePath, "filePath");
 
@@ -509,7 +506,7 @@ public strictfp class RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    public String deleteFileRaw(@NotNull String fileId) throws IOException
+    public static String deleteFileRaw(@NotNull String fileId) throws IOException
     {
         Checks.notEmpty(fileId, "fileId");
         Checks.noWhitespace(fileId, "fileId");
@@ -532,7 +529,7 @@ public strictfp class RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    public String purgeFilesRaw(@NotNull String password) throws IOException
+    public static String purgeFilesRaw(@NotNull String password) throws IOException
     {
         Checks.notEmpty(password, "password");
         Checks.noWhitespace(password, "password");
@@ -566,7 +563,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String getUserInfoRaw() throws IOException
+    public static String getUserInfoRaw() throws IOException
     {
         Route.CompiledRoute route = Route.Self.GET_SELF.compile();
 
@@ -588,7 +585,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String getUserInfoRaw(@NotNull String userData) throws IOException
+    public static String getUserInfoRaw(@NotNull String userData) throws IOException
     {
         Checks.notEmpty(userData, "userData");
         Checks.noWhitespace(userData, "userData");
@@ -611,11 +608,11 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String getUserDomainsRaw() throws IOException
+    public static String getUserDomainsRaw() throws IOException
     {
         Route.CompiledRoute route = Route.Self.GET_DOMAINS.compile();
 
-        return request(route, false, null);
+        return request(route, true, null);
     }
 
     /**
@@ -623,14 +620,14 @@ public strictfp class RawResponseData
      *                      a connectivity problem or timeout. Because networks can fail during an exchange,
      *                      it is possible that the remote server accepted the request before the failure.
      *
-     * @see Domains#getUsableDomains(int)
+     * @see Domains#getUsableDomainName(int)
      * @see Domains#getUsableDomainCount()
      * @see Domains#isActive(int)
      *
      * @return The raw response of the request.
      */
     @NotNull
-    public String getUsableDomainsRaw() throws IOException
+    public static String getUsableDomainsRaw() throws IOException
     {
         Route.CompiledRoute route = Route.Domain.GET_DOMAINS.compile();
 
@@ -647,7 +644,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String generateDomainRaw() throws IOException
+    public static String generateDomainRaw() throws IOException
     {
         Route.CompiledRoute route = Route.Resources.GET_GENERATED_DOMAIN.compile();
 
@@ -667,7 +664,7 @@ public strictfp class RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    public String addSubdomainRaw(@NotNull String domainName) throws IOException
+    public static String addSubdomainRaw(@NotNull String domainName) throws IOException
     {
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
@@ -693,7 +690,7 @@ public strictfp class RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    public String addCustomDomainRaw(@NotNull String domainName) throws IOException
+    public static String addCustomDomainRaw(@NotNull String domainName) throws IOException
     {
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
@@ -718,7 +715,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String deleteDomainRaw(@NotNull String domainName) throws IOException
+    public static String deleteDomainRaw(@NotNull String domainName) throws IOException
     {
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
@@ -738,7 +735,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    public String getAPIKeyBySessionTokenRaw() throws IOException
+    public static String getAPIKeyBySessionTokenRaw() throws IOException
     {
         Route.CompiledRoute route = Route.Self.GET_KEYS.compile();
 
@@ -757,12 +754,15 @@ public strictfp class RawResponseData
      * @see EmbedEditor#getEmbedProviderName()
      * @see EmbedEditor#getEmbedProviderURL()
      * @see EmbedEditor#getEmbedThemeColor()
+     * @see EmbedEditor#onlyImageEnabled()
+     * @see EmbedEditor#hidesBranding()
+     * @see TixteClient#baseRedirect()
      * @see PageDesign#getCustomCSS()
      *
      * @return The raw response of the request.
      */
     @NotNull
-    public String getConfigRaw() throws IOException
+    public static String getConfigRaw() throws IOException
     {
         Route.CompiledRoute route = Route.Self.GET_CONFIG.compile();
 
@@ -782,7 +782,7 @@ public strictfp class RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    public String setCustomCSSRaw(@NotNull String customCSS) throws IOException
+    public static String setCustomCSSRaw(@NotNull String customCSS) throws IOException
     {
         Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
@@ -811,27 +811,128 @@ public strictfp class RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    public String setEmbedRaw(@Nullable String description, @Nullable String title, @Nullable String color,
+    public static String setEmbedRaw(@Nullable String description, @Nullable String title, @Nullable String color,
                               @Nullable String authorName, @Nullable String authorURL, @Nullable String providerName,
                               @Nullable String providerURL) throws IOException
     {
         Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
         RequestBody requestBody = RequestBody.create(
-                "{ \"embed\": { \"description\": \"" + description == null ? "" : description + "\", " +
-                        "\"title\": \"" + title == null ? "" : title + "\", " +
-                        "\"theme_color\": \"" + color == null ? "" : color + "\", " +
-                        "\"author_name\": \"" + authorName == null ? "" : authorName + "\", " +
-                        "\"author_url\": \"" + authorURL == null ? "" : authorURL + "\", " +
-                        "\"provider_name\": \"" + providerName == null ? "" : providerName + "\", " +
-                        "\"provider_url\": \"" + providerURL == null ? "" : providerURL + "\" } }",
+                "{ \"embed\": { \"description\": \"" + description + "\", " +
+                        "\"title\": \"" + title + "\", " +
+                        "\"theme_color\": \"" + color + "\", " +
+                        "\"author_name\": \"" + authorName + "\", " +
+                        "\"author_url\": \"" + authorURL + "\", " +
+                        "\"provider_name\": \"" + providerName + "\", " +
+                        "\"provider_url\": \"" + providerURL + "\" } }",
                 MediaType.get("application/json"));
 
         return request(route, false, requestBody);
     }
 
+
+    /**
+     * @param hideBranding Whether the branding is hidden or not.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see EmbedEditor#setHideBranding(boolean)
+     *
+     * @return The raw response of the request.
+     */
+    @NotNull
+    @CanIgnoreReturnValue
+    public static String setHideBrandingRaw(boolean hideBranding) throws IOException
+    {
+        Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
+
+        RequestBody requestBody = RequestBody.create("{ \"hide_branding\": " + hideBranding + " }",
+                MediaType.get("application/json"));
+
+        SelfUser self = new SelfUser();
+
+        if (!self.hasTixteSubscription())
+        {
+            throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription.");
+        }
+
+        return request(route, false, requestBody);
+    }
+
+    /**
+     * @param onlyImagedEnabled Whether only images are enabled or not.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see EmbedEditor#setOnlyImagedEnabled(boolean)
+     *
+     * @return The raw response of the request.
+     */
+    @NotNull
+    @CanIgnoreReturnValue
+    public static String setOnlyImageEnabledRaw(boolean onlyImagedEnabled) throws IOException
+    {
+        Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
+
+        RequestBody requestBody = RequestBody.create("{ \"only_image\": " + onlyImagedEnabled + " }",
+                MediaType.get("application/json"));
+
+        return request(route, false, requestBody);
+    }
+
+    /**
+     * @param redirectURL The redirect url to be built.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see TixteClient#setBaseRedirect(String)
+     *
+     * @return The raw response of the request.
+     */
+    @NotNull
+    @CanIgnoreReturnValue
+    public static String setBaseRedirectRaw(@NotNull String redirectURL) throws IOException
+    {
+        Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
+
+        RequestBody requestBody = RequestBody.create("{ \"base_redirect\": " + redirectURL + " }",
+                MediaType.get("application/json"));
+
+        SelfUser self = new SelfUser();
+
+        if (!self.hasTixteSubscription())
+        {
+            throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription.");
+        }
+
+        return request(route, false, requestBody);
+    }
+
+    /**
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @see SelfUser#getExperimentCount()
+     *
+     * @return The raw response of the request.
+     */
+    @NotNull
+    public static String getExperimentsRaw() throws IOException
+    {
+        Route.CompiledRoute route = Route.Self.GET_EXPERIMENTS.compile();
+
+        return request(route, true, null);
+    }
+
     @Nullable
-    private String request(@NotNull Route.CompiledRoute route, boolean sessionTokenNeeded, @Nullable RequestBody requestBody) throws IOException
+    private static String request(@NotNull Route.CompiledRoute route, boolean sessionTokenNeeded, @Nullable RequestBody requestBody) throws IOException
     {
         String BASE_URL = "https://api.tixte.com/v1/";
 
@@ -868,7 +969,7 @@ public strictfp class RawResponseData
     }
 
     @Nullable
-    private String postFile(@Nullable String domain, @NotNull MultipartBody multipartBody, boolean privateFile) throws IOException
+    private static String postFile(@Nullable String domain, @NotNull MultipartBody multipartBody, boolean privateFile) throws IOException
     {
         String BASE_URL = "https://api.tixte.com/v1/";
 
@@ -886,20 +987,5 @@ public strictfp class RawResponseData
         {
             return response.body().string();
         }
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(new RawResponseData());
-    }
-
-    @NotNull
-    @Override
-    public String toString()
-    {
-        return "RawResponseData{" +
-                "Request='" + request.toString() + '\'' +
-                '}';
     }
 }

@@ -1,4 +1,4 @@
-package secrets; /**
+/**
  * Copyright 2022 Dominic (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,8 @@ package secrets; /**
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package secrets;
+
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.NotNull;

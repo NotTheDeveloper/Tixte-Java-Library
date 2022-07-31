@@ -17,6 +17,7 @@ package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dev.blocky.library.tixte.api.enums.AccountType;
+import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.Helpers;
@@ -30,7 +31,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
+import static dev.blocky.library.tixte.api.RawResponseData.*;
 
 /**
  * Builder system used to build {@link Embed embeds}.
@@ -481,6 +482,83 @@ public class EmbedEditor
     }
 
     /**
+     * Sets the visibility of the branding in the {@link Embed}.
+     * <br>This requires a Tixte turbo/turbo-charged subscription or else there will be thrown a {@link TixteWantsYourMoneyException}.
+     *
+     * @param hideBranding If the embed should have the Tixte branding.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @return The current instance of the {@link EmbedEditor}.
+     */
+    @NotNull
+    @CanIgnoreReturnValue
+    public EmbedEditor setHideBranding(boolean hideBranding) throws IOException
+    {
+        setHideBrandingRaw(hideBranding);
+        return this;
+    }
+
+    /**
+     * If this is set, there only will be an image in the {@link Embed}.
+     * <br>This is highly recommended not to set to true, if you are using any method of the {@link EmbedEditor} class,
+     * because there could be some errors if you use {@link #build()} to send the request.
+     *
+     * @param onlyImagedEnabled If the embed should only have images.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @return The current instance of the {@link EmbedEditor}.
+     */
+    @NotNull
+    @CanIgnoreReturnValue
+    public EmbedEditor setOnlyImagedEnabled(boolean onlyImagedEnabled) throws IOException
+    {
+        setOnlyImageEnabledRaw(onlyImagedEnabled);
+        return this;
+    }
+
+    /**
+     * Checks if the branding of the {@link Embed} is hidden.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @return <b>true</b> - If the branding is hidden.
+     *         <br><b>false</b> - If the branding is not hidden.
+     */
+    public boolean hidesBranding() throws IOException
+    {
+        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject data = json.getDataObject("data");
+
+        return data.getBoolean("hide_branding");
+    }
+
+    /**
+     * Checks if there is only the image of the {@link Embed} enabled.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @return <b>true</b> - If only the image of the {@link Embed} is enabled.
+     *         <br><b>false</b> - If the {@link Embed} is not only the image.
+     */
+    public boolean onlyImageEnabled() throws IOException
+    {
+        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject data = json.getDataObject("data");
+
+        return data.getBoolean("only_image");
+    }
+
+    /**
      * The title of the {@link Embed}.
      * <br>Typically, this will be the html title of the webpage that is being embedded.
      * <br>The only difference between this and {@link Embed#getTitle()} is that this method gets the current title
@@ -495,7 +573,7 @@ public class EmbedEditor
     @NotNull
     public String getEmbedTitle() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -518,7 +596,7 @@ public class EmbedEditor
     @NotNull
     public String getEmbedDescription() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -540,7 +618,7 @@ public class EmbedEditor
     @NotNull
     public String getEmbedAuthorName() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -562,7 +640,7 @@ public class EmbedEditor
     @NotNull
     public String getEmbedAuthorURL() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -584,7 +662,7 @@ public class EmbedEditor
     @NotNull
     public String getEmbedProviderName() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -606,7 +684,7 @@ public class EmbedEditor
     @NotNull
     public String getEmbedProviderURL() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -628,7 +706,7 @@ public class EmbedEditor
     @NotNull
     public String getEmbedThemeColor() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -670,6 +748,8 @@ public class EmbedEditor
         {
             return "EmbedEditor{" +
                     "URL_PATTERN=" + URL_PATTERN + ", " +
+                    "only_image=" + onlyImageEnabled() + ", " +
+                    "hide_branding=" + hidesBranding() + ", " +
                     "description=" + getEmbedDescription() + ", " +
                     "provider_name='" + getEmbedProviderName() + "', " +
                     "provider_url='" + getEmbedProviderURL() + "', " +

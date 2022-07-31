@@ -23,7 +23,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Objects;
 
-import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
+import static dev.blocky.library.tixte.api.RawResponseData.getConfigRaw;
+import static dev.blocky.library.tixte.api.RawResponseData.setCustomCSSRaw;
 
 /**
  * Represents the 'Page Design' tab of the Tixte dashboard.
@@ -55,7 +56,7 @@ public class PageDesign
     @NotNull
     public String getCustomCSS() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getString("custom_css");
@@ -88,7 +89,7 @@ public class PageDesign
      */
     public PageDesign build() throws IOException
     {
-        getRawResponseData().setCustomCSSRaw(customCSS == null ? "" : customCSS);
+        setCustomCSSRaw(customCSS == null ? "" : customCSS);
         return this;
     }
 

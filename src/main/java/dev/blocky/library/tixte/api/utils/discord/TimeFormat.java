@@ -65,6 +65,7 @@ public enum TimeFormat
     /**
      * {@link Pattern} used for {@link #parse(String)}.
      * <table>
+     *     <caption style="display: none"></caption>
      *   <tr>
      *     <th>Index</th>
      *     <th>Name</th>

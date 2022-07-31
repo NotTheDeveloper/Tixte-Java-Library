@@ -26,7 +26,7 @@ Tixte4J strives to provide a clean and full wrapping of the Tixte API for Java.
 3. [Documentation](#documentation)
 4. [Support](#getting-help)
 5. [Dependencies](#dependencies)
-6. [Other libraries](#jda-related-projects)
+6. [Other libraries](#tixte4j-related-projects)
 
 ## Introduction
 

@@ -48,7 +48,7 @@ public class CustomCSSExample
         PageDesign pageDesign = client.getPageDesign();
 
         // Creates a new File object for the CSS file. (You don't have to do this, but it's a good idea to do so.)
-        // You can do this much simpler, by just using an string instead of a File object.
+        // You can do this much simpler, by just using a string instead of a File object.
         File file = new File("src/test/resources/style.css");
 
         return pageDesign
@@ -57,7 +57,7 @@ public class CustomCSSExample
                         Files.readAllLines(file.toPath()).toString()
                 )
                 // This will throw an exception if the CSS is invalid.
-                // This also will throw an TixteWantsYourMoneyException if you don't own a Tixte subscription, so i recommend
+                // This also will throw an TixteWantsYourMoneyException if you don't own a Tixte subscription, so I recommend
                 // that you check if a subscription is active before you try to use this.
                 .build();
     }

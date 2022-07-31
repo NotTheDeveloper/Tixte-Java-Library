@@ -71,7 +71,7 @@ public class FileExample
         TixteClient client = BasicTixteClientExample.getTixteClient();
         MyFiles myFiles = client.getFileSystem();
 
-        // This could throw a HTTPException if there is no file to purge, but i am not sure about that.
+        // This could throw a HTTPException if there is no file to purge, but I am not sure about that.
         // This will throw an HTTPException if the password is wrong.
         // This will delete the file with an index of 0 (This is the newest file).
         return myFiles.deleteFile(myFiles.getAssetId(0, 0 ));
@@ -92,7 +92,7 @@ public class FileExample
         MyFiles myFiles = client.getFileSystem();
 
         // You must set a password (for some reason) for this request, because otherwise it won't work.
-        // This could throw a HTTPException if there is no file to purge, but i am not sure about that.
+        // This could throw a HTTPException if there is no file to purge, but I am not sure about that.
         // This will throw an HTTPException if the password is wrong.
         return myFiles.purgeFiles("YourVerySecurePassword1234!");
     }

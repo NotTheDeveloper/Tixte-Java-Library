@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Objects;
 
-import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
+import static dev.blocky.library.tixte.api.RawResponseData.*;
 
 /**
  * Represents your Tixte user-account.
@@ -53,7 +53,7 @@ public class SelfUser
      */
     public boolean isEmailVerified() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getBoolean("email_verified");
@@ -72,7 +72,7 @@ public class SelfUser
     @CheckReturnValue
     public String getPhoneNumber() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.isNull("phone") ? "": data.getString("phone");
@@ -92,7 +92,7 @@ public class SelfUser
     @NotNull
     public String getLastLogin() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getString("last_login");
@@ -109,7 +109,7 @@ public class SelfUser
      */
     public int getFlagCount() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getInt("flags");
@@ -126,7 +126,7 @@ public class SelfUser
      */
     public int getPremiumTier() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getInt("premium_tier");
@@ -144,7 +144,7 @@ public class SelfUser
      */
     public boolean hasMFAEnabled() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getBoolean("mfa_enabled");
@@ -162,7 +162,7 @@ public class SelfUser
     @NotNull
     public String getId() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getString("id");
@@ -182,7 +182,7 @@ public class SelfUser
     @CheckReturnValue
     public String getAvatarId() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.isNull("avatar") ? "": data.getString("avatar");
@@ -200,7 +200,7 @@ public class SelfUser
     @NotNull
     public String getUploadRegion() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getString("upload_region");
@@ -220,7 +220,7 @@ public class SelfUser
     @CheckReturnValue
     public String getEmail() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.isNull("email") ? "": data.getString("email");
@@ -238,7 +238,7 @@ public class SelfUser
     @NotNull
     public String getUsername() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getString("username");
@@ -257,7 +257,7 @@ public class SelfUser
     @CheckReturnValue
     public String getAPIKeyBySessionToken() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getAPIKeyBySessionTokenRaw());
+        DataObject json = DataObject.fromJson(getAPIKeyBySessionTokenRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getString("api_key");
@@ -293,10 +293,7 @@ public class SelfUser
      */
     public boolean hasTixteTurboSubscription() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawSize());
-        DataObject data = json.getDataObject("data");
-
-        return data.getInt("premium_tier") == 1;
+        return getPremiumTier() == 1;
     }
 
     /**
@@ -311,10 +308,23 @@ public class SelfUser
      */
     public boolean hasTixteTurboChargedSubscription() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawSize());
-        DataObject data = json.getDataObject("data");
+        return getPremiumTier() == 2;
+    }
 
-        return data.getInt("premium_tier") == 2;
+    /**
+     * Gets the count of every available experiment you can use.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @return The count of every available experiment you can use.
+     */
+    public int getExperimentCount() throws IOException
+    {
+        DataObject json = DataObject.fromJson(getExperimentsRaw());
+
+        return json.getInt("data");
     }
 
     @Override
@@ -344,7 +354,8 @@ public class SelfUser
                     "apiKey='" + getAPIKeyBySessionToken() + "', " +
                     "hasTixteSubscription=" + hasTixteSubscription() + ", " +
                     "hasTixteTurboSubscription=" + hasTixteTurboSubscription() + ", " +
-                    "hasTixteTurboChargedSubscription=" + hasTixteTurboChargedSubscription() +
+                    "hasTixteTurboChargedSubscription=" + hasTixteTurboChargedSubscription() + ", " +
+                    "data=" + getExperimentCount() +
                     '}';
         }
         catch (IOException e)

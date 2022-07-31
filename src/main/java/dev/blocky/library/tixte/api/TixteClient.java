@@ -17,6 +17,8 @@ package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
+import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
+import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +27,8 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 
+import static dev.blocky.library.tixte.api.RawResponseData.getConfigRaw;
+import static dev.blocky.library.tixte.api.RawResponseData.setBaseRedirectRaw;
 import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
 
 /**
@@ -81,17 +85,6 @@ public class TixteClient
     public Optional<String> getDefaultDomain()
     {
         return Optional.ofNullable(defaultDomain);
-    }
-
-    /**
-     * Represents the raw response data from Tixte API-requests.
-     *
-     * @return Instantiates a <b>new</b> Raw-Response.
-     */
-    @NotNull
-    public static RawResponseData getRawResponseData()
-    {
-        return new RawResponseData();
     }
 
     /**
@@ -269,6 +262,48 @@ public class TixteClient
     }
 
     /**
+     * Sets the redirect-URL.
+     * <br>A redirect is a server- or client-side automatic forwarding from one URL to another URL.
+     * <br>This requires a Tixte turbo/turbo-charged subscription or else there will be thrown a {@link TixteWantsYourMoneyException}.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @param redirectURL The redirect-URL.
+     *
+     * @return The current instance of the {@link TixteClient}.
+     */
+    @NotNull
+    @CheckReturnValue
+    public TixteClient setBaseRedirect(@NotNull String redirectURL) throws IOException
+    {
+        setBaseRedirectRaw(redirectURL);
+        return this;
+    }
+
+    /**
+     * This will return <b>false</b> if you have not set a redirect-url or this will return a string if you have set one.
+     * <br>You can set the redirect-url by using {@link TixteClient#setBaseRedirect(String)}.
+     *
+     * @throws IOException  If the request could not be executed due to cancellation,
+     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
+     *                      it is possible that the remote server accepted the request before the failure.
+     *
+     * @return <b>false</b> - If you are not redirected to the redirect-url.
+     *         <br><b>Otherwise</b> - The redirect-url as a string.
+     */
+    @NotNull
+    @CheckReturnValue
+    public Object baseRedirect() throws IOException
+    {
+        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject data = json.getDataObject("data");
+
+        return data.get("base_redirect");
+    }
+
+    /**
      * Cancel all calls currently enqueued or executing.
      * <br>Includes calls executed both {@link Call#execute()} and {@link Call#enqueue(Callback)}.
      */
@@ -287,12 +322,20 @@ public class TixteClient
     @Override
     public String toString()
     {
-        return "TixteClient{" +
-                "API_KEY='" + getAPIKey() + "', " +
-                "SESSION_TOKEN='" + getSessionToken() + "', " +
-                "DEFAULT_DOMAIN='" + getDefaultDomain() + "', " +
-                "policy=" + policy +  ", " +
-                "request=" + request +
-                '}';
+        try
+        {
+            return "TixteClient{" +
+                    "API_KEY='" + getAPIKey() + "', " +
+                    "SESSION_TOKEN='" + getSessionToken() + "', " +
+                    "DEFAULT_DOMAIN='" + getDefaultDomain() + "', " +
+                    "policy=" + policy +  ", " +
+                    "request=" + request + ", " +
+                    "base_redirect='" + baseRedirect() + "'" +
+                    '}';
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

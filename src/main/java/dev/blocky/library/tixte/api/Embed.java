@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Objects;
 
-import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
+import static dev.blocky.library.tixte.api.RawResponseData.setEmbedRaw;
 
 /**
  * Represents an embed displayed by Discord.
@@ -126,7 +126,17 @@ public class Embed
         this.providerURL = providerUrl;
         this.accountType = accountType;
 
-        getRawResponseData().setEmbedRaw(description, title, color, authorName, authorURL, providerName, providerUrl);
+        EmbedEditor editor = new EmbedEditor();
+
+        String embedDescription = description == null ? editor.getEmbedDescription() : description;
+        String embedTitle = title == null ? editor.getEmbedTitle() : title;
+        String embedColor = color == null ? editor.getEmbedThemeColor() : color;
+        String embedAuthorName = authorName == null ? editor.getEmbedAuthorName() : authorName;
+        String embedAuthorURL = authorURL == null ? editor.getEmbedAuthorURL() : authorURL;
+        String embedProviderName = providerName == null ? editor.getEmbedProviderName() : providerName;
+        String embedProviderURL = providerURL == null ? editor.getEmbedProviderURL() : providerURL;
+
+        setEmbedRaw(embedDescription, embedTitle, embedColor, embedAuthorName, embedAuthorURL, embedProviderName, embedProviderURL);
     }
 
     /**

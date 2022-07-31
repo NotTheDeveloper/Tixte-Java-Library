@@ -65,7 +65,7 @@ public class DomainExample
         TixteClient client = BasicTixteClientExample.getTixteClient();
         Domains domains = client.getDomainSystem();
 
-        // You should note everything i said above.
+        // You should note everything I said above.
         // This will only create the beginning of the domain, because otherwise it could create a domain, you don*t own.
         return domains.addSubdomain(domains.generateDomain() + ".from.space");
     }

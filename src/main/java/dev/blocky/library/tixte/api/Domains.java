@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 
-import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
+import static dev.blocky.library.tixte.api.RawResponseData.*;
 
 /**
  * Represents the 'Domains' tab of the Tixte dashboard and everything else what Tixte offers you with domains.
@@ -57,7 +57,7 @@ public class Domains
      */
     public int getUsableDomainCount() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUsableDomainsRaw());
+        DataObject json = DataObject.fromJson(getUsableDomainsRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getInt("count");
@@ -83,9 +83,9 @@ public class Domains
 
     @Nullable
     @CheckReturnValue
-    public String getUsableDomains(int index) throws IOException
+    public String getUsableDomainName(int index) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUsableDomainsRaw());
+        DataObject json = DataObject.fromJson(getUsableDomainsRaw());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("domains");
 
@@ -114,7 +114,7 @@ public class Domains
      */
     public boolean isActive(int index) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUsableDomainsRaw());
+        DataObject json = DataObject.fromJson(getUsableDomainsRaw());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("domains");
 
@@ -134,7 +134,7 @@ public class Domains
      */
     public int getDomainCount() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserDomainsRaw());
+        DataObject json = DataObject.fromJson(getUserDomainsRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getInt("total");
@@ -161,7 +161,7 @@ public class Domains
     @CheckReturnValue
     public String getOwnerId(int index) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserDomainsRaw());
+        DataObject json = DataObject.fromJson(getUserDomainsRaw());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("domains");
 
@@ -191,7 +191,7 @@ public class Domains
     @CheckReturnValue
     public String getDomainName(int index) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserDomainsRaw());
+        DataObject json = DataObject.fromJson(getUserDomainsRaw());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("domains");
 
@@ -219,7 +219,7 @@ public class Domains
      */
     public int getUploadCount(int index) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserDomainsRaw());
+        DataObject json = DataObject.fromJson(getUserDomainsRaw());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("domains");
 
@@ -240,7 +240,7 @@ public class Domains
     @NotNull
     public String generateDomain() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().generateDomainRaw());
+        DataObject json = DataObject.fromJson(generateDomainRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getString("name");
@@ -283,7 +283,7 @@ public class Domains
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
 
-        getRawResponseData().addSubdomainRaw(domainName);
+        addSubdomainRaw(domainName);
         return this;
     }
 
@@ -311,7 +311,7 @@ public class Domains
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
 
-        getRawResponseData().addCustomDomainRaw(domainName);
+        addCustomDomainRaw(domainName);
         return this;
     }
 
@@ -333,7 +333,7 @@ public class Domains
     @CheckReturnValue
     public Domains deleteDomain(@NotNull String domainName) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().deleteDomainRaw(domainName));
+        DataObject json = DataObject.fromJson(deleteDomainRaw(domainName));
         DataObject data = json.getDataObject("data");
 
         lastDeletedDomain = data.getString("domain");

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dev.blocky.library.tixte.api.exceptions.ParsingException;
 import dev.blocky.library.tixte.internal.utils.Helpers;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
@@ -494,6 +495,7 @@ public class DataArray implements Iterable<Object>, SerializableArray
      * @return A {@link DataArray} with the value inserted at the end.
      */
     @NotNull
+    @CanIgnoreReturnValue
     public DataArray add(@Nullable Object value)
     {
         if (value instanceof SerializableData)

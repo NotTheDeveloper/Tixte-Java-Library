@@ -40,6 +40,7 @@ public class Route
     {
         public static final Route GET_SELF                  = new Route(GET,      "users/@me");
         public static final Route GET_KEYS                  = new Route(GET,      "users/@me/keys");
+        public static final Route GET_EXPERIMENTS           = new Route(GET,      "users/@me/experiments");
         public static final Route GET_CONFIG                = new Route(GET,      "users/@me/config");
         public static final Route PATCH_CONFIG              = new Route(PATCH,    "users/@me/config");
         public static final Route GET_DOMAINS               = new Route(GET,      "users/@me/domains");
@@ -157,11 +158,13 @@ public class Route
 
         Set<String> major = new HashSet<>();
         StringBuilder compiledRoute = new StringBuilder(route);
+
         for (int i = 0; i < paramCount; i++)
         {
             int paramStart = compiledRoute.indexOf("{");
             int paramEnd = compiledRoute.indexOf("}");
             String paramName = compiledRoute.substring(paramStart+1, paramEnd);
+
             if (majorParameters.contains(paramName))
             {
                 if (params[i].length() > 30)

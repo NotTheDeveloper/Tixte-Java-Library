@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Objects;
 
-import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
+import static dev.blocky.library.tixte.api.RawResponseData.getUserInfoRaw;
 
 /**
  * Represents a Tixte user-account.
@@ -61,7 +61,7 @@ public class User
      */
     public int getFlagCount() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw(userData));
+        DataObject json = DataObject.fromJson(getUserInfoRaw(userData));
         DataObject data = json.getDataObject("data");
 
         return data.getInt("flags");
@@ -80,7 +80,7 @@ public class User
     @CheckReturnValue
     public String getId() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw(userData));
+        DataObject json = DataObject.fromJson(getUserInfoRaw(userData));
         DataObject data = json.getDataObject("data");
 
         return data.getString("id");
@@ -100,7 +100,7 @@ public class User
     @CheckReturnValue
     public String getAvatarId() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw(userData));
+        DataObject json = DataObject.fromJson(getUserInfoRaw(userData));
         DataObject data = json.getDataObject("data");
 
         return data.isNull("avatar") ? "": data.getString("avatar");
@@ -119,7 +119,7 @@ public class User
     @CheckReturnValue
     public String getUsername() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw(userData));
+        DataObject json = DataObject.fromJson(getUserInfoRaw(userData));
         DataObject data = json.getDataObject("data");
 
         return data.getString("username");

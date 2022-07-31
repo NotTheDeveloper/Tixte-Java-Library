@@ -28,7 +28,7 @@ import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
 
-import static dev.blocky.library.tixte.api.TixteClient.getRawResponseData;
+import static dev.blocky.library.tixte.api.RawResponseData.*;
 
 /**
  * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
@@ -59,7 +59,7 @@ public class MyFiles
      */
     public long getUsedSize() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawSize());
+        DataObject json = DataObject.fromJson(getSizeRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getInt("used");
@@ -79,7 +79,7 @@ public class MyFiles
      */
     public long getLimit() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawSize());
+        DataObject json = DataObject.fromJson(getSizeRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getInt("limit");
@@ -119,7 +119,7 @@ public class MyFiles
      */
     public int getPremiumTier() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawSize());
+        DataObject json = DataObject.fromJson(getSizeRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getInt("premium_tier");
@@ -136,7 +136,7 @@ public class MyFiles
      */
     public int getTotalUploadCount() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(0));
+        DataObject json = DataObject.fromJson(getUploadsRaw(0));
         DataObject data = json.getDataObject("data");
 
         return data.getInt("total");
@@ -156,7 +156,7 @@ public class MyFiles
      */
     public int getResults(int page) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject json = DataObject.fromJson(getUploadsRaw(page));
         DataObject data = json.getDataObject("data");
 
         return data.getInt("results");
@@ -168,8 +168,8 @@ public class MyFiles
      * <br>index 1 = the second-newest file
      * <br>And so on.
      * <br>
-     * <br>If you want to get every file permission level at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file permission level at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -187,7 +187,7 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject json = DataObject.fromJson(getUploadsRaw(page));
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
@@ -203,8 +203,8 @@ public class MyFiles
      * <br>index 1 = the second-newest file
      * <br>And so on.
      * <br>
-     * <br>If you want to get every file extension at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file extension at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -223,7 +223,7 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject json = DataObject.fromJson(getUploadsRaw(page));
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
@@ -236,8 +236,8 @@ public class MyFiles
      * <br>index 1 = the second-newest file
      * <br>And so on.
      * <br>
-     * <br>If you want to get every file size at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file size at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -255,7 +255,7 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject json = DataObject.fromJson(getUploadsRaw(page));
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
@@ -271,8 +271,8 @@ public class MyFiles
      * <br>index 1 = the second-newest file
      * <br>And so on.
      * <br>
-     * <br>If you want to get every file upload date at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file upload date at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -291,7 +291,7 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject json = DataObject.fromJson(getUploadsRaw(page));
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
@@ -304,8 +304,8 @@ public class MyFiles
      * <br>index 1 = the second-newest file
      * <br>And so on.
      * <br>
-     * <br>If you want to get every file domain at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file domain at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -324,7 +324,7 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject json = DataObject.fromJson(getUploadsRaw(page));
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
@@ -337,8 +337,8 @@ public class MyFiles
      * <br>index 1 = the second-newest file
      * <br>And so on.
      * <br>
-     * <br>If you want to get every file name at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file name at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -357,7 +357,7 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject json = DataObject.fromJson(getUploadsRaw(page));
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
@@ -375,8 +375,8 @@ public class MyFiles
      * <br>index 1 = the second-newest file
      * <br>And so on.
      * <br>
-     * <br>If you want to get every file mime type at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file mime type at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -395,7 +395,7 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject json = DataObject.fromJson(getUploadsRaw(page));
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
@@ -411,8 +411,8 @@ public class MyFiles
      * <br>index 1 = the second-newest file
      * <br>And so on.
      * <br>
-     * <br>If you want to get every file expiration time at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file expiration time at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -428,15 +428,15 @@ public class MyFiles
      */
     @Nullable
     @CheckReturnValue
-    public String getExpirationTime(int page, int index) throws IOException
+    public Object getExpirationTime(int page, int index) throws IOException
     {
         Checks.notNegative(index, "index");
 
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject json = DataObject.fromJson(getUploadsRaw(page));
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
-        return array.getDataObject(index).isNull("expiration") ? "": array.getDataObject(index).getString("expiration");
+        return array.getDataObject(index).isNull("expiration") ? 0 : array.getDataObject(index).get("expiration");
     }
 
     /**
@@ -445,8 +445,8 @@ public class MyFiles
      * <br>index 1 = the second-newest file
      * <br>And so on.
      * <br>
-     * <br>If you want to get every file ID at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file ID at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -465,7 +465,7 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject json = DataObject.fromJson(getUploadsRaw(page));
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
@@ -484,8 +484,8 @@ public class MyFiles
      * <br>If you don't want to make your own method for checking, if the file is private or not you can use
      * {@link #isPrivate(int, int)} or {@link #isPublic(int, int)} instead.
      * <br>
-     * <br>If you want to get every file type at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file type at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -503,7 +503,7 @@ public class MyFiles
     {
         Checks.notNegative(index, "index");
 
-        DataObject json = DataObject.fromJson(getRawResponseData().getRawUploads(page));
+        DataObject json = DataObject.fromJson(getUploadsRaw(page));
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
@@ -513,8 +513,8 @@ public class MyFiles
     /**
      * Checks if the specified file is public or not.
      * <br>
-     * <br>If you want to get every file type at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file type at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -539,8 +539,8 @@ public class MyFiles
     /**
      * Checks if the specified file is private or not.
      * <br>
-     * <br>If you want to get every file type at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getRawUploads(int)
-     * RawResponseData#getRawUploads(int)} and then you can print everything out by using a for loop, but if you want
+     * <br>If you want to get every file type at once you can use {@link dev.blocky.library.tixte.api.RawResponseData#getUploadsRaw(int)
+     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
      * you also can use an Optional.
      * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
      * to implement this method/use this method.
@@ -602,7 +602,7 @@ public class MyFiles
     @NotNull
     public String getUploadRegion() throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().getUserInfoRaw());
+        DataObject json = DataObject.fromJson(getUserInfoRaw());
         DataObject data = json.getDataObject("data");
 
         return data.getString("upload_region");
@@ -674,7 +674,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull File file) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(file));
+        DataObject json = DataObject.fromJson(uploadFileRaw(file));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -710,7 +710,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadPrivateFile(@NotNull File file) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(file));
+        DataObject json = DataObject.fromJson(uploadPrivateFileRaw(file));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -746,7 +746,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull File file, @NotNull String domain) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(file, domain));
+        DataObject json = DataObject.fromJson(uploadFileRaw(file, domain));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -782,7 +782,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadPrivateFile(@NotNull File file, @NotNull String domain) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(file, domain));
+        DataObject json = DataObject.fromJson(uploadPrivateFileRaw(file, domain));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -818,7 +818,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull URI filePath) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(filePath));
+        DataObject json = DataObject.fromJson(uploadFileRaw(filePath));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -854,7 +854,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadPrivateFile(@NotNull URI filePath) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(filePath));
+        DataObject json = DataObject.fromJson(uploadPrivateFileRaw(filePath));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -890,7 +890,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull URI filePath, @NotNull String domain) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(filePath, domain));
+        DataObject json = DataObject.fromJson(uploadFileRaw(filePath, domain));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -926,7 +926,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadPrivateFile(@NotNull URI filePath, @NotNull String domain) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(filePath, domain));
+        DataObject json = DataObject.fromJson(uploadPrivateFileRaw(filePath, domain));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -962,7 +962,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull String filePath) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(filePath));
+        DataObject json = DataObject.fromJson(uploadFileRaw(filePath));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -998,7 +998,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadPrivateFile(@NotNull String filePath) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(filePath));
+        DataObject json = DataObject.fromJson(uploadPrivateFileRaw(filePath));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -1034,7 +1034,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadFile(@NotNull String filePath, @NotNull String domain) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadFileRaw(filePath, domain));
+        DataObject json = DataObject.fromJson(uploadFileRaw(filePath, domain));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -1070,7 +1070,7 @@ public class MyFiles
     @NotNull
     public MyFiles uploadPrivateFile(@NotNull String filePath, @NotNull String domain) throws IOException
     {
-        DataObject json = DataObject.fromJson(getRawResponseData().uploadPrivateFileRaw(filePath, domain));
+        DataObject json = DataObject.fromJson(uploadPrivateFileRaw(filePath, domain));
         DataObject data = json.getDataObject("data");
 
         url = data.getString("url");
@@ -1100,7 +1100,7 @@ public class MyFiles
     @NotNull
     public MyFiles deleteFile(@NotNull String fileId) throws IOException
     {
-        getRawResponseData().deleteFileRaw(fileId);
+        deleteFileRaw(fileId);
         return this;
     }
 
@@ -1122,7 +1122,7 @@ public class MyFiles
     @NotNull
     public MyFiles purgeFiles(@NotNull String password) throws IOException
     {
-        getRawResponseData().purgeFilesRaw(password);
+        purgeFilesRaw(password);
         return this;
     }
 
