@@ -22,23 +22,23 @@ import java.util.Locale;
 /**
  * This class has major inspiration from
  * <a href="https://commons.apache.org/proper/commons-lang/" target="_blank">Lang 3</a>.
- *
- * <br>Specifically StringUtils.java and ExceptionUtils.java
+ * <br>Specifically {@code StringUtils.java} and {@code ExceptionUtils.java}
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.1
  * @since v1.0.0-beta.2
  */
 public final class Helpers
 {
+    Helpers() { }
 
     /**
      * Checks if the given {@link CharSequence} is empty.
      *
      * @param argument The argument, which should be checked.
      *
-     * @return  <b>true</b> - If the given {@link CharSequence} is empty.
-     *          <br><b>false</b> - If the given {@link CharSequence} is not empty.
+     * @return <b>true</b> - If the given {@link CharSequence} is empty.
+     *         <br><b>false</b> - If the given {@link CharSequence} is not empty.
      */
     public static boolean isEmpty(@NotNull CharSequence argument)
     {
@@ -74,11 +74,11 @@ public final class Helpers
      * Returns a formatted string using {@link Locale#ROOT}, the specified format string, and the specified arguments.
      *
      * @param format A format string.
-     * @param args   Arguments referenced by the format specifiers in the format string. If there are more arguments
-     *               than format specifiers, the extra arguments are ignored. The number of arguments is variable and
-     *               may be zero. The maximum number of arguments is limited by the maximum dimension of a Java array as
-     *               defined by <i> The Java™ Virtual Machine Specification</i>. The behaviour on a {@code null} argument
-     *               depends on the conversion.
+     * @param args Arguments referenced by the format specifiers in the format string. If there are more arguments
+     *             than format specifiers, the extra arguments are ignored. The number of arguments is variable and
+     *             may be zero. The maximum number of arguments is limited by the maximum dimension of a Java array as
+     *             defined by <i> The Java™ Virtual Machine Specification</i>. The behaviour on a {@code null} argument
+     *             depends on the conversion.
      *
      * @return A formatted string.
      */

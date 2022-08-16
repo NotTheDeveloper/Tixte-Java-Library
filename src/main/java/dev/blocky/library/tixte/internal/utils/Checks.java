@@ -23,17 +23,19 @@ import org.jetbrains.annotations.Nullable;
  * Utility class for handling errors.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.1.1
  * @since v1.0.0-beta.1
  */
 public class Checks
 {
+    Checks() { }
+
     /**
      * The boolean, which should be checked.
      * <br>If the boolean value is false, an {@link IllegalArgumentException} will be thrown.
      *
      * @param expression The expression, which should be checked.
-     * @param message    The message for the exception.
+     * @param message The message for the exception.
      */
     @Contract("false, _ -> fail")
     public static void check(boolean expression, @NotNull String message)
@@ -50,12 +52,12 @@ public class Checks
      * be thrown.
      *
      * @param expression The expression, which should be checked.
-     * @param format    A format string.
-     * @param args      Arguments referenced by the format specifiers in the format string. If there are more arguments
-     *                  than format specifiers, the extra arguments are ignored. The number of arguments is variable and
-     *                  may be zero. The maximum number of arguments is limited by the maximum dimension of a Java array as
-     *                  defined by <i> The Java™ Virtual Machine Specification</i>. The behaviour on a {@code null} argument
-     *                  depends on the conversion.
+     * @param format A format string.
+     * @param args Arguments referenced by the format specifiers in the format string. If there are more arguments
+     *             than format specifiers, the extra arguments are ignored. The number of arguments is variable and
+     *             may be zero. The maximum number of arguments is limited by the maximum dimension of a Java array as
+     *             defined by <i> The Java™ Virtual Machine Specification</i>. The behaviour on a {@code null} argument
+     *             depends on the conversion.
      */
     @Contract("false, _, _ -> fail")
     public static void check(boolean expression, @NotNull String format, @NotNull Object... args)
@@ -70,7 +72,7 @@ public class Checks
      * If the given object is null, there will be thrown an {@link IllegalArgumentException}.
      *
      * @param argument The argument, which should be checked.
-     * @param name     The name of the object.
+     * @param name The name of the object.
      */
     @Contract("null, _ -> fail")
     public static void notNull(@Nullable Object argument, @NotNull String name)
@@ -86,7 +88,7 @@ public class Checks
      * {@link CharSequence} is empty, there will be thrown an {@link IllegalStateException}.
      *
      * @param argument The argument, which should be checked.
-     * @param name     The name of the object.
+     * @param name The name of the object.
      */
     @Contract("null, _ -> fail")
     public static void notEmpty(@Nullable CharSequence argument, @NotNull String name)
@@ -104,7 +106,7 @@ public class Checks
      * {@link CharSequence} contains whitespaces, there will be thrown an {@link IllegalStateException}.
      *
      * @param argument The argument, which should be checked.
-     * @param name     The name of the object.
+     * @param name The name of the object.
      */
     @Contract("null, _ -> fail")
     public static void noWhitespace(@Nullable CharSequence argument, @NotNull String name)
@@ -133,8 +135,8 @@ public class Checks
     /**
      * If the given integer is below 0, there will be thrown an {@link IllegalStateException}.
      *
-     * @param number  The number, which should be checked.
-     * @param name    The name of the object.
+     * @param number The number, which should be checked.
+     * @param name The name of the object.
      */
     public static void notNegative(int number, @NotNull String name)
     {

@@ -16,45 +16,42 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import dev.blocky.library.tixte.api.enums.AccountType;
+import dev.blocky.library.tixte.api.entities.Embed;
+import dev.blocky.library.tixte.api.entities.SelfUser;
 import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
+import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.Helpers;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
-
-import static dev.blocky.library.tixte.api.RawResponseData.*;
 
 /**
  * Builder system used to build {@link Embed embeds}.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.2.0
  * @since v1.0.0-beta.1
  */
-public class EmbedEditor
+public class EmbedEditor extends RawResponseData
 {
-    private final Pattern URL_PATTERN = Pattern.compile("\\s*(https?|attachment)://\\S+\\s*",
-            Pattern.CASE_INSENSITIVE);
+    private final Pattern URL_PATTERN = Pattern.compile("\\s*(https?|attachment)://\\S+\\s*", Pattern.CASE_INSENSITIVE);
     private final Logger logger = TixteLogger.getLog(EmbedEditor.class);
     private final StringBuilder description = new StringBuilder();
+    private final SelfUser self = new SelfUser();
     private String providerName, providerURL, color;
     private String authorName, authorURL, title;
-    private AccountType accountType;
 
-    /**
-     * Constructs a <b>new</b> {@link EmbedEditor} instance, which can be used to create {@link Embed embeds}.
-     * <br>Every part of an embed can be removed or cleared by providing {@code null} to the setter method.
-     */
-    EmbedEditor() { }
+    @Internal
+    public EmbedEditor() { }
 
     /**
      * Creates an {@link EmbedEditor} using fields from an existing editor.
@@ -79,25 +76,13 @@ public class EmbedEditor
     /**
      * Returns a {@link Embed} that has been checked as being valid for sending.
      *
-     * @param accountType The type of account that is sending the embed.
-     *
-     * @throws java.lang.IllegalStateException
-     *         If the embed is empty. Can be checked with {@link #isEmpty()}.
-     * @throws IOException If the request could not be executed due to cancellation,
-     *         a connectivity problem or timeout. Because networks can fail during an exchange,
-     *         it is possible that the remote server accepted the request before the failure.
+     * @throws IllegalStateException If the embed is empty. Can be checked with {@link #isEmpty()}.
      *
      * @return The built, sendable {@link Embed}.
      */
     @NotNull
-    public Embed build(@NotNull AccountType accountType) throws IOException
+    public Embed send() throws ExecutionException, InterruptedException
     {
-        if (accountType == null)
-        {
-            accountType = AccountType.CLIENT;
-            logger.info("'accountType' equals null, setting to CLIENT");
-        }
-
         if (isEmpty())
         {
             throw new IllegalStateException("Cannot build an empty embed!");
@@ -109,43 +94,15 @@ public class EmbedEditor
                     Embed.DESCRIPTION_MAX_LENGTH));
         }
 
-        if (length() > Embed.EMBED_MAX_LENGTH_BOT && accountType == AccountType.BOT)
+        if (length() > Embed.EMBED_MAX_LENGTH)
         {
-            throw new IllegalStateException("Cannot build an embed with more than " + Embed.EMBED_MAX_LENGTH_BOT +
-                    " characters!");
-        }
-
-        if (length() > Embed.EMBED_MAX_LENGTH_CLIENT && accountType == AccountType.CLIENT)
-        {
-            throw new IllegalStateException("Cannot build an embed with more than " + Embed.EMBED_MAX_LENGTH_CLIENT +
+            throw new IllegalStateException("Cannot build an embed with more than " + Embed.EMBED_MAX_LENGTH +
                     " characters!");
         }
 
         String description = this.description.length() < 1 ? null : this.description.toString();
-        
-        this.accountType = accountType;
 
-        return new Embed(authorName, authorURL, title, description, color, providerName, providerURL, accountType);
-    }
-
-    /**
-     * Returns a {@link Embed} that has been checked as being valid for sending.
-     * <br>The account type is set to {@link AccountType#CLIENT}.
-     *
-     * @throws java.lang.IllegalStateException
-     *         If the embed is empty. Can be checked with {@link #isEmpty()}.
-     * @throws IOException If the request could not be executed due to cancellation,
-     *         a connectivity problem or timeout. Because networks can fail during an exchange,
-     *         it is possible that the remote server accepted the request before the failure.
-     *
-     * @return The built, sendable {@link Embed}.
-     */
-    @NotNull
-    @CanIgnoreReturnValue
-    public Embed build() throws IOException
-    {
-        this.accountType = AccountType.CLIENT;
-        return build(AccountType.CLIENT);
+        return new Embed(authorName, authorURL, title, description, color, providerName, providerURL);
     }
 
     /**
@@ -164,7 +121,6 @@ public class EmbedEditor
         color = null;
         providerName = null;
         providerURL = null;
-        accountType = null;
         return this;
     }
 
@@ -185,7 +141,6 @@ public class EmbedEditor
             this.color = editor.color;
             this.providerName = editor.providerName;
             this.providerURL = editor.providerURL;
-            this.accountType = editor.accountType;
         }
     }
 
@@ -206,7 +161,6 @@ public class EmbedEditor
             this.color = embed.getColor();
             this.providerName = embed.getProviderName();
             this.providerURL = embed.getProviderURL();
-            this.accountType = embed.getAccountType();
         }
     }
 
@@ -252,7 +206,6 @@ public class EmbedEditor
 
     /**
      * Sets the title of the {@link Embed}.
-     *
      * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
      *
      * @param title The title of the {@link Embed}.
@@ -261,7 +214,7 @@ public class EmbedEditor
      *         <ul>
      *             <li>If the provided {@code title} is an empty string.</li>
      *             <li>If the character limit for {@code title}, defined by {@link Embed#TITLE_MAX_LENGTH} as {@value Embed#TITLE_MAX_LENGTH},
-     *             is exceeded.</li>
+     *                 is exceeded.</li>
      *         </ul>
      *
      * @return The editor after the title has been set.
@@ -288,14 +241,12 @@ public class EmbedEditor
     /**
      * Sets the description of the {@link Embed}.
      * <br>This is where the main chunk of text for an {@link Embed} is typically placed.
-     *
      * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
      *
      * @param description The description of the {@link Embed}, {@code null} to reset.
      *
-     * @throws IllegalArgumentException
-     *         If {@code description} is longer than {@value Embed#DESCRIPTION_MAX_LENGTH} characters,
-     *         as defined by {@link Embed#DESCRIPTION_MAX_LENGTH}.
+     * @throws IllegalArgumentException If {@code description} is longer than {@value Embed#DESCRIPTION_MAX_LENGTH} characters,
+     *                                  as defined by {@link Embed#DESCRIPTION_MAX_LENGTH}.
      *
      * @return The editor after the description has been set.
      */
@@ -314,7 +265,6 @@ public class EmbedEditor
     /**
      * Appends to the description of the {@link Embed}.
      * <br>This is where the main chunk of text for an {@link Embed} is typically placed.
-     *
      * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
      *
      * @param description The string to append to the description of the {@link Embed}.
@@ -322,8 +272,9 @@ public class EmbedEditor
      * @throws IllegalArgumentException
      *         <ul>
      *             <li>If the provided {@code description} String is null.</li>
+     *
      *             <li>If the character limit for {@code description}, defined by {@link Embed#DESCRIPTION_MAX_LENGTH}
-     *             as {@value Embed#DESCRIPTION_MAX_LENGTH}, is exceeded.</li>
+     *                 as {@value Embed#DESCRIPTION_MAX_LENGTH}, is exceeded.</li>
      *         </ul>
      *
      * @return The editor after the description has been set.
@@ -341,7 +292,6 @@ public class EmbedEditor
 
     /**
      * Sets the color of the {@link Embed}.
-     *
      * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
      *
      * @param hexColor The {@link Color color} as a string of the {@link Embed} or {@code null} to use no color.
@@ -359,13 +309,12 @@ public class EmbedEditor
      * Sets the author of the {@link Embed}.
      * <br>The author appears in the top left of the {@link Embed} with its name being made clickable by way of providing an url.
      * <br>This convenience method just sets the name.
-     *
      * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
      *
      * @param authorName The name of the author of the {@link Embed}. If this is not set, the author will not appear in the {@link Embed}.
      *
-     * @throws IllegalArgumentException  If {@code name} is longer than {@value Embed#AUTHOR_MAX_LENGTH} characters,
-     *                                   as defined by {@link Embed#AUTHOR_MAX_LENGTH}.
+     * @throws IllegalArgumentException If {@code name} is longer than {@value Embed#AUTHOR_NAME_MAX_LENGTH} characters,
+     *                                  as defined by {@link Embed#AUTHOR_NAME_MAX_LENGTH}.
      *
      * @return The editor after the author has been set.
      */
@@ -388,10 +337,12 @@ public class EmbedEditor
      *
      * @throws IllegalArgumentException
      *         <ul>
-     *             <li>If the character limit for {@code name}, defined by {@link Embed#AUTHOR_MAX_LENGTH} as
-     *             {@value Embed#AUTHOR_MAX_LENGTH}, is exceeded.</li>
+     *             <li>If the character limit for {@code name}, defined by {@link Embed#AUTHOR_NAME_MAX_LENGTH} as
+     *             {@value Embed#AUTHOR_NAME_MAX_LENGTH}, is exceeded.</li>
+     *
      *             <li>If the character limit for {@code url}, defined by {@link Embed#URL_MAX_LENGTH} as
      *             {@value Embed#URL_MAX_LENGTH}, is exceeded.</li>
+     *
      *             <li>If the provided {@code url} is not a properly formatted http or https url.</li>
      *         </ul>
      *
@@ -407,8 +358,8 @@ public class EmbedEditor
         }
         else
         {
-            Checks.check(authorName.length() <= Embed.AUTHOR_MAX_LENGTH, "Name cannot be longer than %d characters.",
-                    Embed.AUTHOR_MAX_LENGTH);
+            Checks.check(authorName.length() <= Embed.AUTHOR_NAME_MAX_LENGTH, "Name cannot be longer than %d characters.",
+                    Embed.AUTHOR_NAME_MAX_LENGTH);
             urlCheck(authorURL);
 
             this.authorName = authorName;
@@ -422,8 +373,8 @@ public class EmbedEditor
      *
      * @param  providerName The name of the provider of the embed. If this is not set, the provider will not appear in the embed.
      *
-     * @throws IllegalArgumentException  If {@code name} is longer than {@value Embed#PROVIDER_MAX_LENGTH} characters,
-     *                                   as defined by {@link Embed#PROVIDER_MAX_LENGTH}.
+     * @throws IllegalArgumentException If {@code name} is longer than {@value Embed#PROVIDER_NAME_MAX_LENGTH} characters,
+     *                                  as defined by {@link Embed#PROVIDER_NAME_MAX_LENGTH}.
      *
      * @return The editor after the provider has been set.
      */
@@ -442,10 +393,12 @@ public class EmbedEditor
      *
      * @throws IllegalArgumentException
      *         <ul>
-     *             <li>If the character limit for {@code name}, defined by {@link Embed#PROVIDER_MAX_LENGTH} as
-     *             {@value Embed#PROVIDER_MAX_LENGTH}, is exceeded.</li>
+     *             <li>If the character limit for {@code name}, defined by {@link Embed#PROVIDER_NAME_MAX_LENGTH} as
+     *             {@value Embed#PROVIDER_NAME_MAX_LENGTH}, is exceeded.</li>
+     *
      *             <li>If the character limit for {@code url}, defined by {@link Embed#URL_MAX_LENGTH} as
      *             {@value Embed#URL_MAX_LENGTH}, is exceeded.</li>
+     *
      *             <li>If the provided {@code url} is not a properly formatted http or https url.</li>
      *         </ul>
      *
@@ -461,8 +414,8 @@ public class EmbedEditor
         }
         else
         {
-            Checks.check(providerName.length() <= Embed.PROVIDER_MAX_LENGTH, "Name cannot be longer than %d characters.",
-                    Embed.PROVIDER_MAX_LENGTH);
+            Checks.check(providerName.length() <= Embed.PROVIDER_NAME_MAX_LENGTH, "Name cannot be longer than %d characters.",
+                    Embed.PROVIDER_NAME_MAX_LENGTH);
             urlCheck(providerURL);
 
             this.providerName = providerName;
@@ -487,16 +440,20 @@ public class EmbedEditor
      *
      * @param hideBranding If the embed should have the Tixte branding.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The current instance of the {@link EmbedEditor}.
      */
     @NotNull
     @CanIgnoreReturnValue
-    public EmbedEditor setHideBranding(boolean hideBranding) throws IOException
+    public EmbedEditor setHideBranding(boolean hideBranding) throws ExecutionException, InterruptedException
     {
+        if (!self.hasTixteSubscription())
+        {
+            throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
+        }
+
         setHideBrandingRaw(hideBranding);
         return this;
     }
@@ -508,15 +465,11 @@ public class EmbedEditor
      *
      * @param onlyImagedEnabled If the embed should only have images.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
-     *
      * @return The current instance of the {@link EmbedEditor}.
      */
     @NotNull
     @CanIgnoreReturnValue
-    public EmbedEditor setOnlyImagedEnabled(boolean onlyImagedEnabled) throws IOException
+    public EmbedEditor setOnlyImagedEnabled(boolean onlyImagedEnabled) 
     {
         setOnlyImageEnabledRaw(onlyImagedEnabled);
         return this;
@@ -525,16 +478,15 @@ public class EmbedEditor
     /**
      * Checks if the branding of the {@link Embed} is hidden.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return <b>true</b> - If the branding is hidden.
      *         <br><b>false</b> - If the branding is not hidden.
      */
-    public boolean hidesBranding() throws IOException
+    public boolean hidesBranding() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
         DataObject data = json.getDataObject("data");
 
         return data.getBoolean("hide_branding");
@@ -543,16 +495,15 @@ public class EmbedEditor
     /**
      * Checks if there is only the image of the {@link Embed} enabled.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return <b>true</b> - If only the image of the {@link Embed} is enabled.
      *         <br><b>false</b> - If the {@link Embed} is not only the image.
      */
-    public boolean onlyImageEnabled() throws IOException
+    public boolean onlyImageEnabled() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
         DataObject data = json.getDataObject("data");
 
         return data.getBoolean("only_image");
@@ -564,16 +515,15 @@ public class EmbedEditor
      * <br>The only difference between this and {@link Embed#getTitle()} is that this method gets the current title
      * of the Tixte 'Embed Editor' page, while {@link Embed#getTitle()} only gets the current value of the variable.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Possibly-empty string containing the title of the embedded resource.
      */
     @NotNull
-    public String getEmbedTitle() throws IOException
+    public String getEmbedTitle() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -587,16 +537,15 @@ public class EmbedEditor
      * <br>The only difference between this and {@link Embed#getDescription()} is that this method gets the current description
      * of the Tixte 'Embed Editor' page, while {@link Embed#getDescription()} only gets the current value of the variable.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Possibly-empty string containing a description of the embedded resource.
      */
     @NotNull
-    public String getEmbedDescription() throws IOException
+    public String getEmbedDescription() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -609,16 +558,15 @@ public class EmbedEditor
      * <br>The only difference between this and {@link Embed#getAuthorName()} is that this method gets the current author name
      * of the Tixte 'Embed Editor' page, while {@link Embed#getAuthorName()} only gets the current value of the variable.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The name on the creator of the embedded content.
      */
     @NotNull
-    public String getEmbedAuthorName() throws IOException
+    public String getEmbedAuthorName() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -631,16 +579,15 @@ public class EmbedEditor
      * <br>The only difference between this and {@link Embed#getAuthorURL()}is that this method gets the current author url
      * of the Tixte 'Embed Editor' page, while {@link Embed#getAuthorURL()} only gets the current value of the variable.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The url to a website from the creator of the embedded content.
      */
     @NotNull
-    public String getEmbedAuthorURL() throws IOException
+    public String getEmbedAuthorURL() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -653,16 +600,15 @@ public class EmbedEditor
      * <br>The only difference between this and {@link Embed#getProviderName()} is that this method gets the current provider name
      * of the Tixte 'Embed Editor' page, while {@link Embed#getProviderName()} only gets the current value of the variable.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The name on the provider of the embedded content.
      */
     @NotNull
-    public String getEmbedProviderName() throws IOException
+    public String getEmbedProviderName() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -675,16 +621,15 @@ public class EmbedEditor
      * <br>The only difference between this and {@link Embed#getProviderURL()} is that this method gets the current provider url
      * of the Tixte 'Embed Editor' page, while {@link Embed#getProviderURL()} only gets the current value of the variable.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The url to a website of the embedded content.
      */
     @NotNull
-    public String getEmbedProviderURL() throws IOException
+    public String getEmbedProviderURL() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -697,16 +642,15 @@ public class EmbedEditor
      * <br>The only difference between this and {@link Embed#getColor()} is that this method gets the current theme color
      * of the Tixte 'Embed Editor' page, while {@link Embed#getColor()} only gets the current value of the variable.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Possibly-empty color.
      */
     @NotNull
-    public String getEmbedThemeColor() throws IOException
+    public String getEmbedThemeColor() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
         DataObject data = json.getDataObject("data");
         DataObject embed = data.getDataObject("embed");
 
@@ -730,14 +674,13 @@ public class EmbedEditor
 
         return URL_PATTERN.equals(that.URL_PATTERN) && Objects.equals(description.toString(), that.description.toString()) &&
                 Objects.equals(providerName, that.providerName) && Objects.equals(providerURL, that.providerURL) && color.equals(that.color)
-                && Objects.equals(authorName, that.authorName) && Objects.equals(authorURL, that.authorURL) && Objects.equals(title, that.title)
-                && accountType == that.accountType;
+                && Objects.equals(authorName, that.authorName) && Objects.equals(authorURL, that.authorURL) && Objects.equals(title, that.title);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(URL_PATTERN, description, providerName, providerURL, color, authorName, authorURL, title, accountType);
+        return Objects.hash(URL_PATTERN, description, providerName, providerURL, color, authorName, authorURL, title);
     }
 
     @NotNull
@@ -757,10 +700,9 @@ public class EmbedEditor
                     "author_name='" + getEmbedAuthorName() + "', " +
                     "author_url='" + getEmbedAuthorURL() + "', " +
                     "title='" + getEmbedTitle() + "', " +
-                    "accountType=" + accountType +
                     '}';
         }
-        catch (IOException e)
+        catch (ExecutionException | InterruptedException e)
         {
             throw new RuntimeException(e);
         }

@@ -17,46 +17,38 @@ package dev.blocky.library.tixte.api;
 
 import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
+import dev.blocky.library.tixte.internal.RawResponseData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Objects;
-
-import static dev.blocky.library.tixte.api.RawResponseData.getConfigRaw;
-import static dev.blocky.library.tixte.api.RawResponseData.setCustomCSSRaw;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Represents the 'Page Design' tab of the Tixte dashboard.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.2.0
  * @since v1.0.0-alpha.1
  */
-public class PageDesign
+public class PageDesign extends RawResponseData
 {
     private String customCSS;
 
-    /**
-     * Instantiates a <b>new</b> Page-Design.
-     */
-    PageDesign()
-    {
-    }
+    PageDesign() { }
 
     /**
      * Gets your custom CSS code from the 'Page Design' tab of the Tixte dashboard.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The custom CSS code.
      */
     @NotNull
-    public String getCustomCSS() throws IOException
+    public String getCustomCSS() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
         DataObject data = json.getDataObject("data");
 
         return data.getString("custom_css");
@@ -67,7 +59,7 @@ public class PageDesign
      *
      * @param customCSS The custom CSS code for your page design.
      *
-     * @return The current instance of the PageDesign.
+     * @return The current instance of the {@link PageDesign}.
      */
     @NotNull
     public PageDesign setCustomCSS(@Nullable String customCSS)
@@ -81,13 +73,10 @@ public class PageDesign
      * <br>Note that this method will throw an {@link TixteWantsYourMoneyException}
      * if you don't own a Tixte turbo/turbo-charged subscription.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
-     *
-     * @return The current instance of the PageDesign.
+     * @return The current instance of the {@link PageDesign}.
      */
-    public PageDesign build() throws IOException
+    @NotNull
+    public PageDesign send()
     {
         setCustomCSSRaw(customCSS == null ? "" : customCSS);
         return this;
@@ -103,12 +92,13 @@ public class PageDesign
     @Override
     public String toString()
     {
-        try {
+        try
+        {
             return "PageDesign{" +
                     "custom_css='" + getCustomCSS() + '\'' +
                     '}';
         }
-        catch (IOException e)
+        catch (ExecutionException | InterruptedException e)
         {
             throw new RuntimeException(e);
         }

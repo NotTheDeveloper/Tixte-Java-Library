@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
@@ -34,7 +35,7 @@ import java.util.ServiceLoader;
  * <br>It also has the utility method {@link #getLazyString(LazyEvaluation)} which is used to lazily construct strings for logging.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.1.1
  * @since v1.0.0-alpha.3
  */
 public class TixteLogger
@@ -175,6 +176,6 @@ public class TixteLogger
          *
          * @return The string for log message.
          */
-        String getString();
+        String getString() throws IOException;
     }
 }

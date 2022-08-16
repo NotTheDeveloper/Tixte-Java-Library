@@ -38,12 +38,12 @@ import java.nio.file.Paths;
 public class DONOTOPEN
 {
     private static final Logger logger = TixteLogger.getLog(DONOTOPEN.class);
-    private static final File file = new File("C:\\Users\\Dominic\\Desktop\\Applications\\token\\secrets.json");
+    private static final File file = new File("FILE_PATH");
 
     /**
      * Gets the API-key from the secrets.json file.
      *
-     * @throws IOException If an I/O error occurs reading from the stream.
+     * @throws IOException If an I/O error occurs reading from the file or a malformed or unmappable byte sequence is read.
      *
      * @return The API-key from the secrets.json file.
      */
@@ -65,7 +65,7 @@ public class DONOTOPEN
     /**
      * Gets the session token from the secrets.json file.
      *
-     * @throws IOException If an I/O error occurs reading from the stream.
+     * @throws IOException If an I/O error occurs reading from the file or a malformed or unmappable byte sequence is read.
      *
      * @return The session token from the secrets.json file.
      */
@@ -78,7 +78,7 @@ public class DONOTOPEN
     /**
      * Gets the default domain from the secrets.json file.
      *
-     * @throws IOException If an I/O error occurs reading from the stream.
+     * @throws IOException If an I/O error occurs reading from the file or a malformed or unmappable byte sequence is read.
      *
      * @return The default domain from the secrets.json file.
      */
@@ -89,7 +89,7 @@ public class DONOTOPEN
     }
 
     @Nullable
-    static String getString(@NotNull String jsonObject) throws IOException
+    private static String getString(@NotNull String jsonObject) throws IOException
     {
         String content = new String(Files.readAllBytes(Paths.get(file.toURI())), StandardCharsets.UTF_8);
         DataObject json = DataObject.fromJson(content);

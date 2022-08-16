@@ -34,15 +34,13 @@ import java.nio.file.Files;
 public class CustomCSSExample
 {
     /**
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws IOException If an I/O error occurs reading from the file or a malformed or unmappable byte sequence is read.
      *
      * @return Builds the custom CSS code from the 'Page Design' tab of the Tixte dashboard.
      */
     @NotNull
     @CheckReturnValue
-    public static PageDesign buildCustomCSS() throws IOException
+    public static PageDesign setCustomCSS() throws IOException
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
         PageDesign pageDesign = client.getPageDesign();
@@ -59,6 +57,6 @@ public class CustomCSSExample
                 // This will throw an exception if the CSS is invalid.
                 // This also will throw an TixteWantsYourMoneyException if you don't own a Tixte subscription, so I recommend
                 // that you check if a subscription is active before you try to use this.
-                .build();
+                .send();
     }
 }

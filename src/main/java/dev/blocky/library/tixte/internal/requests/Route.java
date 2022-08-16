@@ -18,23 +18,29 @@ package dev.blocky.library.tixte.internal.requests;
 import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.Helpers;
+import okhttp3.Request;
+import org.jetbrains.annotations.ApiStatus.Experimental;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import static dev.blocky.library.tixte.api.TixteInfo.TIXTE_API_VERSION;
 import static dev.blocky.library.tixte.internal.requests.Method.*;
 
 /**
- * Utility class for creating {@link okhttp3.Request requests}.
+ * Utility class for creating {@link Request requests}.
  *
  * @author BlockyDotJar
- * @version v2.0.0
+ * @version v2.0.1
  * @since v1.0.0-alpha.3
  */
+@Internal
 public class Route
 {
+    public static final String TIXTE_API_PREFIX = Helpers.format("https://api.tixte.com/v%d/", TIXTE_API_VERSION);
 
     public static class Self
     {
@@ -49,6 +55,9 @@ public class Route
         public static final Route GET_UPLOADS               = new Route(GET,      "users/@me/uploads");
         public static final Route GET_UPLOAD_SIZE           = new Route(GET,      "users/@me/uploads/size");
         public static final Route DELETE_FILE               = new Route(DELETE,   "users/@me/uploads/{asset_id}");
+
+        @Experimental //  Can't be used yet by everyone, so i am not able to implement it already.
+        public static final Route SEARCH_FILE               = new Route(POST,      "users/@me/uploads/search");
     }
 
     public static class Users

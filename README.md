@@ -56,16 +56,16 @@ The `TixteClientBuilder` allows a set of configurations to improve the experienc
         // This method also sets the cache policy. I really recommend to set this to ALL.
         // If this is equal to null or not set, this will be automatically set to NONE.
         // If you use this method like here, you don't have to set it via setCachePolicy(@Nullable CachePolicy).
-        .create(DONOTOPEN.getAPIKey(), CachePolicy.ALL)
+        .create(getAPIKey(), CachePolicy.ALL)
         // Sets the session-token. (Optional but recommended)
-        .setSessionToken(DONOTOPEN.getSessionToken())
+        .setSessionToken(getSessionToken())
         // Sets a default domain. (Optional)
-        .setDefaultDomain(DONOTOPEN.getDefaultDomain());
+        .setDefaultDomain(getDefaultDomain());
 
         // Builds a new TixteClient instance and uses the provided API-key and session-token to start the login process.
         client = builder.build();
 
-        if (request.isHttps())
+        if (!request.isHttps())
         {
             client.cancelRequests();
         }
@@ -167,7 +167,7 @@ There is a guide for logback-classic available at the JDA wiki: [Logging Setup](
 ## Getting help
 
 Troubleshooting or FAQ pages will be available soon!
-<br> If you need help, or just want to talk with the Tixte4J or other devs, you can join the [support server][discord-invite].
+<br>If you need help, or just want to talk with the Tixte4J or other devs, you can join the [support server][discord-invite].
 ## Dependencies:
 
 This project requires **Java 8+**
@@ -188,7 +188,7 @@ This project requires **Java 8+**
     * Version: **v23.0.0**
     * [Github](https://github.com/JetBrains/java-annotations)
 * error-prone-annotations
-    * Version: **v2.14.0**
+    * Version: **v2.15.0**
     * [Github](https://github.com/google/error-prone)
 * commons-collections4
     * Version: **v4.4**

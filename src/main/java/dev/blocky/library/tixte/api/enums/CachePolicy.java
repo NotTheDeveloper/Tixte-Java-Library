@@ -19,10 +19,8 @@ package dev.blocky.library.tixte.api.enums;
  * Policy which decides whether there should be created a cache or not.
  * <br>This will be called throughout Tixte4J when data gets constructed or modified and allows for a dynamically
  * adjusting cache.
- *
  * <br>When {@link dev.blocky.library.tixte.api.TixteClient#pruneCache() TixteClient#pruneCache()} is called, the
  * configured policy will be used to unload any data that the policy has decided not to cache.
- *
  * <br>This can be configured with {@link dev.blocky.library.tixte.api.TixteClientBuilder#setCachePolicy(CachePolicy)
  * TixteClientBuilder#setCachePolicy(CachePolicy)}.
  *
@@ -32,7 +30,7 @@ package dev.blocky.library.tixte.api.enums;
  * @see #ONLY_NETWORK_CACHE
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.1
  * @since v1.0.0-beta.2
  */
 public enum CachePolicy
@@ -45,13 +43,13 @@ public enum CachePolicy
 
     /**
      * Only force-cache cache-policy.
-     * <br>Only force cache will be used.
+     * <br>Caches will only be used, if the internet is not available.
      */
     ONLY_FORCE_CACHE,
 
     /**
      * Only network-cache cache-policy.
-     * <br>nly network cache will be used.
+     * <br>Caches will only be used, if the internet is available.
      */
     ONLY_NETWORK_CACHE,
 

@@ -15,12 +15,12 @@
  */
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import dev.blocky.library.tixte.api.Embed;
+import dev.blocky.library.tixte.api.entities.Embed;
 import dev.blocky.library.tixte.api.EmbedEditor;
 import dev.blocky.library.tixte.api.TixteClient;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Some basic examples, how to use an {@link EmbedEditor}.
@@ -32,15 +32,14 @@ import java.io.IOException;
 public class EmbedEditorExample
 {
     /**
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link Embed} that has been checked as being valid for sending.
      */
     @NotNull
     @CanIgnoreReturnValue
-    public static Embed buildEmbed() throws IOException
+    public static Embed buildEmbed() throws ExecutionException, InterruptedException
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
 
@@ -61,6 +60,6 @@ public class EmbedEditorExample
                 .setProvider("You don't need to know more than: Java > *", "https://github.com/BlockyDotJar");
 
         // Builds the embed and sends it to Tixte.
-        return editor.build();
+        return editor.send();
     }
 }

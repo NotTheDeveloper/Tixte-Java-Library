@@ -13,24 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.internal.requests.json;
+package dev.blocky.library.tixte.internal.utils.io;
 
-import org.jetbrains.annotations.NotNull;
+import java.io.IOException;
+import java.util.function.BiConsumer;
 
 /**
- * Allows custom serialization for JSON payloads of an object.
+ * An {@link BiConsumer} for I/O operations.
+ *
+ * @param <T> The type of the first argument to the operation.
+ * @param <R> The type of the second argument to the operation.
  *
  * @author BlockyDotJar
- * @version v1.0.1
- * @since v1.0.0-beta.3
+ * @version v1.0.0
+ * @since v1.0.0-beta.5
  */
-public interface SerializableArray
+@FunctionalInterface
+public interface IOBiConsumer<T, R>
 {
     /**
-     * Serialized {@link DataArray} for this object.
+     * Performs this operation on the given arguments.
      *
-     * @return An {@link DataArray}.
+     * @param a The first input argument to the operation.
+     * @param b The second input argument to the operation.
+     *
+     * @throws IOException If an I/O error occurs.
      */
-    @NotNull
-    DataArray toDataArray();
+     void accept(T a, R b) throws IOException;
 }

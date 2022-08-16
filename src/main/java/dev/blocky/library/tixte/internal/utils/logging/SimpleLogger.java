@@ -24,10 +24,7 @@ import org.slf4j.helpers.MessageFormatter;
 import org.slf4j.helpers.Util;
 import org.slf4j.spi.LocationAwareLogger;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.DateFormat;
@@ -38,10 +35,10 @@ import java.util.Properties;
 import static dev.blocky.library.tixte.internal.utils.logging.SimpleLogger.SimpleLoggerConfiguration.*;
 
 /**
- * A custom {@link SimpleLogger}. (from slf4j-simple).
+ * A custom {@link SimpleLogger}. (from <a href="https://www.slf4j.org/api/org/slf4j/simple/SimpleLogger.html">slf4j-simple</a>).
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.1.1
  * @since v1.0.0-alpha.3
  */
 public class SimpleLogger extends MarkerIgnoringBase
@@ -840,7 +837,7 @@ public class SimpleLogger extends MarkerIgnoringBase
                 {
                     SIMPLE_LOGGER_PROPS.load(in);
                 }
-                catch (java.io.IOException e)
+                catch (IOException e)
                 {
                     // Ignored.
                 }
@@ -850,7 +847,7 @@ public class SimpleLogger extends MarkerIgnoringBase
                     {
                         in.close();
                     }
-                    catch (java.io.IOException e)
+                    catch (IOException e)
                     {
                         // Ignored.
                     }

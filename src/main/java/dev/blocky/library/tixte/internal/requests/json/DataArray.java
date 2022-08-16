@@ -41,10 +41,10 @@ import java.util.stream.Stream;
 /**
  * Represents a list of values used in communication with the Tixte API.
  * <br>Throws {@link IndexOutOfBoundsException} if provided with index out of bounds.
- * <br>This class is not thread-safe
+ * <br>This class is not thread-safe.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.1
  * @since v1.0.0-beta.3
  */
 public class DataArray implements Iterable<Object>, SerializableArray
@@ -65,7 +65,7 @@ public class DataArray implements Iterable<Object>, SerializableArray
         listType = mapper.getTypeFactory().constructRawCollectionType(ArrayList.class);
     }
 
-    DataArray(List<Object> data)
+    DataArray(@NotNull List<Object> data)
     {
         this.data = data;
     }
@@ -204,7 +204,8 @@ public class DataArray implements Iterable<Object>, SerializableArray
     /**
      * Whether this array is empty.
      *
-     * @return True, if this array is empty.
+     * @return <b>true</b> - If this array is empty.
+     *         <br><b>false</b> - If this array is not empty.
      */
     public boolean isEmpty()
     {
@@ -627,6 +628,11 @@ public class DataArray implements Iterable<Object>, SerializableArray
         }
     }
 
+    /**
+     * Method that can be used to convert the current object as a string.
+     *
+     * @return The current object as a pretty string.
+     */
     @NotNull
     public String toPrettyString()
     {
@@ -645,9 +651,9 @@ public class DataArray implements Iterable<Object>, SerializableArray
     }
 
     /**
-     * Converts this DataArray to a {@link java.util.List}.
+     * Converts this DataArray to a {@link List}.
      *
-     * @return The resulting list.
+     * @return The resulting {@link List}.
      */
     @NotNull
     public List<Object> toList()
@@ -687,7 +693,6 @@ public class DataArray implements Iterable<Object>, SerializableArray
             return type.cast(value.toString());
         }
 
-        // attempt type coercion
         if (stringMapper != null && value instanceof String)
         {
             return stringMapper.apply((String) value);

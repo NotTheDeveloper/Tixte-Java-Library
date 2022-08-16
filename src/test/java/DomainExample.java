@@ -15,12 +15,12 @@
  */
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import dev.blocky.library.tixte.api.Domains;
+import dev.blocky.library.tixte.api.entities.Domains;
 import dev.blocky.library.tixte.api.TixteClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Some basic examples, how to use the {@link Domains domain system}.
@@ -32,15 +32,11 @@ import java.io.IOException;
 public class DomainExample
 {
     /**
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
-     *
      * @return Adds a subdomain to our other domains.
      */
     @NotNull
     @CheckReturnValue
-    public static Domains createDomain() throws IOException
+    public static Domains createDomain()
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
         Domains domains = client.getDomainSystem();
@@ -53,14 +49,13 @@ public class DomainExample
     }
 
     /**
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Adds a subdomain with random name to our other domains.
      */
     @NotNull
-    public static Domains createRandomDomain() throws IOException
+    public static Domains createRandomDomain() throws ExecutionException, InterruptedException
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
         Domains domains = client.getDomainSystem();
@@ -71,14 +66,13 @@ public class DomainExample
     }
 
     /**
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Deletes a domain of your domain collection.
      */
     @Nullable
-    public static Domains deleteDomain() throws IOException
+    public static Domains deleteDomain() throws ExecutionException, InterruptedException
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
         Domains domains = client.getDomainSystem();

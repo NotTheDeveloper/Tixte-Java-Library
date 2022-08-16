@@ -15,6 +15,8 @@
  */
 package dev.blocky.library.tixte.internal.requests;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
+
 /**
  * Represents HTTP-methods.
  *
@@ -22,6 +24,7 @@ package dev.blocky.library.tixte.internal.requests;
  * @version v1.0.0
  * @since v1.0.0-beta.3
  */
+@Internal
 public enum Method
 {
 

@@ -58,7 +58,7 @@ public class BasicTixteClientExample
 
         logger.info("Executing request...");
 
-        if (request.isHttps())
+        if (!request.isHttps())
         {
             client.cancelRequests();
         }
@@ -67,7 +67,7 @@ public class BasicTixteClientExample
     /**
      * Returns the {@link TixteClient} instance from the {@link BasicTixteClientExample} class.
      *
-     * @return {@link BasicTixteClientExample#client}
+     * @return {@link BasicTixteClientExample#client}.
      */
     @NotNull
     public static TixteClient getTixteClient()

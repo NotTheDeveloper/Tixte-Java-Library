@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
  * Allows custom serialization for JSON payloads of an object.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.1
  * @since v1.0.0-beta.3
  */
 public interface SerializableData
@@ -29,7 +29,7 @@ public interface SerializableData
     /**
      * Serialized {@link DataObject} for this object.
      *
-     * @return {@link DataObject}
+     * @return A {@link DataObject}.
      */
     @NotNull
     DataObject toData();

@@ -40,7 +40,7 @@ import java.util.function.UnaryOperator;
  * <br>This class is not thread-safe.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.1
  * @since v1.0.0-beta.3
  */
 public class DataObject implements SerializableData
@@ -696,6 +696,11 @@ public class DataObject implements SerializableData
         }
     }
 
+    /**
+     * Method that can be used to convert the current object as a string.
+     *
+     * @return The current object as a pretty string.
+     */
     @NotNull
     public String toPrettyString()
     {
@@ -716,7 +721,7 @@ public class DataObject implements SerializableData
     /**
      * Converts this {@link DataObject} to a {@link Map}.
      *
-     * @return The resulting map.
+     * @return The resulting {@link Map}.
      */
     @NotNull
     public Map<String, Object> toMap()
@@ -763,7 +768,6 @@ public class DataObject implements SerializableData
             return type.cast(value.toString());
         }
 
-        // attempt type coercion
         if (value instanceof Number && numberParse != null)
         {
             return numberParse.apply((Number) value);

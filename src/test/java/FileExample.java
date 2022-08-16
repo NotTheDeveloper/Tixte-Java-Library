@@ -20,27 +20,23 @@ import dev.blocky.library.tixte.api.TixteClient;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Some basic examples, how to upload a {@link File}.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.1
  * @since v1.0.0-beta.3
  */
 public class FileExample
 {
     /**
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
-     *
      * @return Upload a file to Tixte by initializing a <b>new</b> {@link File}.
      */
     @NotNull
     @CheckReturnValue
-    public static MyFiles uploadFile() throws IOException
+    public static MyFiles uploadFile()
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
         MyFiles myFiles = client.getFileSystem();
@@ -58,15 +54,14 @@ public class FileExample
     }
 
     /**
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Delete any kind of file from your Tixte dashboard.
      */
     @NotNull
     @CheckReturnValue
-    public static MyFiles deleteFile() throws IOException
+    public static MyFiles deleteFile() throws ExecutionException, InterruptedException
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
         MyFiles myFiles = client.getFileSystem();
@@ -78,15 +73,11 @@ public class FileExample
     }
 
     /**
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
-     *
      * @return Deletes every file from your Tixte dashboard.
      */
     @NotNull
     @CheckReturnValue
-    public static MyFiles deleteAllFiles() throws IOException
+    public static MyFiles deleteAllFiles()
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
         MyFiles myFiles = client.getFileSystem();

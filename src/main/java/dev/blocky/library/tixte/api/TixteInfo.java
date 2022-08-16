@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.internal.requests.json;
-
-import org.jetbrains.annotations.NotNull;
+package dev.blocky.library.tixte.api;
 
 /**
- * Allows custom serialization for JSON payloads of an object.
+ * Contains information to this specific build of Tixte4J.
  *
  * @author BlockyDotJar
- * @version v1.0.1
- * @since v1.0.0-beta.3
+ * @version v1.0.0
+ * @since v1.0.0-beta.5
  */
-public interface SerializableArray
+public class TixteInfo
 {
-    /**
-     * Serialized {@link DataArray} for this object.
-     *
-     * @return An {@link DataArray}.
-     */
-    @NotNull
-    DataArray toDataArray();
+    TixteInfo() { }
+
+    public static final int TIXTE_API_VERSION = 1;
+    public static final String VERSION = "v1.0.0-beta.5";
+    public static final String GITHUB = "https://github.com/BlockyDotJar/Tixte-Java-Library";
 }

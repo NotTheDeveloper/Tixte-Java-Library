@@ -16,20 +16,26 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CheckReturnValue;
+import dev.blocky.library.tixte.api.entities.*;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
 import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
+import dev.blocky.library.tixte.internal.requests.FunctionalCallback;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
-import okhttp3.*;
+import dev.blocky.library.tixte.internal.RawResponseData;
+import dev.blocky.library.tixte.internal.utils.io.IOUtil;
+import okhttp3.Cache;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Objects;
 import java.util.Optional;
-
-import static dev.blocky.library.tixte.api.RawResponseData.getConfigRaw;
-import static dev.blocky.library.tixte.api.RawResponseData.setBaseRedirectRaw;
-import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The core of Tixte4J.
@@ -37,18 +43,14 @@ import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
  * <br>All parts of the API can be accessed starting from this class.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.2.0
  * @since v1.0.0-alpha.1
  */
-public class TixteClient
+public class TixteClient extends RawResponseData
 {
+    private final SelfUser self = new SelfUser();
 
-    /**
-     * Instantiates a <b>new</b> Tixte-Client.
-     */
-    TixteClient()
-    {
-    }
+    protected TixteClient() { }
 
     /**
      * Gets the API-key, you specified with {@link TixteClientBuilder#create(String)}.
@@ -101,29 +103,15 @@ public class TixteClient
     /**
      * Represents a Tixte user-account.
      *
-     * @param userName  A specific user-name
+     * @param userData A specific user-name or id.
      *
      * @return Instantiates a <b>new</b> user.
      */
     @Nullable
     @CheckReturnValue
-    public User getUserByName(@NotNull String userName)
+    public User getUserByData(@NotNull String userData)
     {
-        return new User(userName);
-    }
-
-    /**
-     * Represents a Tixte user-account.
-     *
-     * @param userId A specific user-id.
-     *
-     * @return Instantiates a <b>new</b> user.
-     */
-    @Nullable
-    @CheckReturnValue
-    public User getUserById(@NotNull String userId)
-    {
-        return new User(userId);
+        return new User(userData);
     }
 
     /**
@@ -229,19 +217,41 @@ public class TixteClient
      * Gets the HTTP headers of the request.
      * <br>Note that you must send a request to an endpoint before using this method.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
-     *
-     * @return The HTTP headers of the request.
+     * @return The HTTP-headers of the request.
      */
     @Nullable
     @CheckReturnValue
-    public Optional<String> getHeader() throws IOException
+    public Optional<String> getHeader()
     {
-        try (Response response = client.newCall(request).execute())
+        CompletableFuture<String> future = new CompletableFuture<>();
+
+        client.newCall(request).enqueue(FunctionalCallback
+                .onFailure((call, e) -> future.completeExceptionally(new UncheckedIOException(e)))
+                .onSuccess((call, response) ->
+                {
+                    if (response.isSuccessful())
+                    {
+                        String body = response.headers().toString();
+
+                        if (!future.complete(body))
+                        {
+                            IOUtil.silentClose(response);
+                        }
+                    }
+                    else
+                    {
+                        IOUtil.silentClose(response);
+                    }
+                }).build()
+        );
+
+        try
         {
-            return Optional.ofNullable(response.headers().toString());
+            return Optional.ofNullable(future.get());
+        }
+        catch (ExecutionException | InterruptedException e)
+        {
+            throw new RuntimeException(e);
         }
     }
 
@@ -249,9 +259,7 @@ public class TixteClient
      * Closes the cache and deletes all of its stored values.
      * <br>This will delete all files in the cache directory including files that weren't created by the cache.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws IOException If an I/O error occurs.
      */
     public void pruneCache() throws IOException
     {
@@ -266,18 +274,22 @@ public class TixteClient
      * <br>A redirect is a server- or client-side automatic forwarding from one URL to another URL.
      * <br>This requires a Tixte turbo/turbo-charged subscription or else there will be thrown a {@link TixteWantsYourMoneyException}.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
-     *
      * @param redirectURL The redirect-URL.
+     *
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The current instance of the {@link TixteClient}.
      */
     @NotNull
     @CheckReturnValue
-    public TixteClient setBaseRedirect(@NotNull String redirectURL) throws IOException
+    public TixteClient setBaseRedirect(@NotNull String redirectURL) throws ExecutionException, InterruptedException
     {
+        if (!self.hasTixteSubscription())
+        {
+            throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
+        }
+
         setBaseRedirectRaw(redirectURL);
         return this;
     }
@@ -286,18 +298,17 @@ public class TixteClient
      * This will return <b>false</b> if you have not set a redirect-url or this will return a string if you have set one.
      * <br>You can set the redirect-url by using {@link TixteClient#setBaseRedirect(String)}.
      *
-     * @throws IOException  If the request could not be executed due to cancellation,
-     *                      a connectivity problem or timeout. Because networks can fail during an exchange,
-     *                      it is possible that the remote server accepted the request before the failure.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return <b>false</b> - If you are not redirected to the redirect-url.
      *         <br><b>Otherwise</b> - The redirect-url as a string.
      */
     @NotNull
     @CheckReturnValue
-    public Object baseRedirect() throws IOException
+    public Object baseRedirect() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw());
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
         DataObject data = json.getDataObject("data");
 
         return data.get("base_redirect");
@@ -333,7 +344,7 @@ public class TixteClient
                     "base_redirect='" + baseRedirect() + "'" +
                     '}';
         }
-        catch (IOException e)
+        catch (ExecutionException | InterruptedException e)
         {
             throw new RuntimeException(e);
         }

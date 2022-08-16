@@ -25,7 +25,7 @@ import java.util.Map;
  * Enum constants representing possible types for a {@link DataObject} value.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.1
  * @since v1.0.0-beta.3
  */
 public enum DataType
@@ -35,7 +35,7 @@ public enum DataType
     /**
      * Assumes the type of the provided value through instance checks.
      *
-     * @param  value The value to test.
+     * @param value The value to test.
      *
      * @return The {@link DataType} constant or {@link #UNKNOWN}.
      */
@@ -55,9 +55,10 @@ public enum DataType
     /**
      * Tests whether the type for the provided value is the one represented by this enum constant.
      *
-     * @param  value The value to check.
+     * @param value The value to check.
      *
-     * @return True, if the value is of this type.
+     * @return <b>true</b> - If the value is of this type.
+     *         <br><b>false</b> - If the value is not of this type.
      */
     public boolean isType(@Nullable Object value)
     {

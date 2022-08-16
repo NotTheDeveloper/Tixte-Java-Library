@@ -22,33 +22,35 @@ import dev.blocky.library.tixte.internal.interceptor.ForceCacheInterceptor;
 import dev.blocky.library.tixte.internal.interceptor.RateLimitInterceptor;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
+import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.jetbrains.annotations.NonBlocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Used to create <b>new</b> {@link TixteClient} instances.
- * <br>
- * <br>A single {@link TixteClientBuilder} can be reused multiple times.
+ * <br><br>A single {@link TixteClientBuilder} can be reused multiple times.
  * <br>Each call to {@link #build()} creates a <b>new</b> {@link TixteClient} instance using the same information.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.2.0
  * @since v1.0.0-alpha.1
  */
 public class TixteClientBuilder
 {
-    private final Logger logger = TixteLogger.getLog(TixteClient.class);
-    private final Dispatcher dispatcher = new Dispatcher();
-    static String apiKey, sessionToken, defaultDomain;
-    static CachePolicy policy;
-    static OkHttpClient client;
-    static Request request;
+    private final Logger logger = TixteLogger.getLog(TixteClientBuilder.class);
+    protected static String apiKey, sessionToken, defaultDomain;
+    protected final Dispatcher dispatcher = new Dispatcher();
+    protected static CachePolicy policy;
+    protected static OkHttpClient client;
+    protected static Request request;
 
     /**
      * Creates a <b>new</b> {@link TixteClientBuilder} instance by initializing the builder with your API-key.
@@ -151,19 +153,23 @@ public class TixteClientBuilder
      * @return A {@link TixteClient} instance that has started the login process.
      */
     @NotNull
+    @NonBlocking
     public TixteClient build()
     {
-        dispatcher.setMaxRequestsPerHost(100);
+        dispatcher.setMaxRequestsPerHost(25);
+
+        ConnectionPool connectionPool = new ConnectionPool(5, 10, TimeUnit.SECONDS);
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .dispatcher(dispatcher)
+                .connectionPool(connectionPool)
                 .addInterceptor(new RateLimitInterceptor())
                 .addInterceptor(new ErrorResponseInterceptor());
 
         if (policy == null)
         {
             policy = CachePolicy.NONE;
-            logger.info("'policy' equals null, setting to NONE.");
+            logger.info("'policy' equals null, setting to 'NONE'.");
         }
 
         switch (policy)

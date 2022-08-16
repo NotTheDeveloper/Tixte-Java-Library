@@ -25,7 +25,7 @@ import java.io.IOException;
  * Handles rate-limits using an {@link Interceptor}.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.1
  * @since v1.0.0-alpha.1
  */
 public class RateLimitInterceptor implements Interceptor
@@ -41,7 +41,7 @@ public class RateLimitInterceptor implements Interceptor
         {
             try
             {
-                Thread.sleep(1000);
+                Thread.sleep(5000);
             }
             catch (InterruptedException e)
             {

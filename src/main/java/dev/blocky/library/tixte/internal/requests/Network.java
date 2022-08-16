@@ -27,7 +27,7 @@ import java.net.SocketAddress;
  * Utility class for handling network connectivity.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.1.1
  * @since v1.0.0-alpha.3
  */
 public strictfp class Network
@@ -49,8 +49,8 @@ public strictfp class Network
     /**
      * Creates a network connection.
      *
-     * @param hostName The host name
-     * @param port     The port number
+     * @param hostName The host name.
+     * @param port The port number.
      * @return Creates a <b>new</b> network.
      */
     @NotNull
@@ -62,18 +62,17 @@ public strictfp class Network
     /**
      * Checks if you can connect to internet or not.
      *
-     * @return  <b>true</b> - If you can connect to internet.
-     *          <br><b>false</b> - If you cannot connect to internet.
+     * @return <b>true</b> - If you can connect to internet.
+     *         <br><b>false</b> - If you cannot connect to internet.
      */
     public boolean isInternetAvailable()
     {
         try
         {
-            int timeout = 1500;
             Socket socket = new Socket();
             SocketAddress socketAddress = new InetSocketAddress(hostName, port);
 
-            socket.connect(socketAddress, timeout);
+            socket.connect(socketAddress, 1500);
             socket.close();
             return true;
         }
