@@ -1,5 +1,5 @@
 /**
- * Root package of the Tixte4J annotations.
+ * Root package of all Tixte4J annotations.
  *
  * <br>From here you can navigate to all annotations.
  *

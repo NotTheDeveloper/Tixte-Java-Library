@@ -51,7 +51,7 @@ import static dev.blocky.library.tixte.internal.requests.Route.TIXTE_API_PREFIX;
  * Represents the raw response data from Tixte API-requests.
  *
  * @author BlockyDotJar
- * @version v2.1.0
+ * @version v3.0.0
  * @since v1.0.0-beta.1
  */
 @Internal
@@ -79,28 +79,24 @@ public strictfp class RawResponseData extends TixteClientBuilder
     }
 
     /**
-     * @param page The page you want to get the xyz from.
-     *
      * @see MyFiles#getTotalUploadCount() 
-     * @see MyFiles#getResults(int)
-     * @see MyFiles#getPermissionLevel(int, int) 
-     * @see MyFiles#getExtension(int, int) 
-     * @see MyFiles#getSize(int, int) 
-     * @see MyFiles#getUploadDate(int, int) 
-     * @see MyFiles#getName(int, int) 
-     * @see MyFiles#getDomain(int, int) 
-     * @see MyFiles#getMimeType(int, int) 
-     * @see MyFiles#getExpirationTime(int, int) 
-     * @see MyFiles#getAssetId(int, int) 
-     * @see MyFiles#getType(int, int) 
+     * @see MyFiles#getResults()
+     * @see MyFiles#getPermissionLevels()
+     * @see MyFiles#getExtensions()
+     * @see MyFiles#getSizes()
+     * @see MyFiles#getUploadDates()
+     * @see MyFiles#getNames()
+     * @see MyFiles#getDomains()
+     * @see MyFiles#getMimeTypes()
+     * @see MyFiles#getExpirationTimes()
+     * @see MyFiles#getAssetIds()
+     * @see MyFiles#getTypes()
      *
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> getUploadsRaw(int page)
+    protected static CompletableFuture<InputStream> getUploadsRaw()
     {
-        Checks.notNegative(page, "page");
-
         Route.CompiledRoute route = Route.Self.GET_UPLOADS.compile();
 
         return request(route, false, null);
@@ -441,9 +437,9 @@ public strictfp class RawResponseData extends TixteClientBuilder
     }
 
     /**
-     * @see Domains#getUploadCount(int)
-     * @see Domains#getDomainName(int) 
-     * @see Domains#getOwnerId(int) 
+     * @see Domains#getUploadCounts()
+     * @see Domains#getDomainNames()
+     * @see Domains#getOwnerIds()
      * @see Domains#getDomainCount() 
      *
      * @return The raw response of the request.
@@ -457,9 +453,9 @@ public strictfp class RawResponseData extends TixteClientBuilder
     }
 
     /**
-     * @see Domains#getUsableDomainName(int)
+     * @see Domains#getUsableDomainNames()
      * @see Domains#getUsableDomainCount()
-     * @see Domains#isActive(int)
+     * @see Domains#isActive()
      *
      * @return The raw response of the request.
      */
@@ -778,7 +774,7 @@ public strictfp class RawResponseData extends TixteClientBuilder
                 {
                     if (response.isSuccessful())
                     {
-                        logger.info("Request successful: POST/" + Route.File.UPLOAD_FILE);
+                        logger.info("Request successful: " + Route.File.UPLOAD_FILE);
 
                         InputStream body = IOUtil.getBody(response);
 

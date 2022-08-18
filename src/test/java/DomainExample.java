@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutionException;
  * Some basic examples, how to use the {@link Domains domain system}.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-beta.3
  */
 public class DomainExample
@@ -41,7 +41,7 @@ public class DomainExample
         TixteClient client = BasicTixteClientExample.getTixteClient();
         Domains domains = client.getDomainSystem();
 
-        // Adds a new domain to the dashboard.
+        // Adds a *new* domain to the dashboard.
         // You cannot use domain endings, you don't own.
         // This mustn't contain http or https in the name.
         // Note that you only can have up to 3 subdomains without a subscription.

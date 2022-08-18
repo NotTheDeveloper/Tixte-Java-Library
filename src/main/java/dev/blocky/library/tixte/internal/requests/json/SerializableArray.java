@@ -18,10 +18,10 @@ package dev.blocky.library.tixte.internal.requests.json;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Allows custom serialization for JSON payloads of an object.
+ * Allows custom serialization for JSON payloads of an array.
  *
  * @author BlockyDotJar
- * @version v1.0.1
+ * @version v1.0.2
  * @since v1.0.0-beta.3
  */
 public interface SerializableArray

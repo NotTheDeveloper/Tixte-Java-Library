@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
  * Exception used for handling HTTP errors.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.1.1
  * @since v1.0.0-alpha.1
  */
 public class HTTPException extends RuntimeException
@@ -36,17 +36,5 @@ public class HTTPException extends RuntimeException
     public HTTPException(@NotNull String message)
     {
         super(message);
-    }
-
-    /**
-     * Constructs a {@link HTTPException} with the specified cause and a detail message
-     * of {@code (cause==null ? null : cause.toString())}.
-     * <br>A detail message is a String that describes this particular exception.
-     *
-     * @param cause The cause.
-     */
-    public HTTPException(@NotNull Throwable cause)
-    {
-        super(cause);
     }
 }

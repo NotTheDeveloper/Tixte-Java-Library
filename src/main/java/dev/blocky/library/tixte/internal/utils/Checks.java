@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
  * Utility class for handling errors.
  *
  * @author BlockyDotJar
- * @version v1.1.1
+ * @version v1.2.0
  * @since v1.0.0-beta.1
  */
 public class Checks
@@ -117,19 +117,6 @@ public class Checks
         {
             throw new IllegalStateException("\"" + name + "\" may not contain blanks. Provided: \"" + argument + "\"");
         }
-    }
-
-    /**
-     * Checks, if the given input is not longer than the given length.
-     *
-     * @param input The string to get the number of unicode code points in the specified text range.
-     * @param length The maximum length of the string.
-     * @param name The name of the string.
-     */
-    public static void notLonger(@NotNull String input, int length, @NotNull String name)
-    {
-        notNull(input, name);
-        check(Helpers.codePointLength(input) <= length, "%s may not be longer than %d characters! Provided: \"%s\"", name, length, input);
     }
 
     /**

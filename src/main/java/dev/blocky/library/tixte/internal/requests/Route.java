@@ -34,7 +34,7 @@ import static dev.blocky.library.tixte.internal.requests.Method.*;
  * Utility class for creating {@link Request requests}.
  *
  * @author BlockyDotJar
- * @version v2.0.1
+ * @version v2.1.0
  * @since v1.0.0-alpha.3
  */
 @Internal
@@ -42,6 +42,13 @@ public class Route
 {
     public static final String TIXTE_API_PREFIX = Helpers.format("https://api.tixte.com/v%d/", TIXTE_API_VERSION);
 
+    /**
+     * Represents your Tixte user-account.
+     *
+     * @author BlockyDotJar
+     * @version v1.3.0
+     * @since v1.0.0-beta.3
+     */
     public static class Self
     {
         public static final Route GET_SELF                  = new Route(GET,      "users/@me");
@@ -56,31 +63,73 @@ public class Route
         public static final Route GET_UPLOAD_SIZE           = new Route(GET,      "users/@me/uploads/size");
         public static final Route DELETE_FILE               = new Route(DELETE,   "users/@me/uploads/{asset_id}");
 
-        @Experimental //  Can't be used yet by everyone, so i am not able to implement it already.
+        //  Can't be used yet by everyone, so I am not able to implement it already.
+
+        @Experimental
         public static final Route SEARCH_FILE               = new Route(POST,      "users/@me/uploads/search");
+
+        @Experimental
+        public static final Route GET_FOLDERS               = new Route(GET,      "users/@me/folders");
     }
 
+    /**
+     * Represents a Tixte user-account.
+     *
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-beta.3
+     */
     public static class Users
     {
         public static final Route GET_USER                  = new Route(GET,      "users/{user_data}");
     }
 
+    /**
+     * Represents everything what Tixte offers you with files.
+     *
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-beta.3
+     */
     public static class File
     {
         public static final Route UPLOAD_FILE               = new Route(POST,     "upload");
     }
 
+    /**
+     * Represents everything what Tixte offers you with domains.
+     *
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-beta.3
+     */
     public static class Domain
     {
         public static final Route GET_DOMAINS               = new Route(GET,     "domains");
     }
 
+    /**
+     * Represents everything what Tixte offers you with resources.
+     *
+     * @author BlockyDotJar
+     * @version v1.0.0
+     * @since v1.0.0-beta.3
+     */
     public static class Resources
     {
         public static final Route GET_GENERATED_DOMAIN     = new Route(GET,     "resources/generate-domain");
     }
 
+    /**
+     * Represents a custom HTTP-method to specific route.
+     *
+     * @param method The {@link Method} of the request.
+     * @param route The route of the request.
+     *
+     * @return A custom HTTP-method to specific route.
+     */
     @NotNull
+    @CheckReturnValue
     public static Route custom(@NotNull Method method, @NotNull String route)
     {
         Checks.notNull(method, "Method");
@@ -90,30 +139,65 @@ public class Route
         return new Route(method, route);
     }
 
+    /**
+     * Represents a {@code delete}-request to a specific route.
+     *
+     * @param route The route of the request.
+     *
+     * @return A {@code delete}-request to a specific route.
+     */
     @NotNull
     public static Route delete(@NotNull String route)
     {
         return custom(DELETE, route);
     }
 
+    /**
+     * Represents a {@code post}-request to a specific route.
+     *
+     * @param route The route of the request.
+     *
+     * @return A {@code post}-request to a specific route.
+     */
     @NotNull
     public static Route post(@NotNull String route)
     {
         return custom(POST, route);
     }
 
+    /**
+     * Represents a {@code put}-request to a specific route.
+     *
+     * @param route The route of the request.
+     *
+     * @return A {@code put}-request to a specific route.
+     */
     @NotNull
     public static Route put(@NotNull String route)
     {
         return custom(PUT, route);
     }
 
+    /**
+     * Represents a {@code patch}-request to a specific route.
+     *
+     * @param route The route of the request.
+     *
+     * @return A {@code patch}-request to a specific route.
+     */
     @NotNull
     public static Route patch(@NotNull String route)
     {
         return custom(PATCH, route);
     }
 
+    /**
+     * Represents a {@code get}-request to a specific route.
+     *
+     * @param route The route of the request.
+     *
+     * @return A {@code get}-request to a specific route.
+     */
     @NotNull
     public static Route get(@NotNull String route)
     {
@@ -137,6 +221,11 @@ public class Route
         }
     }
 
+    /**
+     * Gets the current used HTTP-method.
+     *
+     * @return The current used HTTP-method.
+     */
     @Nullable
     @CheckReturnValue
     public Method getMethod()
@@ -144,6 +233,11 @@ public class Route
         return method;
     }
 
+    /**
+     * Gets the current used route.
+     *
+     * @return The current used route.
+     */
     @Nullable
     @CheckReturnValue
     public String getRoute()
@@ -151,17 +245,29 @@ public class Route
         return route;
     }
 
+    /**
+     * Gets the amount of parameters in the current route.
+     *
+     * @return The amount of parameters in the current route.
+     */
     public int getParamCount()
     {
         return paramCount;
     }
 
+    /**
+     * Gets the current route with all parameters replaced with the given values.
+     *
+     * @param params The parameters to compile the route with.
+     *
+     * @return The current {@link CompiledRoute} with all parameters replaced with the given values.
+     */
     @NotNull
     public CompiledRoute compile(@NotNull String... params)
     {
         if (params.length != paramCount)
         {
-            throw new IllegalArgumentException("Error Compiling Route: [" + route + "], incorrect amount of parameters provided." +
+            throw new IllegalArgumentException("Error compiling Route: [" + route + "], incorrect amount of parameters provided." +
                     "Expected: " + paramCount + ", Provided: " + params.length);
         }
 
@@ -187,7 +293,7 @@ public class Route
             }
             compiledRoute.replace(paramStart, paramEnd + 1, params[i]);
         }
-        return new CompiledRoute(this, compiledRoute.toString(), major.isEmpty() ? "n/a" : String.join(":", major));
+        return new CompiledRoute(this, compiledRoute.toString(), major.isEmpty() ? "N/A" : String.join(":", major));
     }
 
     @Override
@@ -216,6 +322,13 @@ public class Route
         return method + "/" + route;
     }
 
+    /**
+     * Represents the current compiled route.
+     *
+     * @author BlockyDotJar
+     * @version v1.3.0
+     * @since v1.0.0-beta.3
+     */
     public class CompiledRoute
     {
         private final Route baseRoute;
@@ -236,6 +349,14 @@ public class Route
             this(baseRoute, compiledRoute, major, false);
         }
 
+        /**
+         * Gets the current route with all parameters replaced with the given values.
+         * <br>Query parameter are for example: {@code ?param1=value1&param2=value2}
+         *
+         * @param params The parameters to compile the route with.
+         *
+         * @return The current {@link CompiledRoute} with all parameters replaced with the given values.
+         */
         @NotNull
         @CheckReturnValue
         public CompiledRoute withQueryParams(@NotNull String... params)
@@ -253,25 +374,44 @@ public class Route
             return new CompiledRoute(baseRoute, newRoute.toString(), major, true);
         }
 
+        /**
+         * Gets every major parameter of the route.
+         *
+         * @return Every major parameter of the route.
+         */
         @NotNull
         public String getMajorParameters()
         {
             return major;
         }
 
-
+        /**
+         * Gets the current compiled route.
+         *
+         * @return The current compiled route.
+         */
         @NotNull
         public String getCompiledRoute()
         {
             return compiledRoute;
         }
 
+        /**
+         * Gets the current base route.
+         *
+         * @return The current base route.
+         */
         @NotNull
         public Route getBaseRoute()
         {
             return baseRoute;
         }
 
+        /**
+         * Gets the current used HTTP-method.
+         *
+         * @return The current used HTTP-method.
+         */
         @NotNull
         public Method getMethod()
         {

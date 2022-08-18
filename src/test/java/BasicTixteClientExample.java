@@ -18,7 +18,6 @@ import dev.blocky.library.tixte.api.TixteClient;
 import dev.blocky.library.tixte.api.TixteClientBuilder;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
-import okhttp3.Request;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import secrets.DONOTOPEN;
@@ -29,7 +28,7 @@ import java.io.IOException;
  * Some basic examples, how to use an {@link TixteClient}.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-beta.3
  */
 public class BasicTixteClientExample
@@ -39,8 +38,6 @@ public class BasicTixteClientExample
 
     public static void main(@NotNull String[] args) throws IOException
     {
-        Request request = client.getRequest().orElse(null);
-
         // Creates a new TixteClient.
         TixteClientBuilder builder = new TixteClientBuilder()
                 // Sets the API-key, which is required for most of the methods.
@@ -56,12 +53,7 @@ public class BasicTixteClientExample
         // Builds a new TixteClient instance and uses the provided API-key and session-token to start the login process.
         client = builder.build();
 
-        logger.info("Executing request...");
-
-        if (!request.isHttps())
-        {
-            client.cancelRequests();
-        }
+        logger.info("Successfully logged in!");
     }
 
     /**

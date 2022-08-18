@@ -38,12 +38,12 @@ import java.util.regex.Pattern;
  * Builder system used to build {@link Embed embeds}.
  *
  * @author BlockyDotJar
- * @version v1.2.0
+ * @version v1.3.0
  * @since v1.0.0-beta.1
  */
 public class EmbedEditor extends RawResponseData
 {
-    private final Pattern URL_PATTERN = Pattern.compile("\\s*(https?|attachment)://\\S+\\s*", Pattern.CASE_INSENSITIVE);
+    private final Pattern URL_PATTERN = Pattern.compile("\\s*https://\\S+\\s*", Pattern.CASE_INSENSITIVE);
     private final Logger logger = TixteLogger.getLog(EmbedEditor.class);
     private final StringBuilder description = new StringBuilder();
     private final SelfUser self = new SelfUser();
@@ -76,7 +76,8 @@ public class EmbedEditor extends RawResponseData
     /**
      * Returns a {@link Embed} that has been checked as being valid for sending.
      *
-     * @throws IllegalStateException If the embed is empty. Can be checked with {@link #isEmpty()}.
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The built, sendable {@link Embed}.
      */
@@ -206,7 +207,7 @@ public class EmbedEditor extends RawResponseData
 
     /**
      * Sets the title of the {@link Embed}.
-     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
      *
      * @param title The title of the {@link Embed}.
      *
@@ -241,7 +242,7 @@ public class EmbedEditor extends RawResponseData
     /**
      * Sets the description of the {@link Embed}.
      * <br>This is where the main chunk of text for an {@link Embed} is typically placed.
-     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
      *
      * @param description The description of the {@link Embed}, {@code null} to reset.
      *
@@ -265,7 +266,7 @@ public class EmbedEditor extends RawResponseData
     /**
      * Appends to the description of the {@link Embed}.
      * <br>This is where the main chunk of text for an {@link Embed} is typically placed.
-     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
      *
      * @param description The string to append to the description of the {@link Embed}.
      *
@@ -292,7 +293,7 @@ public class EmbedEditor extends RawResponseData
 
     /**
      * Sets the color of the {@link Embed}.
-     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
      *
      * @param hexColor The {@link Color color} as a string of the {@link Embed} or {@code null} to use no color.
      *
@@ -309,7 +310,7 @@ public class EmbedEditor extends RawResponseData
      * Sets the author of the {@link Embed}.
      * <br>The author appears in the top left of the {@link Embed} with its name being made clickable by way of providing an url.
      * <br>This convenience method just sets the name.
-     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
      *
      * @param authorName The name of the author of the {@link Embed}. If this is not set, the author will not appear in the {@link Embed}.
      *
@@ -329,8 +330,7 @@ public class EmbedEditor extends RawResponseData
      * <br>The author appears in the top left of the embed and can have a small image beside it along with the author's
      * name being made clickable by way of providing an url.
      * <br>This convenience method sets the name and the url.
-     *
-     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte-embed.png" target="_blank">Example</a></b>
+     * <br><br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
      *
      * @param  authorName The name of the author of the embed. If this is not set, the author will not appear in the embed.
      * @param  authorURL The url of the author of the embed.
@@ -430,7 +430,7 @@ public class EmbedEditor extends RawResponseData
         {
             Checks.check(url.length() <= Embed.URL_MAX_LENGTH, "URL cannot be longer than %d characters.",
                     Embed.URL_MAX_LENGTH);
-            Checks.check(URL_PATTERN.matcher(url).matches(), "URL must be a valid http(s) or attachment url.");
+            Checks.check(URL_PATTERN.matcher(url).matches(), "URL must be a valid http(s) url.");
         }
     }
 
@@ -462,6 +462,7 @@ public class EmbedEditor extends RawResponseData
      * If this is set, there only will be an image in the {@link Embed}.
      * <br>This is highly recommended not to set to true, if you are using any method of the {@link EmbedEditor} class,
      * because there could be some errors if you use {@link #build()} to send the request.
+     * <br><br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed-Image-Only.png" target="_blank">Example</a></b>
      *
      * @param onlyImagedEnabled If the embed should only have images.
      *

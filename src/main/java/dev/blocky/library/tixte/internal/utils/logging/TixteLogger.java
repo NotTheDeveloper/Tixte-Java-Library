@@ -35,7 +35,7 @@ import java.util.ServiceLoader;
  * <br>It also has the utility method {@link #getLazyString(LazyEvaluation)} which is used to lazily construct strings for logging.
  *
  * @author BlockyDotJar
- * @version v1.1.1
+ * @version v1.2.0
  * @since v1.0.0-alpha.3
  */
 public class TixteLogger
@@ -173,6 +173,8 @@ public class TixteLogger
          * This method is used by {@link #getLazyString(LazyEvaluation)}
          * when SLF4J requests string construction.
          * <br>The string returned by this is used to construct the log message.
+         *
+         * @throws IOException If an I/O error occurs.
          *
          * @return The string for log message.
          */

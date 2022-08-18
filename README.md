@@ -5,11 +5,11 @@
 [license]: https://github.com/BlockyDotJar/Tixte-Java-Library/tree/main/LICENSE
 
 [discord-invite-shield]: https://discord.com/api/guilds/876766868864647188/widget.png
-[discord-invite]: https://discord.gg/FnGFbzCw2r
+[discord-invite]: https://discord.gg/mYKK4BwGxe
 
 [download]: #download
 
-<img align="right" src="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/tixte.png?raw=true" height="200" width="200">
+<img align="right" src="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Logo.png?raw=true" height="200" width="200">
 
 # Tixte4J (Tixte for Java)
 
@@ -48,8 +48,6 @@ The `TixteClientBuilder` allows a set of configurations to improve the experienc
 ```java
     public static void main(@NotNull String[] args) throws IOException
     {
-        Request request = client.getRequest().orElse(null);
-
         // Creates a new TixteClient.
         TixteClientBuilder builder = new TixteClientBuilder()
         // Sets the API-key, which is required for most of the methods.
@@ -64,11 +62,6 @@ The `TixteClientBuilder` allows a set of configurations to improve the experienc
 
         // Builds a new TixteClient instance and uses the provided API-key and session-token to start the login process.
         client = builder.build();
-
-        if (!request.isHttps())
-        {
-            client.cancelRequests();
-        }
     }
 ```
 
@@ -193,6 +186,9 @@ This project requires **Java 8+**
 * commons-collections4
     * Version: **v4.4**
     * [Github](https://github.com/apache/commons-collections)
+* commons-io
+    * Version: **v2.11.0** 
+    * [Github](https://github.com/apache/commons-io)
 
 ## Tixte4J related projects
 

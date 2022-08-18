@@ -24,6 +24,8 @@ import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -32,7 +34,7 @@ import java.util.concurrent.ExecutionException;
  * Represents the 'Domains' tab of the Tixte dashboard and everything else what Tixte offers you with domains.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.2.0
  * @since v1.0.0-alpha.1
  */
 public class Domains extends RawResponseData
@@ -59,61 +61,52 @@ public class Domains extends RawResponseData
     }
 
     /**
-     * Gets every domain that you can use.
-     * <br>The first index is (like an array) 0.
-     * <br>If you want to get every domain at once you can use {@link RawResponseData#getUsableDomainsRaw()
-     * RawResponseData#getUsableDomainsRaw()} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param index The index for getting the domain.
+     * Gets a {@link List} of every usable domain.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return Every domain at its index.
+     * @return A {@link List} of every usable domain.
      */
 
     @Nullable
     @CheckReturnValue
-    public String getUsableDomainName(int index) throws ExecutionException, InterruptedException
+    public List<String> getUsableDomainNames() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUsableDomainsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("domains");
 
-        Checks.notNegative(index, "index");
+        List<String> list = new ArrayList<>();
 
-        return array.getDataObject(index).getString("domain");
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getString("domain"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Checks if the domain is active at the moment.
-     * <br>The first index is (like an array) 0.
-     * <br>If you want to get every domain at once you can use {@link RawResponseData#getUsableDomainsRaw()
-     * RawResponseData#getUsableDomainsRaw()} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param index The index for checking the activity.
+     * Gets a {@link List} of {@code booleans} that represents if the domain is active at the moment.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return  <b>true</b> - If the domain is active.
-     *          <br><b>false</b> - If the domain is not active.
+     * @return A {@link List} of {@code booleans} that represents if the domain is active at the moment.
      */
-    public boolean isActive(int index) throws ExecutionException, InterruptedException
+    public List<Boolean> isActive() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUsableDomainsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("domains");
 
-        Checks.notNegative(index, "index");
+        List<Boolean> list = new ArrayList<>();
 
-        return array.getDataObject(index).getBoolean("active");
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getBoolean("active"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
@@ -133,88 +126,76 @@ public class Domains extends RawResponseData
     }
 
     /**
-     * Gets the owner by id of the domain at the index.
-     * <br>The first index is (like an array) 0.
-     * <br>If you want to get every domain at once you can use {@link RawResponseData#getUsableDomainsRaw()
-     * RawResponseData#getUsableDomainsRaw()} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param index The index for getting the owner id of the domain.
+     * Gets a {@link List} of every owner by id of the domain.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The owner by id of the domain at the index.
+     * @return A {@link List} of every owner by id of the domain.
      */
     @Nullable
     @CheckReturnValue
-    public String getOwnerId(int index) throws ExecutionException, InterruptedException
+    public List<String> getOwnerIds() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserDomainsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("domains");
 
-        Checks.notNegative(index, "index");
+        List<String> list = new ArrayList<>();
 
-        return array.getDataObject(index).getString("owner");
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getString("owner"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Gets the name of the domain at the index.
-     * <br>The first index is (like an array) 0.
-     * <br>If you want to get every domain at once you can use {@link RawResponseData#getUsableDomainsRaw()
-     * RawResponseData#getUsableDomainsRaw()} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param index The index for getting the name of the domain.
+     * Gets a {@link List} of domain names.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The name of the domain at the index.
+     * @return A {@link List} of domain names.
      */
     @Nullable
     @CheckReturnValue
-    public String getDomainName(int index) throws ExecutionException, InterruptedException
+    public List<String> getDomainNames() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserDomainsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("domains");
 
-        Checks.notNegative(index, "index");
+        List<String> list = new ArrayList<>();
 
-        return array.getDataObject(index).getString("name");
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getString("name"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Gets the upload-count of the domain at the index.
-     * <br>The first index is (like an array) 0.
-     * <br>If you want to get every domain at once you can use {@link RawResponseData#getUsableDomainsRaw()
-     * RawResponseData#getUsableDomainsRaw()} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param index The index for getting the upload-count of the domain.
+     * Gets a {@link List} of upload-counts of the domain.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The upload-count of the domain at the index.
+     * @return A {@link List} of upload-counts of the domain.
      */
-    public int getUploadCount(int index) throws ExecutionException, InterruptedException
+    public List<Integer> getUploadCounts() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserDomainsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("domains");
 
-        Checks.notNegative(index, "index");
+        List<Integer> list = new ArrayList<>();
 
-        return array.getDataObject(index).getInt("uploads");
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getInt("uploads"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**

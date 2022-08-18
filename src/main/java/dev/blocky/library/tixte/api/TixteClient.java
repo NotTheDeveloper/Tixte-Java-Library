@@ -16,17 +16,21 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import dev.blocky.library.tixte.api.entities.*;
+import dev.blocky.library.tixte.api.entities.Domains;
+import dev.blocky.library.tixte.api.entities.Embed;
+import dev.blocky.library.tixte.api.entities.SelfUser;
+import dev.blocky.library.tixte.api.entities.User;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
 import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
+import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.FunctionalCallback;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
-import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.utils.io.IOUtil;
 import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,13 +47,14 @@ import java.util.concurrent.ExecutionException;
  * <br>All parts of the API can be accessed starting from this class.
  *
  * @author BlockyDotJar
- * @version v1.2.0
+ * @version v1.2.1
  * @since v1.0.0-alpha.1
  */
 public class TixteClient extends RawResponseData
 {
     private final SelfUser self = new SelfUser();
 
+    @Internal
     protected TixteClient() { }
 
     /**
@@ -92,7 +97,7 @@ public class TixteClient extends RawResponseData
     /**
      * Represents your Tixte user-account.
      *
-     * @return Instantiates a <b>new</b> Self-User.
+     * @return Instantiates a <b>new</b> {@link SelfUser}.
      */
     @NotNull
     public SelfUser getSelfUser()
@@ -105,7 +110,7 @@ public class TixteClient extends RawResponseData
      *
      * @param userData A specific user-name or id.
      *
-     * @return Instantiates a <b>new</b> user.
+     * @return Instantiates a <b>new</b> {@link User}.
      */
     @Nullable
     @CheckReturnValue
@@ -117,7 +122,7 @@ public class TixteClient extends RawResponseData
     /**
      * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
      *
-     * @return Instantiates a <b>new</b> File-System.
+     * @return Instantiates a <b>new</b> {@link MyFiles File-System}.
      */
     @NotNull
     public MyFiles getFileSystem()
@@ -128,7 +133,7 @@ public class TixteClient extends RawResponseData
     /**
      * Represents the 'Domains' tab of the Tixte dashboard and everything else what Tixte offers you with domains.
      *
-     * @return Instantiates a <b>new</b> Domain-System.
+     * @return Instantiates a <b>new</b> {@link Domains Domain-System}.
      */
     @NotNull
     public Domains getDomainSystem()
@@ -178,7 +183,7 @@ public class TixteClient extends RawResponseData
     /**
      * Represents the 'Page Design' tab of the Tixte dashboard.
      *
-     * @return Instantiates a <b>new</b> Page-Design.
+     * @return Instantiates a <b>new</b> {@link PageDesign}.
      */
     @NotNull
     public PageDesign getPageDesign()
@@ -200,11 +205,11 @@ public class TixteClient extends RawResponseData
     }
 
     /**
-     * An HTTP request.
+     * An HTTP-request.
      * <br>Instances of this class are immutable if their {@link Request#body()} is {@code null} or itself immutable.
      * <br>Note that you must send a request to an endpoint before using this method.
      *
-     * @return An HTTP request.
+     * @return An HTTP-request.
      */
     @Nullable
     @CheckReturnValue
@@ -214,14 +219,17 @@ public class TixteClient extends RawResponseData
     }
 
     /**
-     * Gets the HTTP headers of the request.
+     * Gets the HTTP-headers of the request.
      * <br>Note that you must send a request to an endpoint before using this method.
+     *
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The HTTP-headers of the request.
      */
     @Nullable
     @CheckReturnValue
-    public Optional<String> getHeader()
+    public Optional<String> getHeader() throws ExecutionException, InterruptedException
     {
         CompletableFuture<String> future = new CompletableFuture<>();
 
@@ -244,15 +252,7 @@ public class TixteClient extends RawResponseData
                     }
                 }).build()
         );
-
-        try
-        {
-            return Optional.ofNullable(future.get());
-        }
-        catch (ExecutionException | InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return Optional.ofNullable(future.get());
     }
 
     /**

@@ -15,7 +15,6 @@
  */
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import dev.blocky.library.tixte.api.EmbedEditor;
 import dev.blocky.library.tixte.api.PageDesign;
 import dev.blocky.library.tixte.api.TixteClient;
 import org.jetbrains.annotations.NotNull;
@@ -25,10 +24,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 /**
- * Some basic examples, how to use an {@link EmbedEditor}.
+ * Some basic examples, how to change the {@link PageDesign} of Tixte.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-beta.3
  */
 public class CustomCSSExample
@@ -47,7 +46,8 @@ public class CustomCSSExample
 
         // Creates a new File object for the CSS file. (You don't have to do this, but it's a good idea to do so.)
         // You can do this much simpler, by just using a string instead of a File object.
-        File file = new File("src/test/resources/style.css");
+        // There are some pretty sweet themes that you can use. (some themes are in the resource folder of the test directory)
+        File file = new File("YOUR_VALID_FILE_PATH");
 
         return pageDesign
                 .setCustomCSS(

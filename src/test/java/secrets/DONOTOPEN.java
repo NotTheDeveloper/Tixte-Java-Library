@@ -32,7 +32,7 @@ import java.nio.file.Paths;
  * From this class you can get all data from a JSON file.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.3.0
  * @since v1.0.0-beta.3
  */
 public class DONOTOPEN

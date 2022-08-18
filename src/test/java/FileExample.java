@@ -17,16 +17,19 @@
 import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.api.MyFiles;
 import dev.blocky.library.tixte.api.TixteClient;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Some basic examples, how to upload a {@link File}.
+ * Some basic examples, how to upload a {@link File} to Tixte.
  *
  * @author BlockyDotJar
- * @version v1.0.1
+ * @version v1.1.0
  * @since v1.0.0-beta.3
  */
 public class FileExample
@@ -41,14 +44,40 @@ public class FileExample
         TixteClient client = BasicTixteClientExample.getTixteClient();
         MyFiles myFiles = client.getFileSystem();
 
-        // Creates a new file object.
+        // Creates a *new* File object.
         // If you initialize a file, which doesn't exist, this will throw an FileNotFoundException, an NoSuchFileException and an IOException.
-        File file = new File("src/test/resources/tixte-logo.png");
+        File file = new File("YOUR_VALID_FILE_PATH");
 
         // This uses the default domain, which you can initialize with TixteClientBuilder#setDefaultDomain(@Nullable String).
         // If you haven't initialized the default domain, this will throw an exception.
         // If you don't want to use the default domain, you can use uploadFile(@NotNull File, @NotNull String) instead.
-        // You can also use uploadFile(@NotNull URI) if you want to initialize a URI to create a file or uploadFile(@NotNull String) if you want to initialize a String to create a file.
+        // You can also use uploadFile(@NotNull String) if you want to initialize a String to create a file.
+        // If you want to upload a file, that only you can see/user you can use uploadPrivateFile(@NotNull File) instead.
+        return myFiles.uploadFile(file);
+    }
+
+    /**
+     * @return Upload a file from a specific {@link URL} to Tixte by initializing a <b>new</b> {@link File}.
+     */
+    public static MyFiles uploadFileFromURL() throws IOException
+    {
+        TixteClient client = BasicTixteClientExample.getTixteClient();
+        MyFiles myFiles = client.getFileSystem();
+
+        // Creates a *new* File object.
+        // Here you set the path, where the file should be created, but also the name of the file.
+        File file = new File("YOUR_VALID_FILE_PATH");
+        // This is the url, from where the file will get downloaded.
+        URL url = new URL("YOUR_VALID_URL");
+
+        // Starts the downloading process.
+        FileUtils.copyURLToFile(url, file);
+
+        // After the file got downloaded, it will be uploaded to Tixte.
+        // This uses the default domain, which you can initialize with TixteClientBuilder#setDefaultDomain(@Nullable String).
+        // If you haven't initialized the default domain, this will throw an exception.
+        // If you don't want to use the default domain, you can use uploadFile(@NotNull File, @NotNull String) instead.
+        // You can also use uploadFile(@NotNull String) if you want to initialize a String to create a file.
         // If you want to upload a file, that only you can see/user you can use uploadPrivateFile(@NotNull File) instead.
         return myFiles.uploadFile(file);
     }
@@ -66,10 +95,10 @@ public class FileExample
         TixteClient client = BasicTixteClientExample.getTixteClient();
         MyFiles myFiles = client.getFileSystem();
 
-        // This could throw a HTTPException if there is no file to purge, but I am not sure about that.
-        // This will throw an HTTPException if the password is wrong.
-        // This will delete the file with an index of 0 (This is the newest file).
-        return myFiles.deleteFile(myFiles.getAssetId(0, 0 ));
+        // This could throw an HTTPException if there is no file to purge, but I am not sure about that.
+        // Also note that this could throw an exception if the file takes too long to delete or if the of the fileId is invalid.
+        // This will delete the file with an index of 0 (The newest file).
+        return myFiles.deleteFile(myFiles.getAssetIds().get(0));
     }
 
     /**
@@ -82,9 +111,9 @@ public class FileExample
         TixteClient client = BasicTixteClientExample.getTixteClient();
         MyFiles myFiles = client.getFileSystem();
 
-        // You must set a password (for some reason) for this request, because otherwise it won't work.
-        // This could throw a HTTPException if there is no file to purge, but I am not sure about that.
-        // This will throw an HTTPException if the password is wrong.
+        // You must set a password (for some reason) to execute this request, because otherwise it won't work.
+        // This could throw an HTTPException if there is no file to purge, but I am not sure about that.
+        // But this will definitely throw an HTTPException if the password is wrong.
         return myFiles.purgeFiles("YourVerySecurePassword1234!");
     }
 }

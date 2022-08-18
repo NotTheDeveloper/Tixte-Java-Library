@@ -26,6 +26,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -34,7 +36,7 @@ import java.util.concurrent.ExecutionException;
  * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
  *
  * @author BlockyDotJar
- * @version v1.2.0
+ * @version v1.3.0
  * @since v1.0.0-alpha.1
  */
 public class MyFiles extends RawResponseData
@@ -126,7 +128,7 @@ public class MyFiles extends RawResponseData
      */
     public int getTotalUploadCount() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw(0).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
 
         return data.getInt("total");
@@ -134,393 +136,317 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets your current upload count on a specific page.
-     * <br><br>The page count starts at 0.
-     *
-     * @param page The page you want to get the upload count from.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Your current upload count on a specific page.
      */
-    public int getResults(int page) throws ExecutionException, InterruptedException
+    public int getResults() throws ExecutionException, InterruptedException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw(page).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
 
         return data.getInt("results");
     }
 
     /**
-     * Gets the current permission level, which the file contains.
-     * <br><br>index 0 = the newest file
-     * <br>index 1 = the second-newest file
-     * <br>And so on.
-     * <br><br>If you want to get every file permission level at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param page  The page you want to get the file from.
-     * @param index The file at the specific index.
+     * Gets a {@link List} of permission level, which the files are containing.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The current permission level, which the file contains.
+     * @return A {@link List} of permission level, which the files are containing.
      */
-    public int getPermissionLevel(int page, int index) throws ExecutionException, InterruptedException
+    public List<Integer> getPermissionLevels() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
-
-        DataObject json = DataObject.fromJson(getUploadsRaw(page).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
-        return array.getDataObject(index).getInt("permission_level");
+        List<Integer> list = new ArrayList<>();
+
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getInt("permission_level"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Gets the extension of the file.
+     * Gets a {@link List} of extensions from the files.
      * <br><br>An extension is the file type.
      * <br>For example: "png" or "jpg".
-     * <br><br>index 0 = the newest file
-     * <br>index 1 = the second-newest file
-     * <br>And so on.
-     * <br><br>If you want to get every file extension at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param page  The page you want to get the file from.
-     * @param index The file at the specific index.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The extension of the file.
+     * @return A {@link List} of extensions from the files.
      */
     @NotNull
-    public String getExtension(int page, int index) throws ExecutionException, InterruptedException
+    public List<String> getExtensions() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
-
-        DataObject json = DataObject.fromJson(getUploadsRaw(page).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
-        return array.getDataObject(index).getString("extension");
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getString("extension"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Gets the size of the file in bytes.
-     * <br><br>index 0 = the newest file
-     * <br>index 1 = the second-newest file
-     * <br>And so on.
-     * <br><br>If you want to get every file size at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param page  The page you want to get the file from.
-     * @param index The file at the specific index.
+     * Gets a {@link List} of sizes from the files in bytes.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The size of the file in bytes.
+     * @return A {@link List} of sizes from the files in bytes.
      */
-    public long getSize(int page, int index) throws ExecutionException, InterruptedException
+    public List<Integer> getSizes() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
-
-        DataObject json = DataObject.fromJson(getUploadsRaw(page).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
-        return array.getDataObject(index).getInt("size");
+        List<Integer> list = new ArrayList<>();
+
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getInt("size"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Gets the upload date of the file as a ISO string.
+     * Gets a {@link List} of upload dates from the files as a ISO string.
      * <br><br>Example for ISO string: <b>2022-07-08T11:32:51.913Z</b>.
      * <br>There is an <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/java/DateFormatExample.java">example</a>
      * for formatting the ISO string.
-     * <br><br>index 0 = the newest file
-     * <br>index 1 = the second-newest file
-     * <br>And so on.
-     * <br><br>If you want to get every file upload date at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param page  The page you want to get the file from.
-     * @param index The file at the specific index.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The upload date of the file as a ISO string.
+     * @return A {@link List} of upload dates from the files as a ISO string.
      */
     @NotNull
-    public String getUploadDate(int page, int index) throws ExecutionException, InterruptedException
+    public List<String> getUploadDates() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
-
-        DataObject json = DataObject.fromJson(getUploadsRaw(page).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
-        return array.getDataObject(index).getString("uploaded_at");
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getString("uploaded_at"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Gets the domain, on which the file got uploaded.
-     * <br><br>index 0 = the newest file
-     * <br>index 1 = the second-newest file
-     * <br>And so on.
-     * <br><br>If you want to get every file domain at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param page  The page you want to get the file from.
-     * @param index The file at the specific index.
+     * Gets a {@link List} of domains, on which the files got uploaded.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The domain, on which the file got uploaded.
+     * @return A {@link List} of domains, on which the files got uploaded.
      */
     @NotNull
-    public String getDomain(int page, int index) throws ExecutionException, InterruptedException
+    public List<String> getDomains() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
-
-        DataObject json = DataObject.fromJson(getUploadsRaw(page).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
-        return array.getDataObject(index).getString("domain");
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getString("domain"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Gets the name of the file.
-     * <br><br>index 0 = the newest file
-     * <br>index 1 = the second-newest file
-     * <br>And so on.
-     * <br><br>If you want to get every file name at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param page  The page you want to get the file from.
-     * @param index The file at the specific index.
+     * Gets a {@link List} of names from the files.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The name of the file.
+     * @return A {@link List} of names from the files.
      */
     @NotNull
-    public String getName(int page, int index) throws ExecutionException, InterruptedException
+    public List<String> getNames() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
-
-        DataObject json = DataObject.fromJson(getUploadsRaw(page).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
-        return array.getDataObject(index).getString("name");
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getString("name"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Gets the mime type of the file.
-     * <br><br>An mime type is a string that describes the type of the file.
-     * <br>An example of a mime type is: <b>image/png</b>.
+     * Gets a {@link List} of mime-types from the files.
+     * <br><br>An mime-type is a string that describes the type of the file.
+     * <br>An example of a mime-type is: <b>image/png</b>.
      * <br>An extension is the file type.
      * <br>For example: "png" or "jpg".
-     * <br><br>index 0 = the newest file
-     * <br>index 1 = the second-newest file
-     * <br>And so on.
-     * <br><br>If you want to get every file mime type at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param page  The page you want to get the file from.
-     * @param index The file at the specific index.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The mime type of the file.
+     * @return A {@link List} of mime-types from the files.
      */
     @NotNull
-    public String getMimeType(int page, int index) throws ExecutionException, InterruptedException
+    public List<String> getMimeTypes() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
-
-        DataObject json = DataObject.fromJson(getUploadsRaw(page).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
-        return array.getDataObject(index).getString("mimetype");
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getString("mimetype"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Gets the expiration time of the file as a ISO string.
+     * Gets a {@link List} of expiration times from the file as a ISO string.
      * <br><br>Example for ISO string: <b>2022-07-08T11:32:51.913Z</b>
      * <br>There is an <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/java/DateFormatExample.java">example</a>
      * for formatting the ISO string.
-     * <br><br>index 0 = the newest file
-     * <br>index 1 = the second-newest file
-     * <br>And so on.
-     * <br><br>If you want to get every file expiration time at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param page  The page you want to get the file from.
-     * @param index The file at the specific index.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The expiration time of the file as a ISO string.
+     * @return A {@link List} of expiration times from the files as a ISO string.
      */
     @Nullable
     @CheckReturnValue
-    public Object getExpirationTime(int page, int index) throws ExecutionException, InterruptedException
+    public List<Object> getExpirationTimes() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
-
-        DataObject json = DataObject.fromJson(getUploadsRaw(page).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
-        return array.getDataObject(index).isNull("expiration") ? 0 : array.getDataObject(index).get("expiration");
+        List<Object> list = new ArrayList<>();
+
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            if (array.getDataObject(i).isNull("expiration"))
+            {
+                list.add(0);
+            }
+            else
+            {
+                list.add(array.getDataObject(i).get("expiration"));
+            }
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Gets the ID of the file.
-     * <br><br>index 0 = the newest file
-     * <br>index 1 = the second-newest file
-     * <br>And so on.
-     * <br><br>If you want to get every file ID at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param page  The page you want to get the file from.
-     * @param index The file at the specific index.
+     * Gets a {@link List} of IDs from the files.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The ID of the file.
+     * @return A {@link List} od IDs from the files.
      */
     @NotNull
-    public String getAssetId(int page, int index) throws ExecutionException, InterruptedException
+    public List<String> getAssetIds() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
-
-        DataObject json = DataObject.fromJson(getUploadsRaw(page).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
-        return array.getDataObject(index).getString("asset_id");
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getString("asset_id"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
-     * Gets the type of the file. (public/private)
+     * Gets a {@link List} of types from the files. (public/private)
      * <br><br>1 = public file
      * <br>2 = private file
-     * <br><br>index 0 = the newest file
-     * <br>index 1 = the second-newest file
-     * <br>And so on.
-     * <br><br>If you don't want to make your own method for checking, if the file is private or not you can use
-     * {@link #isPrivate(int, int)} or {@link #isPublic(int, int)} instead.
-     * <br><br>If you want to get every file type at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
-     *
-     * @param page  The page you want to get the file from.
-     * @param index The file at the specific index.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The type of the file. (public/private)
+     * @return A {@link List} of types from the files. (public/private)
      */
-    public int getType(int page, int index) throws ExecutionException, InterruptedException
+    public List<Integer> getTypes() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
-
-        DataObject json = DataObject.fromJson(getUploadsRaw(page).get());
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
         DataObject data = json.getDataObject("data");
         DataArray array = data.getArray("uploads");
 
-        return array.getDataObject(index).getInt("type");
+        List<Integer> list = new ArrayList<>();
+
+        for (int i = 0; i < array.toList().size(); i++)
+        {
+            list.add(array.getDataObject(i).getInt("type"));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
      * Checks if the specified file is public or not.
-     * <br><br>If you want to get every file type at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
      *
-     * @param page  The page you want to get the file from.
      * @param index The file at the specific index.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *      
-     * @see #getType(int, int) 
+     * @see #getTypes()
      *
      * @return <b>true</b> - If the file is public.
      *         <br><b>false</b> - If the file is private.
      */
-    public boolean isPublic(int page, int index) throws ExecutionException, InterruptedException
+    public boolean isPublic(int index) throws ExecutionException, InterruptedException
     {
-        return getType(page, index) == 1;
+        Checks.notNegative(index, "index");
+
+        return getTypes().get(index) == 1;
     }
 
     /**
      * Checks if the specified file is private or not.
-     * <br><br>If you want to get every file type at once you can use {@link RawResponseData#getUploadsRaw(int)
-     * RawResponseData#getUploadsRaw(int)} and then you can print everything out by using a for loop, but if you want
-     * you also can use an Optional.
-     * <br>Because I don't know the best way to do this, it would be very nice to contact me if you know a better way
-     * to implement this method/use this method.
      *
-     * @param page  The page you want to get the file from.
      * @param index The file at the specific index.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *      
-     * @see #getType(int, int) 
+     * @see #getTypes()
      *
      * @return <b>true</b> - If the file is private.
      *         <br><b>false</b> - If the file is public.
      */
-    public boolean isPrivate(int page, int index) throws ExecutionException, InterruptedException
+    public boolean isPrivate(int index) throws ExecutionException, InterruptedException
     {
-        return getType(page, index) == 2;
+        Checks.notNegative(index, "index");
+
+        return getTypes().get(index) == 2;
     }
 
     /**
@@ -532,21 +458,20 @@ public class MyFiles extends RawResponseData
      * <br>index 1 = the second-newest file
      * <br>And so on.
      *
-     * @param page  The page you want to get the file from.
      * @param index The file at the specific index.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *      
-     * @see #getName(int, int) 
-     * @see #getExtension(int, int) 
+     * @see #getNames()
+     * @see #getExtensions()
      *
      * @return The complete name of the file.
      */
     @NotNull
-    public String getFileName(int page, int index) throws ExecutionException, InterruptedException
+    public String getFileName(int index) throws ExecutionException, InterruptedException
     {
-        return getName(page, index) + "." + getExtension(page, index);
+        return getNames().get(index) + "." + getExtensions().get(index);
     }
 
     /**
@@ -903,7 +828,7 @@ public class MyFiles extends RawResponseData
 
     /**
      * Delete any kind of file from your Tixte dashboard.
-     * <br><br>You can get the file's ID by calling {@link #getAssetId(int, int)} or you can directly get
+     * <br><br>You can get the file's ID by calling {@link #getAssetIds()} or you can directly get
      * {@link #getDeletionURL() the deletion url}.
      * <br> <br>This method will throw an exception if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to delete or if the of the fileId

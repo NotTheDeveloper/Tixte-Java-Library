@@ -1,0 +1,36 @@
+/*
+ * Title: Galaxy Mountain
+ * Author: 'Person0z#0812'
+ * Description: Galaxy theme for those who love outer space!
+ *
+ * Theme Preview: https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Galaxy-Mountain-Theme-preview.jpg
+ */
+
+html {
+  background-image: url('https://us-east-1.tixte.net/assets/themes/galaxy-mountain-4326/background.jpg');
+  background-repeat: no-repeat;
+  background-size: cover
+}
+
+.file {
+  border-radius: 10px
+}
+
+.downloadbtn {
+  padding: 20px 60px;
+  outline: 0;
+  background-color: #000;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 9px grey
+}
+
+.downloadbtn:hover {
+  background-color: #000
+}
+
+.downloadbtn:active {
+  background-color: #000;
+  box-shadow: 0 5px grey;
+  transform: translateY(4px)
+}

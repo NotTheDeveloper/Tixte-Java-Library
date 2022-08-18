@@ -28,7 +28,7 @@ import java.io.IOException;
  * Handles http error responses using an {@link Interceptor}.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v2.0.0
  * @since v1.0.0-alpha.3
  */
 public class ErrorResponseInterceptor implements Interceptor
@@ -58,9 +58,9 @@ public class ErrorResponseInterceptor implements Interceptor
                 case 404:
                     throw new NotFound("Not Found: " + error.getString("message"));
                 case 429:
-                    throw new TixteServerError("We got rate-limited: " + error.getString("message"));
+                    throw new TixteServerException("We got rate-limited: " + error.getString("message"));
                 case 500:
-                    throw new TixteServerError("Internal Server Error: " + error.getString("message"));
+                    throw new TixteServerException("Internal Server Error: " + error.getString("message"));
                 default:
                     throw new HTTPException("HTTP Error: " + error.getString("code") + ", " + error.getString("message"));
             }

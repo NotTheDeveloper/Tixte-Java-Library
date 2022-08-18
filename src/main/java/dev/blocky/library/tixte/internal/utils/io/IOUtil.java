@@ -32,7 +32,7 @@ import java.util.zip.ZipException;
  * Utility class for I/O operations.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-beta.5
  */
 public class IOUtil
@@ -94,6 +94,8 @@ public class IOUtil
      * <br>This is used to make usage of encoded responses more user-friendly in various parts of Tixte4J.
      *
      * @param response The not-null {@link Response} object.
+     *
+     * @throws IOException If the {@link InputStream} cannot be retrieved for any reason.
      *
      * @return {@link InputStream} representing the body of this response.
      */
