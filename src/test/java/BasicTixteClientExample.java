@@ -38,7 +38,7 @@ public class BasicTixteClientExample
 
     public static void main(@NotNull String[] args) throws IOException
     {
-        // Creates a new TixteClient.
+        // Creates a *new* TixteClientBuilder instance.
         TixteClientBuilder builder = new TixteClientBuilder()
                 // Sets the API-key, which is required for most of the methods.
                 // This method also sets the cache policy. I really recommend to set this to ALL.

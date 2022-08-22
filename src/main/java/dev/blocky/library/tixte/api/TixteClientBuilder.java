@@ -36,7 +36,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Used to create <b>new</b> {@link TixteClient} instances.
- * <br><br>A single {@link TixteClientBuilder} can be reused multiple times.
+ *
+ * <p>A single {@link TixteClientBuilder} can be reused multiple times.
  * <br>Each call to {@link #build()} creates a <b>new</b> {@link TixteClient} instance using the same information.
  *
  * @author BlockyDotJar
@@ -45,20 +46,20 @@ import java.util.concurrent.TimeUnit;
  */
 public class TixteClientBuilder
 {
-    private final Logger logger = TixteLogger.getLog(TixteClientBuilder.class);
-    protected static String apiKey, sessionToken, defaultDomain;
     protected final Dispatcher dispatcher = new Dispatcher();
+    protected static String apiKey, sessionToken, defaultDomain;
     protected static CachePolicy policy;
     protected static OkHttpClient client;
     protected static Request request;
 
+    private final Logger logger = TixteLogger.getLog(TixteClientBuilder.class);
+
     /**
      * Creates a <b>new</b> {@link TixteClientBuilder} instance by initializing the builder with your API-key.
-     * <br>
-     * There also will be set a policy which decides whether there should be created a cache or not.
+     * <br>There also will be set a policy which decides whether there should be created a cache or not.
      * <br>This will be called throughout Tixte4J when data gets constructed or modified and allows for a dynamically
      * adjusting cache.
-     * <br>When {@link dev.blocky.library.tixte.api.TixteClient#pruneCache() TixteClient#pruneCache()} is called, the
+     * <br>When {@link TixteClient#pruneCache() TixteClient#pruneCache()} is called, the
      * configured policy will be used to unload any data that the policy has decided not to cache.
      * <br>If null the cache-policy will be set to {@link CachePolicy#NONE NONE}.
      *
@@ -129,7 +130,7 @@ public class TixteClientBuilder
      * Policy which decides whether there should be created a cache or not.
      * <br>This will be called throughout Tixte4J when data gets constructed or modified and allows for a dynamically
      * adjusting cache.
-     * <br>When {@link dev.blocky.library.tixte.api.TixteClient#pruneCache() TixteClient#pruneCache()} is called, the
+     * <br>When {@link TixteClient#pruneCache() TixteClient#pruneCache()} is called, the
      * configured policy will be used to unload any data that the policy has decided not to cache.
      * <br>If null the cache-policy will be set to {@link CachePolicy#NONE NONE}.
      *

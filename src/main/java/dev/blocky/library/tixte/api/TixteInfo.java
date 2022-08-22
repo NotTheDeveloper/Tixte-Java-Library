@@ -29,6 +29,6 @@ public class TixteInfo
     }
 
     public static final int TIXTE_API_VERSION = 1;
-    public static final String VERSION = "v1.0.0-beta.5";
+    public static final String VERSION = "v1.0.0-rc.3";
     public static final String GITHUB = "https://github.com/BlockyDotJar/Tixte-Java-Library";
 }

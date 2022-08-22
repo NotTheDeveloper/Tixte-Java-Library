@@ -682,20 +682,6 @@ public class DataObject implements SerializableData
         }
     }
 
-    @NotNull
-    @Override
-    public String toString()
-    {
-        try
-        {
-            return mapper.writeValueAsString(data);
-        }
-        catch (JsonProcessingException e)
-        {
-            throw new ParsingException(e);
-        }
-    }
-
     /**
      * Method that can be used to convert the current object as a string.
      *
@@ -727,13 +713,6 @@ public class DataObject implements SerializableData
     public Map<String, Object> toMap()
     {
         return data;
-    }
-
-    @NotNull
-    @Override
-    public DataObject toData()
-    {
-        return this;
     }
 
     @NotNull
@@ -779,5 +758,26 @@ public class DataObject implements SerializableData
 
         throw new ParsingException(Helpers.format("Cannot parse value for %s into type %s: %s instance of %s",
                 key, type.getSimpleName(), value, value.getClass().getSimpleName()));
+    }
+
+    @NotNull
+    @Override
+    public DataObject toData()
+    {
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public String toString()
+    {
+        try
+        {
+            return mapper.writeValueAsString(data);
+        }
+        catch (JsonProcessingException e)
+        {
+            throw new ParsingException(e);
+        }
     }
 }

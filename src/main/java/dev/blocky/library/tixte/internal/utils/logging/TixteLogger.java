@@ -47,6 +47,7 @@ public class TixteLogger
      * <br>This variable is initialized during static class initialization.
      */
     public static final boolean SLF4J_ENABLED;
+
     private static final Map<String, Logger> LOGS = new CaseInsensitiveMap<>();
 
     TixteLogger()
@@ -170,7 +171,6 @@ public class TixteLogger
     @FunctionalInterface
     public interface LazyEvaluation
     {
-
         /**
          * This method is used by {@link #getLazyString(LazyEvaluation)}
          * when SLF4J requests string construction.

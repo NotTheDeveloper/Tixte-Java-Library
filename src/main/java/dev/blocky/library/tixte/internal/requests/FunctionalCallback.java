@@ -40,6 +40,12 @@ public class FunctionalCallback implements Callback
     private final BiConsumer<Call, IOException> failure;
     private final IOBiConsumer<Call, Response> success;
 
+    /**
+     * Constructs a <b>new</b> {@link  FunctionalCallback}.
+     *
+     * @param failure The callback to be called when the request fails.
+     * @param success The callback to be called when the request is successful.
+     */
     public FunctionalCallback(@NotNull BiConsumer<Call, IOException> failure, @NotNull IOBiConsumer<Call, Response> success)
     {
         this.failure = failure;

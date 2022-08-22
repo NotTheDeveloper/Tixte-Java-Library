@@ -64,35 +64,35 @@ public class SimpleLogger extends LegacyAbstractLogger
 
     private static boolean INITIALIZED = false;
 
-    public static int currentLogLevel = LOG_LEVEL_INFO;
+    private static int currentLogLevel = LOG_LEVEL_INFO;
 
-    public transient String shortLogName;
+    private transient String shortLogName;
 
-    public static final String SYSTEM_PREFIX = "org.slf4j.simpleLogger.";
+    private static final String SYSTEM_PREFIX = "org.slf4j.simpleLogger.";
 
-    public static final String LOG_KEY_PREFIX = SYSTEM_PREFIX + "log.";
+    private static final String LOG_KEY_PREFIX = SYSTEM_PREFIX + "log.";
 
-    public static final String CACHE_OUTPUT_STREAM_STRING_KEY = SimpleLogger.SYSTEM_PREFIX + "cacheOutputStream";
+    private static final String CACHE_OUTPUT_STREAM_STRING_KEY = SimpleLogger.SYSTEM_PREFIX + "cacheOutputStream";
 
-    public static final String WARN_LEVEL_STRING_KEY = SimpleLogger.SYSTEM_PREFIX + "warnLevelString";
+    private static final String WARN_LEVEL_STRING_KEY = SimpleLogger.SYSTEM_PREFIX + "warnLevelString";
 
-    public static final String LEVEL_IN_BRACKETS_KEY = SimpleLogger.SYSTEM_PREFIX + "levelInBrackets";
+    private static final String LEVEL_IN_BRACKETS_KEY = SimpleLogger.SYSTEM_PREFIX + "levelInBrackets";
 
-    public static final String LOG_FILE_KEY = SimpleLogger.SYSTEM_PREFIX + "logFile";
+    private static final String LOG_FILE_KEY = SimpleLogger.SYSTEM_PREFIX + "logFile";
 
-    public static final String SHOW_SHORT_LOG_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showShortLogName";
+    private static final String SHOW_SHORT_LOG_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showShortLogName";
 
-    public static final String SHOW_LOG_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showLogName";
+    private static final String SHOW_LOG_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showLogName";
 
-    public static final String SHOW_THREAD_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showThreadName";
+    private static final String SHOW_THREAD_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showThreadName";
 
-    public static final String SHOW_THREAD_ID_KEY = SimpleLogger.SYSTEM_PREFIX + "showThreadId";
+    private static final String SHOW_THREAD_ID_KEY = SimpleLogger.SYSTEM_PREFIX + "showThreadId";
 
-    public static final String DATE_TIME_FORMAT_KEY = SimpleLogger.SYSTEM_PREFIX + "dateTimeFormat";
+    private static final String DATE_TIME_FORMAT_KEY = SimpleLogger.SYSTEM_PREFIX + "dateTimeFormat";
 
-    public static final String SHOW_DATE_TIME_KEY = SimpleLogger.SYSTEM_PREFIX + "showDateTime";
+    private static final String SHOW_DATE_TIME_KEY = SimpleLogger.SYSTEM_PREFIX + "showDateTime";
 
-    public static final String DEFAULT_LOG_LEVEL_KEY = SimpleLogger.SYSTEM_PREFIX + "defaultLogLevel";
+    private static final String DEFAULT_LOG_LEVEL_KEY = SimpleLogger.SYSTEM_PREFIX + "defaultLogLevel";
 
     SimpleLogger(@NotNull String name)
     {
@@ -159,6 +159,84 @@ public class SimpleLogger extends LegacyAbstractLogger
         dateText = DATE_FORMATTER.format(now);
 
         return dateText;
+    }
+
+    private void innerHandleNormalizedLoggingCall(@NotNull Level level, @NotNull List<Marker> markers, @NotNull String messagePattern,
+                                                  @NotNull Object[] arguments, @Nullable Throwable t)
+    {
+        StringBuilder buf = new StringBuilder(32);
+
+        if (SHOW_DATE_TIME)
+        {
+            if (DATE_FORMATTER != null)
+            {
+                buf.append(getFormattedDate());
+                buf.append(SP);
+            }
+            else
+            {
+                buf.append(System.currentTimeMillis() - START_TIME);
+                buf.append(SP);
+            }
+        }
+
+        if (SHOW_THREAD_NAME)
+        {
+            buf.append('[');
+            buf.append(Thread.currentThread().getName());
+            buf.append("] ");
+        }
+
+        if (SHOW_THREAD_ID)
+        {
+            buf.append(TID_PREFIX);
+            buf.append(Thread.currentThread().getId());
+            buf.append(SP);
+        }
+
+        if (LEVEL_IN_BRACKETS)
+        {
+            buf.append('[');
+        }
+
+        String levelStr = level.name();
+        buf.append(levelStr);
+
+        if (LEVEL_IN_BRACKETS)
+        {
+            buf.append(']');
+        }
+
+        buf.append(SP);
+
+        if (SHOW_SHORT_LOG_NAME)
+        {
+            if (shortLogName == null)
+            {
+                shortLogName = computeShortName();
+            }
+
+            buf.append(shortLogName).append(" - ");
+        }
+        else if (SHOW_LOG_NAME)
+        {
+            buf.append(name).append(" - ");
+        }
+
+        if (markers != null)
+        {
+            buf.append(SP);
+            for (Marker marker : markers)
+            {
+                buf.append(marker.getName()).append(SP);
+            }
+        }
+
+        String formattedMessage = MessageFormatter.basicArrayFormat(messagePattern, arguments);
+
+        buf.append(formattedMessage);
+
+        write(buf, t);
     }
 
     @NotNull
@@ -255,84 +333,6 @@ public class SimpleLogger extends LegacyAbstractLogger
         innerHandleNormalizedLoggingCall(level, markers, messagePattern, arguments, t);
     }
 
-    private void innerHandleNormalizedLoggingCall(@NotNull Level level, @NotNull List<Marker> markers, @NotNull String messagePattern,
-                                                  @NotNull Object[] arguments, @Nullable Throwable t)
-    {
-        StringBuilder buf = new StringBuilder(32);
-
-        if (SHOW_DATE_TIME)
-        {
-            if (DATE_FORMATTER != null)
-            {
-                buf.append(getFormattedDate());
-                buf.append(SP);
-            }
-            else
-            {
-                buf.append(System.currentTimeMillis() - START_TIME);
-                buf.append(SP);
-            }
-        }
-
-        if (SHOW_THREAD_NAME)
-        {
-            buf.append('[');
-            buf.append(Thread.currentThread().getName());
-            buf.append("] ");
-        }
-
-        if (SHOW_THREAD_ID)
-        {
-            buf.append(TID_PREFIX);
-            buf.append(Thread.currentThread().getId());
-            buf.append(SP);
-        }
-
-        if (LEVEL_IN_BRACKETS)
-        {
-            buf.append('[');
-        }
-
-        String levelStr = level.name();
-        buf.append(levelStr);
-
-        if (LEVEL_IN_BRACKETS)
-        {
-            buf.append(']');
-        }
-
-        buf.append(SP);
-
-        if (SHOW_SHORT_LOG_NAME)
-        {
-            if (shortLogName == null)
-            {
-                shortLogName = computeShortName();
-            }
-
-            buf.append(shortLogName).append(" - ");
-        }
-        else if (SHOW_LOG_NAME)
-        {
-            buf.append(name).append(" - ");
-        }
-
-        if (markers != null)
-        {
-            buf.append(SP);
-            for (Marker marker : markers)
-            {
-                buf.append(marker.getName()).append(SP);
-            }
-        }
-
-        String formattedMessage = MessageFormatter.basicArrayFormat(messagePattern, arguments);
-
-        buf.append(formattedMessage);
-
-        write(buf, t);
-    }
-
     @Override
     protected String getFullyQualifiedCallerName()
     {
@@ -389,6 +389,46 @@ public class SimpleLogger extends LegacyAbstractLogger
 
         private static final Properties SIMPLE_LOGGER_PROPS = new Properties();
 
+        private static void loadProperties()
+        {
+            InputStream in = AccessController.doPrivileged((PrivilegedAction<InputStream>) () ->
+            {
+                ClassLoader threadCL = Thread.currentThread().getContextClassLoader();
+
+                if (threadCL != null)
+                {
+                    return threadCL.getResourceAsStream(CONFIGURATION_FILE);
+                }
+                else
+                {
+                    return ClassLoader.getSystemResourceAsStream(CONFIGURATION_FILE);
+                }
+            });
+
+            if (null != in)
+            {
+                try
+                {
+                    SIMPLE_LOGGER_PROPS.load(in);
+                }
+                catch (IOException e)
+                {
+                    // Ignored.
+                }
+                finally
+                {
+                    try
+                    {
+                        in.close();
+                    }
+                    catch (IOException e)
+                    {
+                        // Ignored.
+                    }
+                }
+            }
+        }
+
         static void init()
         {
             INITIALIZED = true;
@@ -426,46 +466,6 @@ public class SimpleLogger extends LegacyAbstractLogger
                 catch (IllegalArgumentException e)
                 {
                     Util.report("Bad date format in " + CONFIGURATION_FILE + "; will output relative time", e);
-                }
-            }
-        }
-
-        private static void loadProperties()
-        {
-            InputStream in = AccessController.doPrivileged((PrivilegedAction<InputStream>) () ->
-            {
-                ClassLoader threadCL = Thread.currentThread().getContextClassLoader();
-
-                if (threadCL != null)
-                {
-                    return threadCL.getResourceAsStream(CONFIGURATION_FILE);
-                }
-                else
-                {
-                    return ClassLoader.getSystemResourceAsStream(CONFIGURATION_FILE);
-                }
-            });
-
-            if (null != in)
-            {
-                try
-                {
-                    SIMPLE_LOGGER_PROPS.load(in);
-                }
-                catch (IOException e)
-                {
-                    // Ignored.
-                }
-                finally
-                {
-                    try
-                    {
-                        in.close();
-                    }
-                    catch (IOException e)
-                    {
-                        // Ignored.
-                    }
                 }
             }
         }

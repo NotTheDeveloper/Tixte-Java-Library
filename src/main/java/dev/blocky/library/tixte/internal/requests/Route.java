@@ -205,9 +205,9 @@ public class Route
     }
 
     private static final String majorParameters = "user_data:asset_id:domain";
-    private final String route;
-    private final Method method;
     private final int paramCount;
+    private final Method method;
+    private final String route;
 
     private Route(@NotNull Method method, @NotNull String route)
     {
@@ -331,10 +331,10 @@ public class Route
      */
     public class CompiledRoute
     {
+        private final boolean hasQueryParams;
         private final Route baseRoute;
         private final String major;
         private final String compiledRoute;
-        private final boolean hasQueryParams;
 
         private CompiledRoute(@NotNull Route baseRoute, @NotNull String compiledRoute, @NotNull String major, boolean hasQueryParams)
         {

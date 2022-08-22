@@ -65,7 +65,8 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets the current limit of storage in bytes.
-     * <br><br>You can have a storage of 15.0 GB without a Tixte turbo/turbo-charged subscription.
+     *
+     * <p>You can have a storage of 15.0 GB without a Tixte turbo/turbo-charged subscription.
      * <br>You can have a storage of 200.0 GB with a Tixte turbo subscription and with a Tixte turbo-charged subscription
      * you can have up to 500.0 GB storage.
      *
@@ -101,10 +102,12 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets your current premium tier as an integer.
-     * <br><br>0 = No subscription.
+     *
+     * <p>0 = No subscription.
      * <br>1 = Tixte turbo subscription.
      * <br>2 = Tixte turbo-charged subscription.
-     * <br><br>If you don't want to make your own method for checking, if the user has a subscription you can use
+     *
+     * <p>If you don't want to make your own method for checking, if the user has a subscription you can use
      * {@link SelfUser#hasTixteSubscription()} instead.
      *
      * @throws ExecutionException If this future completed exceptionally.
@@ -177,7 +180,8 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets a {@link List} of extensions from the files.
-     * <br><br>An extension is the file type.
+     *
+     * <p>An extension is the file type.
      * <br>For example: "png" or "jpg".
      *
      * @throws ExecutionException If this future completed exceptionally.
@@ -226,7 +230,8 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets a {@link List} of upload dates from the files as a ISO string.
-     * <br><br>Example for ISO string: <b>2022-07-08T11:32:51.913Z</b>.
+     *
+     * <p>Example for ISO string: <b>2022-07-08T11:32:51.913Z</b>.
      * <br>There is an <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/java/DateFormatExample.java">example</a>
      * for formatting the ISO string.
      *
@@ -301,7 +306,8 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets a {@link List} of mime-types from the files.
-     * <br><br>An mime-type is a string that describes the type of the file.
+     *
+     * <p>An mime-type is a string that describes the type of the file.
      * <br>An example of a mime-type is: <b>image/png</b>.
      * <br>An extension is the file type.
      * <br>For example: "png" or "jpg".
@@ -329,7 +335,8 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets a {@link List} of expiration times from the file as a ISO string.
-     * <br><br>Example for ISO string: <b>2022-07-08T11:32:51.913Z</b>
+     *
+     * <p>Example for ISO string: <b>2022-07-08T11:32:51.913Z</b>
      * <br>There is an <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/java/DateFormatExample.java">example</a>
      * for formatting the ISO string.
      *
@@ -388,7 +395,8 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets a {@link List} of types from the files. (public/private)
-     * <br><br>1 = public file
+     *
+     * <p>1 = public file
      * <br>2 = private file
      *
      * @throws ExecutionException If this future completed exceptionally.
@@ -453,10 +461,12 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets the complete name of the file.
-     * <br><br>This is composed of the name of the file and the extension.
+     *
+     * <p>This is composed of the name of the file and the extension.
      * <br>An extension is the file type.
      * <br>For example: "png" or "jpg".
-     * <br><br>index 0 = the newest file
+     *
+     * <p>index 0 = the newest file
      * <br>index 1 = the second-newest file
      * <br>And so on.
      *
@@ -495,7 +505,8 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets the url of the current uploaded file.
-     * <br><br>Note that you should only use this method after the file upload method has been called.
+     *
+     * <p>Note that you should only use this method after the file upload method has been called.
      *
      * @return The url of the current uploaded file.
      */
@@ -508,7 +519,8 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets the direct-url of the current uploaded file.
-     * <br><br>Note that you should only use this method after the file upload method has been called.
+     *
+     * <p>Note that you should only use this method after the file upload method has been called.
      *
      * @return The direct-url of the current uploaded file.
      */
@@ -521,7 +533,8 @@ public class MyFiles extends RawResponseData
 
     /**
      * Gets the deletion-url of the current uploaded file.
-     * <br><br>Note that you should only use this method after the file upload method has been called.
+     *
+     * <p>Note that you should only use this method after the file upload method has been called.
      *
      * @return The deletion-url of the current uploaded file.
      */
@@ -534,13 +547,16 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a file to Tixte by initializing a <b>new</b> {@link File}.
-     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     *
+     * <p>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
      * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
      * can upload files up to 10GB.
-     * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
+     *
+     * <p>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
-     * <br><br>This method uses {@link TixteClient#getDefaultDomain() the default domain} to upload the file.
+     *
+     * <p>This method uses {@link TixteClient#getDefaultDomain() the default domain} to upload the file.
      * <br>If you don't initialize the client with a domain, you should use {@link #uploadFile(File, String)} instead, or
      * you initialize the client with a domain by calling {@link TixteClientBuilder#setDefaultDomain(String)}.
      * <br>But if you don't want to use the default domain, you can use another domain by calling
@@ -571,13 +587,16 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a private file to Tixte by initializing a <b>new</b> {@link File}.
-     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     *
+     * <p>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
      * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
      * can upload files up to 10GB.
-     * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
+     *
+     * <p>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
-     * <br><br>This method uses {@link TixteClient#getDefaultDomain() the default domain} to upload the file.
+     *
+     * <p>This method uses {@link TixteClient#getDefaultDomain() the default domain} to upload the file.
      * <br>If you don't initialize the client with a domain, you should use {@link #uploadPrivateFile(File, String)} instead, or
      * you initialize the client with a domain by calling {@link TixteClientBuilder#setDefaultDomain(String)}.
      * <br>But if you don't want to use the default domain, you can use another domain by calling
@@ -608,13 +627,16 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a file to Tixte by initializing a <b>new</b> {@link File} and a domain.
-     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     *
+     * <p>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
      * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
      * can upload files up to 10GB.
-     * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
+     *
+     * <p>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
-     * <br><br>This method uses a specific domain to upload the file.
+     *
+     * <p>This method uses a specific domain to upload the file.
      * <br>If you want to use the default domain, you don't have to call this method, you can call
      * {@link #uploadFile(File)} instead.
      * <br>Note that you must have initialized the client with a default domain before you can use this method.
@@ -645,13 +667,16 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a private file to Tixte by initializing a <b>new</b> {@link File} and a domain.
-     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     *
+     * <p>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
      * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
      * can upload files up to 10GB.
-     * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
+     *
+     * <p>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
-     * <br><br>This method uses a specific domain to upload the file.
+     *
+     * <p>This method uses a specific domain to upload the file.
      * <br>If you want to use the default domain, you don't have to call this method, you can call
      * {@link #uploadPrivateFile(File)} instead.
      * <br>Note that you must have initialized the client with a default domain before you can use this method.
@@ -682,13 +707,16 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a file to Tixte by initializing a <b>new</b> {@link String}.
-     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     *
+     * <p>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
      * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
      * can upload files up to 10GB.
-     * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
+     *
+     * <p>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
-     * <br><br>This method uses {@link TixteClient#getDefaultDomain() the default domain} to upload the file.
+     *
+     * <p>This method uses {@link TixteClient#getDefaultDomain() the default domain} to upload the file.
      * <br>If you don't initialize the client with a domain, you should use {@link #uploadFile(String, String)} instead, or
      * you initialize the client with a domain by calling {@link TixteClientBuilder#setDefaultDomain(String)}.
      * <br>But if you don't want to use the default domain, you can use another domain by calling
@@ -719,13 +747,16 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a private file to Tixte by initializing a <b>new</b> {@link String}.
-     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     *
+     * <p>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
      * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
      * can upload files up to 10GB.
-     * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
+     *
+     * <p>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
-     * <br><br>This method uses {@link TixteClient#getDefaultDomain() the default domain} to upload the file.
+     *
+     * <p>This method uses {@link TixteClient#getDefaultDomain() the default domain} to upload the file.
      * <br>If you don't initialize the client with a domain, you should use {@link #uploadPrivateFile(String, String)} instead, or
      * you initialize the client with a domain by calling {@link TixteClientBuilder#setDefaultDomain(String)}.
      * <br>But if you don't want to use the default domain, you can use another domain by calling
@@ -756,13 +787,16 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a file to Tixte by initializing a <b>new</b> {@link String} and a domain.
-     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     *
+     * <p>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
      * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
      * can upload files up to 10GB.
-     * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
+     *
+     * <p>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
-     * <br><br>This method uses a specific domain to upload the file.
+     *
+     * <p>This method uses a specific domain to upload the file.
      * <br>If you want to use the default domain, you don't have to call this method, you can call
      * {@link #uploadFile(String)} instead.
      * <br>Note that you must have initialized the client with a default domain before you can use this method.
@@ -793,13 +827,16 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a private file to Tixte by initializing a <b>new</b> {@link String} and a domain.
-     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     *
+     * <p>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
      * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
      * can upload files up to 10GB.
-     * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
+     *
+     * <p>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
-     * <br><br>This method uses a specific domain to upload the file.
+     *
+     * <p>This method uses a specific domain to upload the file.
      * <br>If you want to use the default domain, you don't have to call this method, you can call
      * {@link #uploadPrivateFile(String)} instead.
      * <br>Note that you must have initialized the client with a default domain before you can use this method.
@@ -830,7 +867,8 @@ public class MyFiles extends RawResponseData
 
     /**
      * Delete any kind of file from your Tixte dashboard.
-     * <br><br>You can get the file's ID by calling {@link #getAssetIds()} or you can directly get
+     *
+     * <p>You can get the file's ID by calling {@link #getAssetIds()} or you can directly get
      * {@link #getDeletionURL() the deletion url}.
      * <br> <br>This method will throw an exception if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to delete or if the of the fileId
@@ -850,8 +888,10 @@ public class MyFiles extends RawResponseData
 
     /**
      * Deletes every file from your Tixte dashboard.
-     * <br><br>You must set a password for this request, because otherwise it won't work.
-     * <br><br>Also note that this could throw an exception if the file takes too long to delete.
+     *
+     * <p>You must set a password for this request, because otherwise it won't work.
+     *
+     * <p>Also note that this could throw an exception if the file takes too long to delete.
      * <br>if you want to delete a single file in your Tixte dashboard, you can call {@link #deleteFile(String)} instead.
      *
      * @param password The password of your Tixte account.

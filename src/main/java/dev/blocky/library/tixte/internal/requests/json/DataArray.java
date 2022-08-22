@@ -614,20 +614,6 @@ public class DataArray implements Iterable<Object>, SerializableArray
         }
     }
 
-    @NotNull
-    @Override
-    public String toString()
-    {
-        try
-        {
-            return mapper.writeValueAsString(data);
-        }
-        catch (JsonProcessingException e)
-        {
-            throw new ParsingException(e);
-        }
-    }
-
     /**
      * Method that can be used to convert the current object as a string.
      *
@@ -707,13 +693,6 @@ public class DataArray implements Iterable<Object>, SerializableArray
     }
 
     @NotNull
-    @Override
-    public Iterator<Object> iterator()
-    {
-        return data.iterator();
-    }
-
-    @NotNull
     public <T> Stream<T> stream(@NotNull BiFunction<? super DataArray, Integer, ? extends T> mapper)
     {
         return IntStream.range(0, length())
@@ -722,8 +701,29 @@ public class DataArray implements Iterable<Object>, SerializableArray
 
     @NotNull
     @Override
+    public Iterator<Object> iterator()
+    {
+        return data.iterator();
+    }
+
+    @NotNull
+    @Override
     public DataArray toDataArray()
     {
         return this;
+    }
+
+    @NotNull
+    @Override
+    public String toString()
+    {
+        try
+        {
+            return mapper.writeValueAsString(data);
+        }
+        catch (JsonProcessingException e)
+        {
+            throw new ParsingException(e);
+        }
     }
 }

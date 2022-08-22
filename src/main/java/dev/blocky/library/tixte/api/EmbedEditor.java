@@ -329,7 +329,8 @@ public class EmbedEditor extends RawResponseData
      * <br>The author appears in the top left of the embed and can have a small image beside it along with the author's
      * name being made clickable by way of providing an url.
      * <br>This convenience method sets the name and the url.
-     * <br><br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
+     *
+     * <p><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
      *
      * @param  authorName The name of the author of the embed. If this is not set, the author will not appear in the embed.
      * @param  authorURL The url of the author of the embed.
@@ -437,7 +438,8 @@ public class EmbedEditor extends RawResponseData
      * If this is set, there only will be an image in the {@link Embed}.
      * <br>This is highly recommended not to set to true, if you are using any method of the {@link EmbedEditor} class,
      * because there could be some errors if you use {@link #build()} to send the request.
-     * <br><br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed-Image-Only.png" target="_blank">Example</a></b>
+     *
+     * <p><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed-Image-Only.png" target="_blank">Example</a></b>
      *
      * @param onlyImagedEnabled If the embed should only have images.
      *

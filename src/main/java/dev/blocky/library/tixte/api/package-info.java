@@ -20,7 +20,8 @@
  *
  * <li>{@link dev.blocky.library.tixte.api.TixteClientBuilder}
  * <br>Used to create <b>new</b> {@link dev.blocky.library.tixte.api.TixteClient} instances.
- * <br><br>A single {@link dev.blocky.library.tixte.api.TixteClientBuilder} can be reused multiple times.
+ *
+ * <p>A single {@link dev.blocky.library.tixte.api.TixteClientBuilder} can be reused multiple times.
  * <br>Each call to {@link dev.blocky.library.tixte.api.TixteClientBuilder#build()} creates a <b>new</b>
  * {@link dev.blocky.library.tixte.api.TixteClient} instance using the same information.</li>
  *
