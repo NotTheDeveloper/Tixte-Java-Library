@@ -49,20 +49,20 @@ public class ErrorResponseInterceptor implements Interceptor
 
             switch (response.code())
             {
-                case 401:
-                    throw new Unauthorized("Unauthorized: " + error.getString("message"));
-                case 402:
-                    throw new TixteWantsYourMoneyException("Payment required: " + error.getString("message"));
-                case 403:
-                    throw new Forbidden("Forbidden: " + error.getString("message"));
-                case 404:
-                    throw new NotFound("Not Found: " + error.getString("message"));
-                case 429:
-                    throw new TixteServerException("We got rate-limited: " + error.getString("message"));
-                case 500:
-                    throw new TixteServerException("Internal Server Error: " + error.getString("message"));
-                default:
-                    throw new HTTPException("HTTP Error: " + error.getString("code") + ", " + error.getString("message"));
+            case 401:
+                throw new Unauthorized(error.getString("message"));
+            case 402:
+                throw new TixteWantsYourMoneyException("Payment required: " + error.getString("message"));
+            case 403:
+                throw new Forbidden(error.getString("message"));
+            case 404:
+                throw new NotFound(error.getString("message"));
+            case 429:
+                throw new TixteServerException("We got rate-limited: " + error.getString("message"));
+            case 500:
+                throw new TixteServerException("Internal Server Error: " + error.getString("message"));
+            default:
+                throw new HTTPException(error.getString("code") + ", " + error.getString("message"));
             }
         }
         return response;

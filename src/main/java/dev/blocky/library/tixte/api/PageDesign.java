@@ -15,9 +15,12 @@
  */
 package dev.blocky.library.tixte.api;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import dev.blocky.library.tixte.api.entities.Embed;
+import dev.blocky.library.tixte.api.entities.SelfUser;
 import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
-import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.RawResponseData;
+import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,9 +36,11 @@ import java.util.concurrent.ExecutionException;
  */
 public class PageDesign extends RawResponseData
 {
-    private String customCSS;
+    private final SelfUser self = new SelfUser();
 
-    PageDesign() { }
+    PageDesign()
+    {
+    }
 
     /**
      * Gets your custom CSS code from the 'Page Design' tab of the Tixte dashboard.
@@ -56,6 +61,8 @@ public class PageDesign extends RawResponseData
 
     /**
      * Sets the custom CSS code from the 'Page Design' tab of the Tixte dashboard.
+     * <br>Note that this method will throw an {@link TixteWantsYourMoneyException}
+     * if you don't own a Tixte turbo/turbo-charged subscription.
      *
      * @param customCSS The custom CSS code for your page design.
      *
@@ -64,22 +71,49 @@ public class PageDesign extends RawResponseData
     @NotNull
     public PageDesign setCustomCSS(@Nullable String customCSS)
     {
-        this.customCSS = customCSS;
+        setCustomCSSRaw(customCSS == null ? "" : customCSS);
         return this;
     }
 
     /**
-     * Builds the custom CSS code from the 'Page Design' tab of the Tixte dashboard.
-     * <br>Note that this method will throw an {@link TixteWantsYourMoneyException}
-     * if you don't own a Tixte turbo/turbo-charged subscription.
+     * Sets the visibility of the branding on the left top corner of the page.
+     * <br>This requires a Tixte turbo/turbo-charged subscription or else there will be thrown a {@link TixteWantsYourMoneyException}.
+     *
+     * @param hideBranding If the page should have the Tixte branding.
+     *
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The current instance of the {@link PageDesign}.
      */
     @NotNull
-    public PageDesign send()
+    @CanIgnoreReturnValue
+    public PageDesign setHideBranding(boolean hideBranding) throws ExecutionException, InterruptedException
     {
-        setCustomCSSRaw(customCSS == null ? "" : customCSS);
+        if (!self.hasTixteSubscription())
+        {
+            throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
+        }
+
+        setHideBrandingRaw(hideBranding);
         return this;
+    }
+
+    /**
+     * Checks if the branding of the {@link Embed} is hidden.
+     *
+     * @throws ExecutionException If this future completed exceptionally.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
+     * @return <b>true</b> - If the branding is hidden.
+     *         <br><b>false</b> - If the branding is not hidden.
+     */
+    public boolean hidesBranding() throws ExecutionException, InterruptedException
+    {
+        DataObject json = DataObject.fromJson(getConfigRaw().get());
+        DataObject data = json.getDataObject("data");
+
+        return data.getBoolean("hide_branding");
     }
 
     @Override
@@ -96,6 +130,7 @@ public class PageDesign extends RawResponseData
         {
             return "PageDesign{" +
                     "custom_css='" + getCustomCSS() + '\'' +
+                    "hide_branding=" + hidesBranding() +
                     '}';
         }
         catch (ExecutionException | InterruptedException e)

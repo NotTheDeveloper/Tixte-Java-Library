@@ -98,7 +98,7 @@ public class User extends RawResponseData
         DataObject json = DataObject.fromJson(getUserInfoRaw(userData).get());
         DataObject data = json.getDataObject("data");
 
-        return data.isNull("avatar") ? "": data.getString("avatar");
+        return data.isNull("avatar") ? "" : data.getString("avatar");
     }
 
     /**

@@ -55,7 +55,9 @@ public class TixteClient extends RawResponseData
     private final SelfUser self = new SelfUser();
 
     @Internal
-    protected TixteClient() { }
+    protected TixteClient()
+    {
+    }
 
     /**
      * Gets the API-key, you specified with {@link TixteClientBuilder#create(String)}.
@@ -339,7 +341,7 @@ public class TixteClient extends RawResponseData
                     "API_KEY='" + getAPIKey() + "', " +
                     "SESSION_TOKEN='" + getSessionToken() + "', " +
                     "DEFAULT_DOMAIN='" + getDefaultDomain() + "', " +
-                    "policy=" + policy +  ", " +
+                    "policy=" + policy + ", " +
                     "request=" + request + ", " +
                     "base_redirect='" + baseRedirect() + "'" +
                     '}';

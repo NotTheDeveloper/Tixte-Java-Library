@@ -42,7 +42,7 @@ public class CacheInterceptor implements Interceptor
         Response response = chain.proceed(request);
 
         CacheControl cacheControl = new CacheControl.Builder()
-                .maxAge(7, TimeUnit.DAYS)
+                .maxAge(604800, TimeUnit.MILLISECONDS)
                 .build();
 
         return response.newBuilder()

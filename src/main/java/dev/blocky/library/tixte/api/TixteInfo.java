@@ -24,7 +24,9 @@ package dev.blocky.library.tixte.api;
  */
 public class TixteInfo
 {
-    TixteInfo() { }
+    TixteInfo()
+    {
+    }
 
     public static final int TIXTE_API_VERSION = 1;
     public static final String VERSION = "v1.0.0-beta.5";

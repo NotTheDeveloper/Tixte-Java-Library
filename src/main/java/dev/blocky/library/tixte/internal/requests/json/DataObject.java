@@ -562,7 +562,7 @@ public class DataObject implements SerializableData
     {
         Double value = get(Double.class, key, Double::parseDouble, Number::doubleValue);
 
-        if(value == null)
+        if (value == null)
         {
             throw valueError(key, "double");
         }
@@ -636,7 +636,7 @@ public class DataObject implements SerializableData
         }
         else
         {
-        data.put(key, value);
+            data.put(key, value);
         }
         return this;
     }

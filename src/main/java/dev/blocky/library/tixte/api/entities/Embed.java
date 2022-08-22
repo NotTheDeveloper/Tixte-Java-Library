@@ -40,7 +40,7 @@ public class Embed extends RawResponseData
      *
      * @see EmbedEditor#setTitle(String)
      */
-     public static final int TITLE_MAX_LENGTH = 256;
+    public static final int TITLE_MAX_LENGTH = 256;
 
     /**
      * The maximum length the author name of an embed can have.
@@ -279,7 +279,7 @@ public class Embed extends RawResponseData
     }
 
     @Override
-    public int hashCode() 
+    public int hashCode()
     {
         return Objects.hash(authorName, authorURL, title, providerName, providerURL, description, color, mutex, length);
     }

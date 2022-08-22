@@ -17,8 +17,6 @@ package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dev.blocky.library.tixte.api.entities.Embed;
-import dev.blocky.library.tixte.api.entities.SelfUser;
-import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
 import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.utils.Checks;
@@ -46,12 +44,13 @@ public class EmbedEditor extends RawResponseData
     private final Pattern URL_PATTERN = Pattern.compile("\\s*https://\\S+\\s*", Pattern.CASE_INSENSITIVE);
     private final Logger logger = TixteLogger.getLog(EmbedEditor.class);
     private final StringBuilder description = new StringBuilder();
-    private final SelfUser self = new SelfUser();
     private String providerName, providerURL, color;
     private String authorName, authorURL, title;
 
     @Internal
-    public EmbedEditor() { }
+    public EmbedEditor()
+    {
+    }
 
     /**
      * Creates an {@link EmbedEditor} using fields from an existing editor.
@@ -153,7 +152,7 @@ public class EmbedEditor extends RawResponseData
      */
     public void copyFrom(@Nullable Embed embed)
     {
-        if(embed != null)
+        if (embed != null)
         {
             setDescription(embed.getDescription());
             this.authorName = embed.getAuthorName();
@@ -435,30 +434,6 @@ public class EmbedEditor extends RawResponseData
     }
 
     /**
-     * Sets the visibility of the branding in the {@link Embed}.
-     * <br>This requires a Tixte turbo/turbo-charged subscription or else there will be thrown a {@link TixteWantsYourMoneyException}.
-     *
-     * @param hideBranding If the embed should have the Tixte branding.
-     *
-     * @throws ExecutionException If this future completed exceptionally.
-     * @throws InterruptedException If the current thread was interrupted.
-     *
-     * @return The current instance of the {@link EmbedEditor}.
-     */
-    @NotNull
-    @CanIgnoreReturnValue
-    public EmbedEditor setHideBranding(boolean hideBranding) throws ExecutionException, InterruptedException
-    {
-        if (!self.hasTixteSubscription())
-        {
-            throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
-        }
-
-        setHideBrandingRaw(hideBranding);
-        return this;
-    }
-
-    /**
      * If this is set, there only will be an image in the {@link Embed}.
      * <br>This is highly recommended not to set to true, if you are using any method of the {@link EmbedEditor} class,
      * because there could be some errors if you use {@link #build()} to send the request.
@@ -470,27 +445,10 @@ public class EmbedEditor extends RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    public EmbedEditor setOnlyImagedEnabled(boolean onlyImagedEnabled) 
+    public EmbedEditor setOnlyImagedEnabled(boolean onlyImagedEnabled)
     {
         setOnlyImageEnabledRaw(onlyImagedEnabled);
         return this;
-    }
-
-    /**
-     * Checks if the branding of the {@link Embed} is hidden.
-     *
-     * @throws ExecutionException If this future completed exceptionally.
-     * @throws InterruptedException If the current thread was interrupted.
-     *
-     * @return <b>true</b> - If the branding is hidden.
-     *         <br><b>false</b> - If the branding is not hidden.
-     */
-    public boolean hidesBranding() throws ExecutionException, InterruptedException
-    {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getBoolean("hide_branding");
     }
 
     /**
@@ -693,7 +651,6 @@ public class EmbedEditor extends RawResponseData
             return "EmbedEditor{" +
                     "URL_PATTERN=" + URL_PATTERN + ", " +
                     "only_image=" + onlyImageEnabled() + ", " +
-                    "hide_branding=" + hidesBranding() + ", " +
                     "description=" + getEmbedDescription() + ", " +
                     "provider_name='" + getEmbedProviderName() + "', " +
                     "provider_url='" + getEmbedProviderURL() + "', " +

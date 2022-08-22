@@ -43,7 +43,9 @@ public class MyFiles extends RawResponseData
 {
     private String url, directURL, deletionURL;
 
-    MyFiles() { }
+    MyFiles()
+    {
+    }
 
     /**
      * Gets the current used file size in bytes.
@@ -416,7 +418,7 @@ public class MyFiles extends RawResponseData
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
-     *      
+     *
      * @see #getTypes()
      *
      * @return <b>true</b> - If the file is public.
@@ -436,7 +438,7 @@ public class MyFiles extends RawResponseData
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
-     *      
+     *
      * @see #getTypes()
      *
      * @return <b>true</b> - If the file is private.
@@ -462,7 +464,7 @@ public class MyFiles extends RawResponseData
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
-     *      
+     *
      * @see #getNames()
      * @see #getExtensions()
      *
@@ -532,9 +534,9 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a file to Tixte by initializing a <b>new</b> {@link File}.
-     * <br><br>Note that you can only upload one file at a time and that this file cannot be greater than the maximum storage.
-     * <br>You can check the maximum storage by calling {@link #getLimit()} and you can check the remaining storage by
-     * calling {@link #getRemainingSize()}.
+     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
+     * can upload files up to 10GB.
      * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
@@ -569,9 +571,9 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a private file to Tixte by initializing a <b>new</b> {@link File}.
-     * <br><br>Note that you can only upload one file at a time and that this file cannot be greater than the maximum storage.
-     * <br>You can check the maximum storage by calling {@link #getLimit()} and you can check the remaining storage by
-     * calling {@link #getRemainingSize()}.
+     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
+     * can upload files up to 10GB.
      * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
@@ -606,9 +608,9 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a file to Tixte by initializing a <b>new</b> {@link File} and a domain.
-     * <br><br>Note that you can only upload one file at a time and that this file cannot be greater than the maximum storage.
-     * <br>You can check the maximum storage by calling {@link #getLimit()} and you can check the remaining storage by
-     * calling {@link #getRemainingSize()}.
+     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
+     * can upload files up to 10GB.
      * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
@@ -643,9 +645,9 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a private file to Tixte by initializing a <b>new</b> {@link File} and a domain.
-     * <br><br>Note that you can only upload one file at a time and that this file cannot be greater than the maximum storage.
-     * <br>You can check the maximum storage by calling {@link #getLimit()} and you can check the remaining storage by
-     * calling {@link #getRemainingSize()}.
+     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
+     * can upload files up to 10GB.
      * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
@@ -680,9 +682,9 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a file to Tixte by initializing a <b>new</b> {@link String}.
-     * <br><br>Note that you can only upload one file at a time and that this file cannot be greater than the maximum storage.
-     * <br>You can check the maximum storage by calling {@link #getLimit()} and you can check the remaining storage by
-     * calling {@link #getRemainingSize()}.
+     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
+     * can upload files up to 10GB.
      * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
@@ -717,9 +719,9 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a private file to Tixte by initializing a <b>new</b> {@link String}.
-     * <br><br>Note that you can only upload one file at a time and that this file cannot be greater than the maximum storage.
-     * <br>You can check the maximum storage by calling {@link #getLimit()} and you can check the remaining storage by
-     * calling {@link #getRemainingSize()}.
+     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
+     * can upload files up to 10GB.
      * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
@@ -754,9 +756,9 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a file to Tixte by initializing a <b>new</b> {@link String} and a domain.
-     * <br><br>Note that you can only upload one file at a time and that this file cannot be greater than the maximum storage.
-     * <br>You can check the maximum storage by calling {@link #getLimit()} and you can check the remaining storage by
-     * calling {@link #getRemainingSize()}.
+     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
+     * can upload files up to 10GB.
      * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
@@ -791,9 +793,9 @@ public class MyFiles extends RawResponseData
 
     /**
      * Upload a private file to Tixte by initializing a <b>new</b> {@link String} and a domain.
-     * <br><br>Note that you can only upload one file at a time and that this file cannot be greater than the maximum storage.
-     * <br>You can check the maximum storage by calling {@link #getLimit()} and you can check the remaining storage by
-     * calling {@link #getRemainingSize()}.
+     * <br><br>Note that this file cannot be greater than 200MB, without a turbo/turbo-charged subscription.
+     * <br>With a turbo subscription you can upload files as big as 4GB and with a turbo-charged subscription you
+     * can upload files up to 10GB.
      * <br><br>This method will throw an exception if the file is too big or if the file was not found/doesn't exist.
      * <br>Also note that this could throw an exception if the file takes too long to upload or if the name of the file
      * is invalid.
@@ -840,7 +842,7 @@ public class MyFiles extends RawResponseData
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles deleteFile(@NotNull String fileId) 
+    public MyFiles deleteFile(@NotNull String fileId)
     {
         deleteFileRaw(fileId);
         return this;
@@ -857,7 +859,7 @@ public class MyFiles extends RawResponseData
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles purgeFiles(@NotNull String password) 
+    public MyFiles purgeFiles(@NotNull String password)
     {
         purgeFilesRaw(password);
         return this;

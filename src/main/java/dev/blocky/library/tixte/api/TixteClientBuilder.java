@@ -174,25 +174,25 @@ public class TixteClientBuilder
 
         switch (policy)
         {
-            case NONE:
-                client = builder.build();
-                break;
-            case ONLY_FORCE_CACHE:
-                client = builder
-                        .addInterceptor(new ForceCacheInterceptor())
-                        .build();
-                break;
-            case ONLY_NETWORK_CACHE:
-                client = builder
-                        .addNetworkInterceptor(new CacheInterceptor())
-                        .build();
-                break;
-            case ALL:
-                client = builder
-                        .addInterceptor(new ForceCacheInterceptor())
-                        .addNetworkInterceptor(new CacheInterceptor())
-                        .build();
-                break;
+        case NONE:
+            client = builder.build();
+            break;
+        case ONLY_FORCE_CACHE:
+            client = builder
+                    .addInterceptor(new ForceCacheInterceptor())
+                    .build();
+            break;
+        case ONLY_NETWORK_CACHE:
+            client = builder
+                    .addNetworkInterceptor(new CacheInterceptor())
+                    .build();
+            break;
+        case ALL:
+            client = builder
+                    .addInterceptor(new ForceCacheInterceptor())
+                    .addNetworkInterceptor(new CacheInterceptor())
+                    .build();
+            break;
         }
         return new TixteClient();
     }
@@ -208,7 +208,7 @@ public class TixteClientBuilder
     public String toString()
     {
         return "TixteClientBuilder{" +
-                "API_KEY='" + apiKey+ "', " +
+                "API_KEY='" + apiKey + "', " +
                 "SESSION_TOKEN='" + sessionToken + "', " +
                 "DEFAULT_DOMAIN='" + defaultDomain + "', " +
                 "policy=" + policy +

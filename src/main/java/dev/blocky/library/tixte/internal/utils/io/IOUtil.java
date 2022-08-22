@@ -39,7 +39,9 @@ public class IOUtil
 {
     private static final Logger logger = TixteLogger.getLog(IOUtil.class);
 
-    IOUtil() { }
+    IOUtil()
+    {
+    }
 
     /**
      * Closes this stream and releases any system resources associated with it.

@@ -15,8 +15,6 @@
 
 [ ![github-packages-shield][] ][download] [ ![license-shield][] ][license] [ ![discord-invite-shield][] ][discord-invite]
 
-**What is Tixte4J (Tixte for Java)?**
-
 Tixte4J strives to provide a clean and full wrapping of the Tixte API for Java.
 
 ## Summary
@@ -25,8 +23,9 @@ Tixte4J strives to provide a clean and full wrapping of the Tixte API for Java.
 2. [Download](#download)
 3. [Documentation](#documentation)
 4. [Support](#getting-help)
-5. [Dependencies](#dependencies)
-6. [Other libraries](#tixte4j-related-projects)
+5. [Contribution](#contribution)
+6. [Dependencies](#dependencies)
+7. [Related projects](#tixte4j-related-projects)
 
 ## Introduction
 
@@ -66,6 +65,92 @@ The `TixteClientBuilder` allows a set of configurations to improve the experienc
 ```
 
 > See [TixteClientBuilder](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/main/java/dev/blocky/library/tixte/api/TixteClientBuilder.java)
+
+### More Examples
+
+We provide a small set of examples in the [example directory](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/).
+
+## Internal/Experimental annotation
+
+You should avoid using methods/constructors marked with the `Internal` annotation, because if you use these wrong, it could break the library and yeah thats not goood.
+
+Now you may think, why i didn't make the constructors or methods private.
+<br>This is not the case because i had no other possibility to do so.
+
+If a class or method is marked with the `Experimental` annotation, you should first check, if you have access to this experiment, because otherwise there could appear a `403 Forbidden` HTTP-code or there will be thrown a `Forbidden` exception.
+<br>Even if you have access to the experiment, you should be careful, because there could appear some bugs/error/exceptions.
+
+## Tixte experiments
+
+If you have early access to a feature that i don't have, feel free to implement this into Tixte4J!
+
+**Requirements:**
+* Good Java knowledge
+* At least one experimental feature
+* Good knowledge about the internal code of Tixte4J
+
+You also should read the [contribution guidelines](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Contributing) first.
+
+## Tixte turbo(-charged)
+
+Some features are requiring a Tixte turbo(-charged) subscription, so be careful.
+If you have access to turob(-charged) features that i don't have access to, feel free to implement this into Tixte4J!
+
+**Requirements:**
+* Good Java knowledge
+* A Tixte turbo(-charged) subscription
+* Good knowledge about the internal code of Tixte4J
+
+If you own a Tixte turbo(-charged) subscription, thats cool!
+<br>This is the case, because we also provide some examples for the 'Page Design' tab!
+
+### Examples
+
+**Name:** `MacOS-Big-Sur-Theme`
+<br>**Author:** `Cole#8888`
+<br>**Description:** `This theme re-creates the modern design of macOS big sur, right on your upload page! Pretty pog if I do say so myself.`
+
+Click [here](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/resources/MacOS-Big-Sur-Theme.css) to get the `CSS` file!
+
+<p>
+    <img src="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/MacOS-Big-Sur-Theme-preview.png" width="500"/>
+</p>
+
+<hr>
+
+**Name:** `Galactic-Waves`
+<br>**Author:** `Swinsor#0001`
+<br>**Description:** `Under the sea? Nahhh, ontop of the universe mate. How snazzy and trendy is this theme?`
+
+Click [here](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/resources/Galactic-Waves.css) to get the `CSS` file!
+
+<p>
+    <img src="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Galactic-Waves-Theme-preview.gif" width="500"/>
+</p>
+
+<hr>
+
+**Name:** `Princess-Peach`
+<br>**Author:** `Swinsor#0001`
+<br>**Description:** `Who doesn't like a bit of pink in their lives? Well now you can have it on your files 😉`
+
+Click [here](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/resources/Princess-Peach.css) to get the `CSS` file!
+
+<p>
+    <img src="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Princess-Peach-Theme-preview.png" width="500"/>
+</p>
+
+<hr>
+
+**Name:** `Galaxy-Mountain`
+<br>**Author:** `Person0z#0812`
+<br>**Description:** `Galaxy theme for those who love outer space 🚀🌌`
+
+Click [here](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/resources/Galaxy%20Mountain.css) to get the `CSS` file!
+
+<p>
+    <img src="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Galaxy-Mountain-Theme-preview.jpg" width="500"/>
+</p>
 
 ## Download
 
@@ -114,7 +199,9 @@ After that you add this repository and dependency to your `pom.xml`:
 
 ### Gradle
 
-Be sure to replace the **`GITHUB_USERNAME`** key below with your GitHub username and **`GITHUB_TOKEN`** with a [GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-tokenn)!
+Be sure to replace the **`GITHUB_USERNAME`** key below with your GitHub username and **`GITHUB_TOKEN`** with a [GitHub token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)!
+
+**Gradle Groovy:**
 
 ```gradle
 repositories {
@@ -123,6 +210,20 @@ repositories {
         credentials {
             username = project.findProperty("gpr.user") ?: "GITHUB_USERNAME"
             password = project.findProperty("gpr.key") ?: "GITHUB_TOKEN"
+        }
+    }
+}
+```
+
+**Kotlin DSL:**
+
+```gradle
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/BlockyDotJar/Tixte-Java-Library")
+        credentials {
+            username = project.findProperty("gpr.user") as String? ?: "GITHUB_USERNAME"
+            password = project.findProperty("gpr.key") as String? ?: "GITHUB_TOKEN"
         }
     }
 }
@@ -150,20 +251,54 @@ SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further detail
 Tixte4J is currently providing a fallback logger in case that no SLF4J implementation is present.
 We strongly recommend to use one though, as that can improve speed and allows you to customize the logger as well as logging to some files.
 
-There is a guide for logback-classic available at the JDA wiki: [Logging Setup](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Logging).
+There is a guide for logback-classic available at the Tixte4J wiki: [Logging-Setup](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Logging).
 
 ## Documentation
 
-***Docs are currently not available***
-<br>See JavaDocs.
+Docs can be found [directly here](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Documentation).
+<br>A simple wiki can also be found in this repository's [wiki section](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki).
 
 ## Getting help
 
-Troubleshooting or FAQ pages will be available soon!
-<br>If you need help, or just want to talk with the Tixte4J or other devs, you can join the [support server][discord-invite].
+For general troubleshooting you can visit our wiki [troubleshooting](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Troubleshooting) and [FAQ](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/FAQ).
+<br>If you need help, or just want to talk with the Tixte4J or other devs, you can join the [offical Tixte4J Discord server][discord-invite].
+
+For guides and setup help you can also take a look at the wiki.
+<br>Especially interesting are the [getting started](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Getting-started) and [setup](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Setup) pages.
+
+## Contribution
+
+If you want to contribute to Tixte4J, make sure to base your branch off of our **developer** branch
+and create your PR into that **same** branch.
+<br>**We will be rejecting any PRs, which are not based to the developer branch!**
+<br>It is very possible that your change might already be in development or you missed something.
+
+More information can be found at the [contributing](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Contributing) wiki page.
+
+### Deprecation Policy
+
+When a feature is introduced to replace or enhance existing functionality we might deprecate old functionality.
+
+A deprecated method/class usually has a replacement mentioned in its documentation which should be switched to.
+<br>Deprecated functionality might or might not exist in the next minor release. (Hint: The minor version is the `MM` of `XX.MM.RR(-TT.ZZ)` in our version format)
+
+It is possible that some features are deprecated without replacement, in this case the functionality is no longer supported by either the Tixte4J structure
+due to fundamental changes or due to Tixte-API changes that cause it to be removed.
+
+We highly recommend discontinuing usage of deprecated functionality and update by going through each minor release instead of jumping.
+<br>For instance, when updating from version `1.0.0-beta.1` to version `1.0.0-rc.2` you should do the following:
+
+- Update to `1.0.0-beta.ZZ` and check for deprecation
+- Update to `1.0.0-rc.2` and check for deprecation
+
+The `RR` in version `1.0.RR` should be replaced by the latest version that was published for `1.0`, you can find out which the latest
+version was by looking at the [release page](https://github.com/BlockyDotJar/Tixte-java-Library/releases)
+
+
 ## Dependencies:
 
 This project requires **Java 8+**
+<br>All dependencies are managed automatically by Gradle.
 
 * okhttp
     * Version: **v4.10.0**
@@ -175,7 +310,7 @@ This project requires **Java 8+**
     * Version: **v2.13.3**
     * [Github](https://github.com/stleary/JSON-java)
 * slf4j-api
-    * Version: **v1.7.36**
+    * Version: **v2.0.0**
     * [Github](https://github.com/qos-ch/slf4j)
 * jetbrains-annotations
     * Version: **v23.0.0**
@@ -187,7 +322,7 @@ This project requires **Java 8+**
     * Version: **v4.4**
     * [Github](https://github.com/apache/commons-collections)
 * commons-io
-    * Version: **v2.11.0** 
+    * Version: **v2.11.0**
     * [Github](https://github.com/apache/commons-io)
 
 ## Tixte4J related projects

@@ -59,7 +59,9 @@ public strictfp class RawResponseData extends TixteClientBuilder
 {
     private static final Logger logger = TixteLogger.getLog(RawResponseData.class);
 
-    protected RawResponseData() { }
+    protected RawResponseData()
+    {
+    }
 
     /**
      * @see MyFiles#getUsedSize() MyFiles#getUsedSize()
@@ -79,7 +81,7 @@ public strictfp class RawResponseData extends TixteClientBuilder
     }
 
     /**
-     * @see MyFiles#getTotalUploadCount() 
+     * @see MyFiles#getTotalUploadCount()
      * @see MyFiles#getResults()
      * @see MyFiles#getPermissionLevels()
      * @see MyFiles#getExtensions()
@@ -107,7 +109,7 @@ public strictfp class RawResponseData extends TixteClientBuilder
      *
      * @throws FileNotFoundException If the file is not found.
      *
-     * @see MyFiles#uploadFile(File) 
+     * @see MyFiles#uploadFile(File)
      *
      * @return The raw response of the request.
      */
@@ -133,7 +135,7 @@ public strictfp class RawResponseData extends TixteClientBuilder
      * @param file The file to be uploaded.
      *
      * @throws FileNotFoundException If the file is not found.
-     *      
+     *
      * @see MyFiles#uploadPrivateFile(File)
      *
      * @return The raw response of the request.
@@ -161,7 +163,7 @@ public strictfp class RawResponseData extends TixteClientBuilder
      * @param domain The domain to upload the file to.
      *
      * @throws FileNotFoundException If the file is not found.
-     *      
+     *
      * @see MyFiles#uploadFile(File, String)
      *
      * @return The raw response of the request.
@@ -312,7 +314,7 @@ public strictfp class RawResponseData extends TixteClientBuilder
                 .addFormDataPart("file", file.getName(), requestBody)
                 .build();
 
-        return postFile(domain,multipartBody, false);
+        return postFile(domain, multipartBody, false);
     }
 
     /**
@@ -353,7 +355,7 @@ public strictfp class RawResponseData extends TixteClientBuilder
     /**
      * @param fileId The ID of the file as a string.
      *
-     * @see MyFiles#deleteFile(String) 
+     * @see MyFiles#deleteFile(String)
      *
      * @return The raw response of the request.
      */
@@ -372,7 +374,7 @@ public strictfp class RawResponseData extends TixteClientBuilder
     /**
      * @param password The password of your Tixte account.
      *
-     * @see MyFiles#purgeFiles(String) 
+     * @see MyFiles#purgeFiles(String)
      *
      * @return The raw response of the request.
      */
@@ -392,18 +394,18 @@ public strictfp class RawResponseData extends TixteClientBuilder
     }
 
     /**
-     * @see MyFiles#getUploadRegion() 
-     * @see SelfUser#getUsername() 
-     * @see SelfUser#getId() 
-     * @see SelfUser#getEmail() 
-     * @see SelfUser#getAvatarId() 
-     * @see SelfUser#getFlagCount() 
-     * @see SelfUser#getPremiumTier() 
-     * @see SelfUser#getPhoneNumber() 
-     * @see SelfUser#getLastLogin() 
-     * @see SelfUser#hasMFAEnabled() 
-     * @see SelfUser#isEmailVerified() 
-     * @see SelfUser#getUploadRegion() 
+     * @see MyFiles#getUploadRegion()
+     * @see SelfUser#getUsername()
+     * @see SelfUser#getId()
+     * @see SelfUser#getEmail()
+     * @see SelfUser#getAvatarId()
+     * @see SelfUser#getFlagCount()
+     * @see SelfUser#getPremiumTier()
+     * @see SelfUser#getPhoneNumber()
+     * @see SelfUser#getLastLogin()
+     * @see SelfUser#hasMFAEnabled()
+     * @see SelfUser#isEmailVerified()
+     * @see SelfUser#getUploadRegion()
      *
      * @return The raw response of the request.
      */
@@ -419,9 +421,9 @@ public strictfp class RawResponseData extends TixteClientBuilder
      * @param userData A user-id oder user-name.
      *
      * @see User#getFlagCount()
-     * @see User#getAvatarId() 
-     * @see User#getId() 
-     * @see User#getUsername() 
+     * @see User#getAvatarId()
+     * @see User#getId()
+     * @see User#getUsername()
      *
      * @return The raw response of the request.
      */
@@ -440,7 +442,7 @@ public strictfp class RawResponseData extends TixteClientBuilder
      * @see Domains#getUploadCounts()
      * @see Domains#getDomainNames()
      * @see Domains#getOwnerIds()
-     * @see Domains#getDomainCount() 
+     * @see Domains#getDomainCount()
      *
      * @return The raw response of the request.
      */
@@ -565,9 +567,9 @@ public strictfp class RawResponseData extends TixteClientBuilder
      * @see EmbedEditor#getEmbedProviderURL()
      * @see EmbedEditor#getEmbedThemeColor()
      * @see EmbedEditor#onlyImageEnabled()
-     * @see EmbedEditor#hidesBranding()
      * @see TixteClient#baseRedirect()
      * @see PageDesign#getCustomCSS()
+     * @see PageDesign#hidesBranding()
      *
      * @return The raw response of the request.
      */
@@ -614,8 +616,8 @@ public strictfp class RawResponseData extends TixteClientBuilder
     @NotNull
     @CanIgnoreReturnValue
     protected static CompletableFuture<InputStream> setEmbedRaw(@Nullable String description, @Nullable String title, @Nullable String color,
-                                                             @Nullable String authorName, @Nullable String authorURL, @Nullable String providerName,
-                                                             @Nullable String providerURL)
+                                                                @Nullable String authorName, @Nullable String authorURL, @Nullable String providerName,
+                                                                @Nullable String providerURL)
     {
         Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
@@ -636,7 +638,7 @@ public strictfp class RawResponseData extends TixteClientBuilder
     /**
      * @param hideBranding Whether the branding is hidden or not.
      *
-     * @see EmbedEditor#setHideBranding(boolean)
+     * @see PageDesign#setHideBranding(boolean)
      *
      * @return The raw response of the request.
      */
@@ -717,15 +719,15 @@ public strictfp class RawResponseData extends TixteClientBuilder
 
         switch (route.getMethod())
         {
-            case GET:
-                request = builder.build();
-                break;
-           case DELETE:
-               request = requestBody == null ? builder.delete().build() : builder.delete(requestBody).build();
-               break;
-           case PATCH:
-               request = builder.patch(requestBody).build();
-               break;
+        case GET:
+            request = builder.build();
+            break;
+        case DELETE:
+            request = requestBody == null ? builder.delete().build() : builder.delete(requestBody).build();
+            break;
+        case PATCH:
+            request = builder.patch(requestBody).build();
+            break;
         }
 
         client.newCall(request).enqueue(FunctionalCallback
@@ -734,11 +736,11 @@ public strictfp class RawResponseData extends TixteClientBuilder
                 {
                     if (response.isSuccessful())
                     {
-                        logger.info("Request successful: " +  route.getMethod() + "/" + route.getCompiledRoute());
+                        logger.info("Request successful: " + route.getMethod() + "/" + route.getCompiledRoute());
 
                         InputStream body = IOUtil.getBody(response);
-                        
-                        if (!future.complete(body)) 
+
+                        if (!future.complete(body))
                         {
                             IOUtil.silentClose(response);
                         }

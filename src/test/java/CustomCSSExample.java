@@ -50,13 +50,12 @@ public class CustomCSSExample
         File file = new File("YOUR_VALID_FILE_PATH");
 
         return pageDesign
-                .setCustomCSS(
-                        // Reads the CSS file and gets the input of the file.
-                        Files.readAllLines(file.toPath()).toString()
-                )
                 // This will throw an exception if the CSS is invalid.
                 // This also will throw an TixteWantsYourMoneyException if you don't own a Tixte subscription, so I recommend
                 // that you check if a subscription is active before you try to use this.
-                .send();
+                .setCustomCSS(
+                        // Reads the CSS file and gets the input of the file.
+                        Files.readAllLines(file.toPath()).toString()
+                );
     }
 }

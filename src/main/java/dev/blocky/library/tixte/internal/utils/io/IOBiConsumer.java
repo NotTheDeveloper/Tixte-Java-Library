@@ -39,5 +39,5 @@ public interface IOBiConsumer<T, R>
      *
      * @throws IOException If an I/O error occurs.
      */
-     void accept(T a, R b) throws IOException;
+    void accept(T a, R b) throws IOException;
 }

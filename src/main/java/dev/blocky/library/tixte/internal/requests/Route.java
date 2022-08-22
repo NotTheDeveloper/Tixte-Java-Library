@@ -51,25 +51,25 @@ public class Route
      */
     public static class Self
     {
-        public static final Route GET_SELF                  = new Route(GET,      "users/@me");
-        public static final Route GET_KEYS                  = new Route(GET,      "users/@me/keys");
-        public static final Route GET_EXPERIMENTS           = new Route(GET,      "users/@me/experiments");
-        public static final Route GET_CONFIG                = new Route(GET,      "users/@me/config");
-        public static final Route PATCH_CONFIG              = new Route(PATCH,    "users/@me/config");
-        public static final Route GET_DOMAINS               = new Route(GET,      "users/@me/domains");
-        public static final Route ADD_DOMAIN                = new Route(PATCH,    "users/@me/domains/{domain}");
-        public static final Route DELETE_DOMAIN             = new Route(DELETE,   "users/@me/domains/{domain}");
-        public static final Route GET_UPLOADS               = new Route(GET,      "users/@me/uploads");
-        public static final Route GET_UPLOAD_SIZE           = new Route(GET,      "users/@me/uploads/size");
-        public static final Route DELETE_FILE               = new Route(DELETE,   "users/@me/uploads/{asset_id}");
+        public static final Route GET_SELF = new Route(GET, "users/@me");
+        public static final Route GET_KEYS = new Route(GET, "users/@me/keys");
+        public static final Route GET_EXPERIMENTS = new Route(GET, "users/@me/experiments");
+        public static final Route GET_CONFIG = new Route(GET, "users/@me/config");
+        public static final Route PATCH_CONFIG = new Route(PATCH, "users/@me/config");
+        public static final Route GET_DOMAINS = new Route(GET, "users/@me/domains");
+        public static final Route ADD_DOMAIN = new Route(PATCH, "users/@me/domains/{domain}");
+        public static final Route DELETE_DOMAIN = new Route(DELETE, "users/@me/domains/{domain}");
+        public static final Route GET_UPLOADS = new Route(GET, "users/@me/uploads");
+        public static final Route GET_UPLOAD_SIZE = new Route(GET, "users/@me/uploads/size");
+        public static final Route DELETE_FILE = new Route(DELETE, "users/@me/uploads/{asset_id}");
 
         //  Can't be used yet by everyone, so I am not able to implement it already.
 
         @Experimental
-        public static final Route SEARCH_FILE               = new Route(POST,      "users/@me/uploads/search");
+        public static final Route SEARCH_FILE = new Route(POST, "users/@me/uploads/search");
 
         @Experimental
-        public static final Route GET_FOLDERS               = new Route(GET,      "users/@me/folders");
+        public static final Route GET_FOLDERS = new Route(GET, "users/@me/folders");
     }
 
     /**
@@ -81,7 +81,7 @@ public class Route
      */
     public static class Users
     {
-        public static final Route GET_USER                  = new Route(GET,      "users/{user_data}");
+        public static final Route GET_USER = new Route(GET, "users/{user_data}");
     }
 
     /**
@@ -93,7 +93,7 @@ public class Route
      */
     public static class File
     {
-        public static final Route UPLOAD_FILE               = new Route(POST,     "upload");
+        public static final Route UPLOAD_FILE = new Route(POST, "upload");
     }
 
     /**
@@ -105,7 +105,7 @@ public class Route
      */
     public static class Domain
     {
-        public static final Route GET_DOMAINS               = new Route(GET,     "domains");
+        public static final Route GET_DOMAINS = new Route(GET, "domains");
     }
 
     /**
@@ -117,7 +117,7 @@ public class Route
      */
     public static class Resources
     {
-        public static final Route GET_GENERATED_DOMAIN     = new Route(GET,     "resources/generate-domain");
+        public static final Route GET_GENERATED_DOMAIN = new Route(GET, "resources/generate-domain");
     }
 
     /**
@@ -278,7 +278,7 @@ public class Route
         {
             int paramStart = compiledRoute.indexOf("{");
             int paramEnd = compiledRoute.indexOf("}");
-            String paramName = compiledRoute.substring(paramStart+1, paramEnd);
+            String paramName = compiledRoute.substring(paramStart + 1, paramEnd);
 
             if (majorParameters.contains(paramName))
             {

@@ -18,8 +18,9 @@ package dev.blocky.library.tixte.internal.utils.logging;
 import com.google.errorprone.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.helpers.FormattingTuple;
-import org.slf4j.helpers.MarkerIgnoringBase;
+import org.slf4j.Marker;
+import org.slf4j.event.Level;
+import org.slf4j.helpers.LegacyAbstractLogger;
 import org.slf4j.helpers.MessageFormatter;
 import org.slf4j.helpers.Util;
 import org.slf4j.spi.LocationAwareLogger;
@@ -29,7 +30,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import static dev.blocky.library.tixte.internal.utils.logging.SimpleLogger.SimpleLoggerConfiguration.*;
@@ -41,7 +44,7 @@ import static dev.blocky.library.tixte.internal.utils.logging.SimpleLogger.Simpl
  * @version v1.1.1
  * @since v1.0.0-alpha.3
  */
-public class SimpleLogger extends MarkerIgnoringBase
+public class SimpleLogger extends LegacyAbstractLogger
 {
 
     private static final long serialVersionUID = -632788891211436180L;
@@ -54,60 +57,43 @@ public class SimpleLogger extends MarkerIgnoringBase
     private static final int LOG_LEVEL_WARN = LocationAwareLogger.WARN_INT;
     private static final int LOG_LEVEL_ERROR = LocationAwareLogger.ERROR_INT;
 
+    private static final char SP = ' ';
     private static final String TID_PREFIX = "tid=";
 
-    /**
-     * The {@code OFF} level can only be used in configuration files to disable logging.
-     * <br>It has no printing method associated with it in o.s.Logger interface.
-     */
     private static final int LOG_LEVEL_OFF = LOG_LEVEL_ERROR + 10;
 
     private static boolean INITIALIZED = false;
 
-    /**
-     * The current log level.
-     */
-    private static int currentLogLevel = LOG_LEVEL_INFO;
+    public static int currentLogLevel = LOG_LEVEL_INFO;
 
-    /**
-     * The short name of this simple log instance.
-     */
-    private transient String shortLogName;
+    public transient String shortLogName;
 
-    /**
-     * All system properties used by {@code SimpleLogger} start with this prefix.
-     */
-    private static final String SYSTEM_PREFIX = "org.slf4j.simpleLogger.";
+    public static final String SYSTEM_PREFIX = "org.slf4j.simpleLogger.";
 
-    private static final String LOG_KEY_PREFIX = SYSTEM_PREFIX + "log.";
+    public static final String LOG_KEY_PREFIX = SYSTEM_PREFIX + "log.";
 
-    private static final String CACHE_OUTPUT_STREAM_STRING_KEY = SimpleLogger.SYSTEM_PREFIX + "cacheOutputStream";
+    public static final String CACHE_OUTPUT_STREAM_STRING_KEY = SimpleLogger.SYSTEM_PREFIX + "cacheOutputStream";
 
-    private static final String WARN_LEVEL_STRING_KEY = SimpleLogger.SYSTEM_PREFIX + "warnLevelString";
+    public static final String WARN_LEVEL_STRING_KEY = SimpleLogger.SYSTEM_PREFIX + "warnLevelString";
 
-    private static final String LEVEL_IN_BRACKETS_KEY = SimpleLogger.SYSTEM_PREFIX + "levelInBrackets";
+    public static final String LEVEL_IN_BRACKETS_KEY = SimpleLogger.SYSTEM_PREFIX + "levelInBrackets";
 
-    private static final String LOG_FILE_KEY = SimpleLogger.SYSTEM_PREFIX + "logFile";
+    public static final String LOG_FILE_KEY = SimpleLogger.SYSTEM_PREFIX + "logFile";
 
-    private static final String SHOW_SHORT_LOG_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showShortLogName";
+    public static final String SHOW_SHORT_LOG_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showShortLogName";
 
-    private static final String SHOW_LOG_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showLogName";
+    public static final String SHOW_LOG_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showLogName";
 
-    private static final String SHOW_THREAD_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showThreadName";
+    public static final String SHOW_THREAD_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showThreadName";
 
-    private static final String SHOW_THREAD_ID_KEY = SimpleLogger.SYSTEM_PREFIX + "showThreadId";
+    public static final String SHOW_THREAD_ID_KEY = SimpleLogger.SYSTEM_PREFIX + "showThreadId";
 
-    private static final String DATE_TIME_FORMAT_KEY = SimpleLogger.SYSTEM_PREFIX + "dateTimeFormat";
+    public static final String DATE_TIME_FORMAT_KEY = SimpleLogger.SYSTEM_PREFIX + "dateTimeFormat";
 
-    private static final String SHOW_DATE_TIME_KEY = SimpleLogger.SYSTEM_PREFIX + "showDateTime";
+    public static final String SHOW_DATE_TIME_KEY = SimpleLogger.SYSTEM_PREFIX + "showDateTime";
 
-    private static final String DEFAULT_LOG_LEVEL_KEY = SimpleLogger.SYSTEM_PREFIX + "defaultLogLevel";
+    public static final String DEFAULT_LOG_LEVEL_KEY = SimpleLogger.SYSTEM_PREFIX + "defaultLogLevel";
 
-    /**
-     * Package access allows only {@link SimpleLoggerConfiguration} to instantiate {@link SimpleLogger} instances.
-     *
-     * @param name The name of the logger.
-     */
     SimpleLogger(@NotNull String name)
     {
         if (!INITIALIZED)
@@ -138,7 +124,7 @@ public class SimpleLogger extends MarkerIgnoringBase
 
         int indexOfLastDot = tempName.length();
 
-        while (levelString == null && indexOfLastDot > -1)
+        while ((levelString == null) && (indexOfLastDot > -1))
         {
             tempName = tempName.substring(0, indexOfLastDot);
             levelString = getStringProperty(LOG_KEY_PREFIX + tempName, null);
@@ -147,115 +133,6 @@ public class SimpleLogger extends MarkerIgnoringBase
         return levelString;
     }
 
-    /**
-     * This is our internal implementation for logging regular (non-parameterized) log messages.
-     *
-     * @param level One of the LOG_LEVEL_XXX constants defining the log level.
-     * @param message The message itself.
-     * @param t The exception whose stack trace should be logged.
-     */
-    private void log(int level, @NotNull String message, @Nullable Throwable t)
-    {
-        if (!isLevelEnabled(level))
-        {
-            return;
-        }
-
-        StringBuilder buf = new StringBuilder(32);
-
-        // Append date-time if so configured.
-        if (SHOW_DATE_TIME)
-        {
-            if (DATE_FORMATTER != null)
-            {
-                buf.append(getFormattedDate());
-                buf.append(' ');
-            }
-            else
-            {
-                buf.append(System.currentTimeMillis() - START_TIME);
-                buf.append(' ');
-            }
-        }
-
-        // Append current thread name if so configured.
-        if (SHOW_THREAD_NAME)
-        {
-            buf.append('[');
-            buf.append(Thread.currentThread().getName());
-            buf.append("] ");
-        }
-
-        if (SHOW_THREAD_ID)
-        {
-            buf.append(TID_PREFIX);
-            buf.append(Thread.currentThread().getId());
-            buf.append(' ');
-        }
-
-        if (LEVEL_IN_BRACKETS)
-        {
-            buf.append('[');
-        }
-
-        // Append a readable representation of the log level.
-        String levelStr = renderLevel(level);
-        buf.append(levelStr);
-
-        if (LEVEL_IN_BRACKETS)
-        {
-            buf.append(']');
-        }
-
-        buf.append(' ');
-
-        // Append the name of the log instance if so configured
-        if (SHOW_SHORT_LOG_NAME)
-        {
-            if (shortLogName == null)
-            {
-                shortLogName = computeShortName();
-            }
-
-            buf.append(shortLogName).append(" - ");
-        }
-        else if (SHOW_LOG_NAME)
-        {
-            buf.append(name).append(" - ");
-        }
-
-        // Append the message.
-        buf.append(message);
-
-        write(buf, t);
-    }
-
-    @Nullable
-    @CheckReturnValue
-    private String renderLevel(int level)
-    {
-        switch (level)
-        {
-            case LOG_LEVEL_TRACE:
-                return "TRACE";
-            case LOG_LEVEL_DEBUG:
-                return "DEBUG";
-            case LOG_LEVEL_INFO:
-                return "INFO";
-            case LOG_LEVEL_WARN:
-                return WARN_LEVEL_STRING;
-            case LOG_LEVEL_ERROR:
-                return "ERROR";
-        }
-        throw new IllegalStateException("Unrecognized level [" + level + "]");
-    }
-
-    /**
-     * To avoid intermingling of log messages and associated stack traces, this is a synchronized method.
-     *
-     * @param buf The message to write.
-     * @param t   The exception whose stack trace should be logged.
-     */
     private synchronized void write(@NotNull StringBuilder buf, @Nullable Throwable t)
     {
         PrintStream targetStream = OUTPUT_CHOICE.getTargetPrintStream();
@@ -291,55 +168,15 @@ public class SimpleLogger extends MarkerIgnoringBase
     }
 
     /**
-     * For formatted messages, first substitute arguments and then log.
-     *
-     * @param level The log level.
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arg1 The argument to be substituted in place of the first formatting anchor.
-     * @param arg2 The argument to be substituted in place of the second formatting anchor.
-     */
-    private void formatAndLog(int level, @NotNull String format, @NotNull Object arg1, @Nullable Object arg2)
-    {
-        if (!isLevelEnabled(level))
-        {
-            return;
-        }
-
-        FormattingTuple tp = MessageFormatter.format(format, arg1, arg2);
-
-        log(level, tp.getMessage(), tp.getThrowable());
-    }
-
-    /**
-     * For formatted messages, first substitute arguments and then log.
-     *
-     * @param level The log level.
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arguments A list of 3 or more arguments.
-     */
-    private void formatAndLog(int level, @NotNull String format, @NotNull Object... arguments)
-    {
-        if (!isLevelEnabled(level))
-        {
-            return;
-        }
-
-        FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-
-        log(level, tp.getMessage(), tp.getThrowable());
-    }
-
-    /**
      * Is the given log level currently enabled?
      *
      * @param logLevel Is this level enabled?
      *
-     * @return b>true</b> - If this level is enabled.
+     * @return <b>true</b> - If this level is enabled.
      *         <br><b>false</b> - If this level is not enabled.
      */
     private boolean isLevelEnabled(int logLevel)
     {
-        // Log level are numerically ordered so can use simple numeric comparison.
         return (logLevel >= currentLogLevel);
     }
 
@@ -356,70 +193,6 @@ public class SimpleLogger extends MarkerIgnoringBase
     }
 
     /**
-     * A simple implementation which logs messages of level {@link #LOG_LEVEL_TRACE TRACE} according to
-     * the format outlined above.
-     *
-     * @param message The message to log.
-     */
-    @Override
-    public void trace(@NotNull String message)
-    {
-        log(LOG_LEVEL_TRACE, message, null);
-    }
-
-    /**
-     * Perform single parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_TRACE TRACE} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arg The argument to be substituted in place of the first formatting anchor.
-     */
-    @Override
-    public void trace(@NotNull String format, @NotNull Object arg)
-    {
-        formatAndLog(LOG_LEVEL_TRACE, format, arg, null);
-    }
-
-    /**
-     * Perform double parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_TRACE TRACE} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arg1 The argument to be substituted in place of the first formatting anchor.
-     * @param arg2 The argument to be substituted in place of the second formatting anchor.
-     */
-    @Override
-    public void trace(@NotNull String format, @NotNull Object arg1, @Nullable Object arg2)
-    {
-        formatAndLog(LOG_LEVEL_TRACE, format, arg1, arg2);
-    }
-
-    /**
-     * Perform double parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_TRACE TRACE} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arguments A list of 3 or more arguments.
-     */
-    @Override
-    public void trace(@NotNull String format, @NotNull Object... arguments)
-    {
-        formatAndLog(LOG_LEVEL_TRACE, format, arguments);
-    }
-
-    /**
-     * Log a message of level {@link #LOG_LEVEL_TRACE TRACE}, including an exception.
-     *
-     * @param message The message to log.
-     * @param t The exception whose stack trace should be logged.
-     */
-    @Override
-    public void trace(@NotNull String message, @Nullable Throwable t)
-    {
-        log(LOG_LEVEL_TRACE, message, t);
-    }
-
-    /**
      * Are {@code debug} messages currently enabled?
      *
      * @return <b>true</b> - If debug messages are enabled.
@@ -429,70 +202,6 @@ public class SimpleLogger extends MarkerIgnoringBase
     public boolean isDebugEnabled()
     {
         return isLevelEnabled(LOG_LEVEL_DEBUG);
-    }
-
-    /**
-     * A simple implementation which logs messages of level {@link #LOG_LEVEL_DEBUG DEBUG} according to
-     * the format outlined above.
-     * 
-     * @param message The message to log.
-     */
-    @Override
-    public void debug(@NotNull String message)
-    {
-        log(LOG_LEVEL_DEBUG, message, null);
-    }
-
-    /**
-     * Perform single parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_DEBUG DEBUG} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arg The argument to be substituted in place of the first formatting anchor.
-     */
-    @Override
-    public void debug(@NotNull String format, @NotNull Object arg)
-    {
-        formatAndLog(LOG_LEVEL_DEBUG, format, arg, null);
-    }
-
-    /**
-     * Perform double parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_DEBUG DEBUG} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arg1 The argument to be substituted in place of the first formatting anchor.
-     * @param arg2 The argument to be substituted in place of the second formatting anchor.
-     */
-    @Override
-    public void debug(@NotNull String format, @NotNull Object arg1, @Nullable Object arg2)
-    {
-        formatAndLog(LOG_LEVEL_DEBUG, format, arg1, arg2);
-    }
-
-    /**
-     * Perform double parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_DEBUG DEBUG} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arguments A list of 3 or more arguments.
-     */
-    @Override
-    public void debug(@NotNull String format, @NotNull Object... arguments)
-    {
-        formatAndLog(LOG_LEVEL_DEBUG, format, arguments);
-    }
-
-    /**
-     * Log a message of level {@link #LOG_LEVEL_DEBUG DEBUG}, including an exception.
-     *
-     * @param message The message to log.
-     * @param t The exception whose stack trace should be logged.
-     */
-    @Override
-    public void debug(@NotNull String message, @Nullable Throwable t)
-    {
-        log(LOG_LEVEL_DEBUG, message, t);
     }
 
     /**
@@ -508,143 +217,15 @@ public class SimpleLogger extends MarkerIgnoringBase
     }
 
     /**
-     * A simple implementation which logs messages of level {@link #LOG_LEVEL_INFO INFO} according to
-     * the format outlined above.
-     * 
-     * @param message The message to log.
-     */
-    @Override
-    public void info(@NotNull String message)
-    {
-        log(LOG_LEVEL_INFO, message, null);
-    }
-
-    /**
-     * Perform single parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_INFO INFO} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arg The argument to be substituted in place of the first formatting anchor.
-     */
-    @Override
-    public void info(@Nullable String format, @NotNull Object arg)
-    {
-        formatAndLog(LOG_LEVEL_INFO, format, arg, null);
-    }
-
-    /**
-     * Perform double parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_INFO INFO} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arg1 The argument to be substituted in place of the first formatting anchor.
-     * @param arg2 The argument to be substituted in place of the second formatting anchor.
-     */
-    @Override
-    public void info(@NotNull String format, @NotNull Object arg1, @Nullable Object arg2)
-    {
-        formatAndLog(LOG_LEVEL_INFO, format, arg1, arg2);
-    }
-
-    /**
-     * Perform double parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_INFO INFO} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arguments A list of 3 or more arguments.
-     */
-    @Override
-    public void info(@NotNull String format, @NotNull Object... arguments)
-    {
-        formatAndLog(LOG_LEVEL_INFO, format, arguments);
-    }
-
-    /**
-     * Log a message of level {@link #LOG_LEVEL_INFO INFO}, including an exception.
-     *
-     * @param message The message to log.
-     * @param t The exception whose stack trace should be logged.
-     */
-    @Override
-    public void info(@NotNull String message, @Nullable Throwable t)
-    {
-        log(LOG_LEVEL_INFO, message, t);
-    }
-
-    /**
      * Are {@code warn} messages currently enabled?
      *
      * @return <b>true</b> - If warn messages are enabled.
      *         <br><b>false</b> - If warn messages are not enabled.
      */
     @Override
-    public boolean isWarnEnabled() 
+    public boolean isWarnEnabled()
     {
         return isLevelEnabled(LOG_LEVEL_WARN);
-    }
-
-    /**
-     * A simple implementation which always logs messages of level {@link #LOG_LEVEL_WARN WARN}
-     * according to the format outlined above.
-     * 
-     * @param message The message to log.
-     */
-    @Override
-    public void warn(@NotNull String message)
-    {
-        log(LOG_LEVEL_WARN, message, null);
-    }
-
-    /**
-     * Perform single parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_WARN WARN} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arg The argument to be substituted in place of the first formatting anchor.
-     */
-    @Override
-    public void warn(@NotNull String format, @NotNull Object arg) 
-    {
-        formatAndLog(LOG_LEVEL_WARN, format, arg, null);
-    }
-
-    /**
-     * Perform double parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_WARN WARN} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arg1 The argument to be substituted in place of the first formatting anchor.
-     * @param arg2 The argument to be substituted in place of the second formatting anchor.
-     */
-    @Override
-    public void warn(@NotNull String format, @NotNull Object arg1, @Nullable Object arg2) 
-    {
-        formatAndLog(LOG_LEVEL_WARN, format, arg1, arg2);
-    }
-
-    /**
-     * Perform double parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_WARN WARN} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arguments A list of 3 or more arguments.
-     */
-    @Override
-    public void warn(@NotNull String format, @NotNull Object... arguments) 
-    {
-        formatAndLog(LOG_LEVEL_WARN, format, arguments);
-    }
-
-    /**
-     * Log a message of level {@link #LOG_LEVEL_WARN WARN}, including an exception.
-     *
-     * @param message The message to log.
-     * @param t The exception whose stack trace should be logged.
-     */
-    @Override
-    public void warn(@NotNull String message, @Nullable Throwable t) 
-    {
-        log(LOG_LEVEL_WARN, message, t);
     }
 
     /**
@@ -654,73 +235,108 @@ public class SimpleLogger extends MarkerIgnoringBase
      *         <br><b>false</b> - If error messages are not enabled.
      */
     @Override
-    public boolean isErrorEnabled() 
+    public boolean isErrorEnabled()
     {
         return isLevelEnabled(LOG_LEVEL_ERROR);
     }
 
-    /**
-     * A simple implementation which always logs messages of level {@link #LOG_LEVEL_ERROR ERROR}
-     * according to the format outlined above.
-     * 
-     * @param message The message to log.
-     */
     @Override
-    public void error(@NotNull String message)
+    protected void handleNormalizedLoggingCall(@NotNull Level level, @NotNull Marker marker, @NotNull String messagePattern,
+                                               @NotNull Object[] arguments, @Nullable Throwable t)
     {
-        log(LOG_LEVEL_ERROR, message, null);
+        List<Marker> markers = null;
+
+        if (marker != null)
+        {
+            markers = new ArrayList<>();
+            markers.add(marker);
+        }
+
+        innerHandleNormalizedLoggingCall(level, markers, messagePattern, arguments, t);
     }
 
-    /**
-     * Perform single parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_ERROR ERROR} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arg The argument to be substituted in place of the first formatting anchor.
-     */
-    @Override
-    public void error(@NotNull String format, @NotNull Object arg)
+    private void innerHandleNormalizedLoggingCall(@NotNull Level level, @NotNull List<Marker> markers, @NotNull String messagePattern,
+                                                  @NotNull Object[] arguments, @Nullable Throwable t)
     {
-        formatAndLog(LOG_LEVEL_ERROR, format, arg, null);
+        StringBuilder buf = new StringBuilder(32);
+
+        if (SHOW_DATE_TIME)
+        {
+            if (DATE_FORMATTER != null)
+            {
+                buf.append(getFormattedDate());
+                buf.append(SP);
+            }
+            else
+            {
+                buf.append(System.currentTimeMillis() - START_TIME);
+                buf.append(SP);
+            }
+        }
+
+        if (SHOW_THREAD_NAME)
+        {
+            buf.append('[');
+            buf.append(Thread.currentThread().getName());
+            buf.append("] ");
+        }
+
+        if (SHOW_THREAD_ID)
+        {
+            buf.append(TID_PREFIX);
+            buf.append(Thread.currentThread().getId());
+            buf.append(SP);
+        }
+
+        if (LEVEL_IN_BRACKETS)
+        {
+            buf.append('[');
+        }
+
+        String levelStr = level.name();
+        buf.append(levelStr);
+
+        if (LEVEL_IN_BRACKETS)
+        {
+            buf.append(']');
+        }
+
+        buf.append(SP);
+
+        if (SHOW_SHORT_LOG_NAME)
+        {
+            if (shortLogName == null)
+            {
+                shortLogName = computeShortName();
+            }
+
+            buf.append(shortLogName).append(" - ");
+        }
+        else if (SHOW_LOG_NAME)
+        {
+            buf.append(name).append(" - ");
+        }
+
+        if (markers != null)
+        {
+            buf.append(SP);
+            for (Marker marker : markers)
+            {
+                buf.append(marker.getName()).append(SP);
+            }
+        }
+
+        String formattedMessage = MessageFormatter.basicArrayFormat(messagePattern, arguments);
+
+        buf.append(formattedMessage);
+
+        write(buf, t);
     }
 
-    /**
-     * Perform double parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_ERROR ERROR} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arg1 The argument to be substituted in place of the first formatting anchor.
-     * @param arg2 The argument to be substituted in place of the second formatting anchor.
-     */
     @Override
-    public void error(@NotNull String format, @NotNull Object arg1, @Nullable Object arg2)
+    protected String getFullyQualifiedCallerName()
     {
-        formatAndLog(LOG_LEVEL_ERROR, format, arg1, arg2);
-    }
-
-    /**
-     * Perform double parameter substitution before logging the message of level
-     * {@link #LOG_LEVEL_ERROR ERROR} according to the format outlined above.
-     *
-     * @param format The message pattern which will be parsed and formatted.
-     * @param arguments A list of 3 or more arguments.
-     */
-    @Override
-    public void error(@NotNull String format, @NotNull Object... arguments)
-    {
-        formatAndLog(LOG_LEVEL_ERROR, format, arguments);
-    }
-
-    /**
-     * Log a message of level {@link #LOG_LEVEL_ERROR ERROR}, including an exception.
-     *
-     * @param message The message to log.
-     * @param t The exception whose stack trace should be logged.
-     */
-    @Override
-    public void error(@NotNull String message, @Nullable Throwable t)
-    {
-        log(LOG_LEVEL_ERROR, message, t);
+        return null;
     }
 
     /**
@@ -735,7 +351,7 @@ public class SimpleLogger extends MarkerIgnoringBase
     {
         private static final String CONFIGURATION_FILE = "simpleLogger.properties";
 
-        private static final int DEFAULT_LOG_LEVEL_DEFAULT = SimpleLogger.LOG_LEVEL_INFO;
+        private static final int DEFAULT_LOG_LEVEL_DEFAULT = LOG_LEVEL_INFO;
         static int DEFAULT_LOG_LEVEL = DEFAULT_LOG_LEVEL_DEFAULT;
 
         private static final boolean SHOW_DATE_TIME_DEFAULT = false;
@@ -761,8 +377,8 @@ public class SimpleLogger extends MarkerIgnoringBase
         private static final boolean LEVEL_IN_BRACKETS_DEFAULT = false;
         static boolean LEVEL_IN_BRACKETS = LEVEL_IN_BRACKETS_DEFAULT;
 
-        private  static final String LOG_FILE_DEFAULT = "System.err";
-        private  static String LOG_FILE = LOG_FILE_DEFAULT;
+        private static final String LOG_FILE_DEFAULT = "System.err";
+        private static String LOG_FILE = LOG_FILE_DEFAULT;
         static OutputChoice OUTPUT_CHOICE;
 
         private static final boolean CACHE_OUTPUT_STREAM_DEFAULT = false;
@@ -797,7 +413,7 @@ public class SimpleLogger extends MarkerIgnoringBase
 
             LOG_FILE = getStringProperty(LOG_FILE_KEY, LOG_FILE);
 
-            CACHE_OUTPUT_STREAM = getBooleanProperty(SimpleLogger.CACHE_OUTPUT_STREAM_STRING_KEY, CACHE_OUTPUT_STREAM_DEFAULT);
+            CACHE_OUTPUT_STREAM = getBooleanProperty(CACHE_OUTPUT_STREAM_STRING_KEY, CACHE_OUTPUT_STREAM_DEFAULT);
 
             OUTPUT_CHOICE = computeOutputChoice(LOG_FILE, CACHE_OUTPUT_STREAM);
 
@@ -816,7 +432,6 @@ public class SimpleLogger extends MarkerIgnoringBase
 
         private static void loadProperties()
         {
-            // Add props from the resource simpleLogger.properties.
             InputStream in = AccessController.doPrivileged((PrivilegedAction<InputStream>) () ->
             {
                 ClassLoader threadCL = Thread.currentThread().getContextClassLoader();
@@ -969,7 +584,7 @@ public class SimpleLogger extends MarkerIgnoringBase
     private static class OutputChoice
     {
         private final OutputChoiceType OUTPUT_CHOICE_TYPE;
-        private final PrintStream TARGET_STREAM;
+        private final PrintStream TARGET_PRINT_STREAM;
 
         private OutputChoice(@NotNull OutputChoiceType outputChoiceType)
         {
@@ -982,22 +597,22 @@ public class SimpleLogger extends MarkerIgnoringBase
 
             if (outputChoiceType == OutputChoiceType.CACHED_SYS_OUT)
             {
-                this.TARGET_STREAM = System.out;
+                this.TARGET_PRINT_STREAM = System.out;
             }
             else if (outputChoiceType == OutputChoiceType.CACHED_SYS_ERR)
             {
-                this.TARGET_STREAM = System.err;
+                this.TARGET_PRINT_STREAM = System.err;
             }
             else
             {
-                this.TARGET_STREAM = null;
+                this.TARGET_PRINT_STREAM = null;
             }
         }
 
         private OutputChoice(@NotNull PrintStream printStream)
         {
             this.OUTPUT_CHOICE_TYPE = OutputChoiceType.FILE;
-            this.TARGET_STREAM = printStream;
+            this.TARGET_PRINT_STREAM = printStream;
         }
 
         @NotNull
@@ -1005,16 +620,16 @@ public class SimpleLogger extends MarkerIgnoringBase
         {
             switch (OUTPUT_CHOICE_TYPE)
             {
-                case SYS_OUT:
-                    return System.out;
-                case SYS_ERR:
-                    return System.err;
-                case CACHED_SYS_ERR:
-                case CACHED_SYS_OUT:
-                case FILE:
-                    return TARGET_STREAM;
-                default:
-                    throw new IllegalArgumentException();
+            case SYS_OUT:
+                return System.out;
+            case SYS_ERR:
+                return System.err;
+            case CACHED_SYS_ERR:
+            case CACHED_SYS_OUT:
+            case FILE:
+                return TARGET_PRINT_STREAM;
+            default:
+                throw new IllegalArgumentException();
             }
         }
     }

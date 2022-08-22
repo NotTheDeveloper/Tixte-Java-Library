@@ -29,7 +29,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @since v1.0.0
  */
 @Retention(RUNTIME)
-@Target( { PACKAGE, TYPE, METHOD, CONSTRUCTOR } )
+@Target({PACKAGE, TYPE, METHOD, CONSTRUCTOR})
 public @interface Undocumented
 {
 }

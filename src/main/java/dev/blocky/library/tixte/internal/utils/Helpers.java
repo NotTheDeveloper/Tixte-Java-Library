@@ -30,7 +30,9 @@ import java.util.Locale;
  */
 public final class Helpers
 {
-    Helpers() { }
+    Helpers()
+    {
+    }
 
     /**
      * Checks if the given {@link CharSequence} is empty.

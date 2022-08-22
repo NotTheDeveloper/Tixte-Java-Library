@@ -30,7 +30,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @since v1.0.0-alpha.1
  */
 @Retention(RUNTIME)
-@Target( { TYPE, METHOD } )
+@Target({TYPE, METHOD})
 public @interface DeprecatedSince
 {
     /**

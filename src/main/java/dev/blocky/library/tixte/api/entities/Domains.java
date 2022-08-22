@@ -42,7 +42,9 @@ public class Domains extends RawResponseData
     private String lastDeletedDomain;
 
     @Internal
-    public Domains() { }
+    public Domains()
+    {
+    }
 
     /**
      * Gets the count of domains that you can use.
@@ -243,7 +245,7 @@ public class Domains extends RawResponseData
      */
     @Nullable
     @CheckReturnValue
-    public Domains addSubdomain(@NotNull String domainName) 
+    public Domains addSubdomain(@NotNull String domainName)
     {
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
@@ -267,7 +269,7 @@ public class Domains extends RawResponseData
      */
     @Nullable
     @CheckReturnValue
-    public Domains addCustomDomain(@NotNull String domainName) 
+    public Domains addCustomDomain(@NotNull String domainName)
     {
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");

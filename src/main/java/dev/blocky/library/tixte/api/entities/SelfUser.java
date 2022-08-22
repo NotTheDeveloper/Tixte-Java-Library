@@ -35,7 +35,9 @@ import java.util.concurrent.ExecutionException;
 public class SelfUser extends RawResponseData
 {
     @Internal
-    public SelfUser() { }
+    public SelfUser()
+    {
+    }
 
     /**
      * Checks if your account is email verified.
@@ -70,7 +72,7 @@ public class SelfUser extends RawResponseData
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
         DataObject data = json.getDataObject("data");
 
-        return data.isNull("phone") ? "": data.getString("phone");
+        return data.isNull("phone") ? "" : data.getString("phone");
     }
 
     /**
@@ -175,7 +177,7 @@ public class SelfUser extends RawResponseData
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
         DataObject data = json.getDataObject("data");
 
-        return data.isNull("avatar") ? "": data.getString("avatar");
+        return data.isNull("avatar") ? "" : data.getString("avatar");
     }
 
     /**
@@ -211,7 +213,7 @@ public class SelfUser extends RawResponseData
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
         DataObject data = json.getDataObject("data");
 
-        return data.isNull("email") ? "": data.getString("email");
+        return data.isNull("email") ? "" : data.getString("email");
     }
 
     /**

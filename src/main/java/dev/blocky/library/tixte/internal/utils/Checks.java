@@ -28,7 +28,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Checks
 {
-    Checks() { }
+    Checks()
+    {
+    }
 
     /**
      * The boolean, which should be checked.

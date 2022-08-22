@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
- * This class serves as a {@link org.slf4j.LoggerFactory} for Tixte4J's internals.
- * <br>It will either return a logger from a SLF4J implementation via {@link org.slf4j.LoggerFactory} if present,
+ * This class serves as a {@link LoggerFactory} for Tixte4J's internals.
+ * <br>It will either return a logger from a SLF4J implementation via {@link LoggerFactory} if present,
  * or an instance of a custom {@link SimpleLogger}. (from slf4j-simple)
  * <br>It also has the utility method {@link #getLazyString(LazyEvaluation)} which is used to lazily construct strings for logging.
  *
@@ -49,7 +49,9 @@ public class TixteLogger
     public static final boolean SLF4J_ENABLED;
     private static final Map<String, Logger> LOGS = new CaseInsensitiveMap<>();
 
-    TixteLogger() { }
+    TixteLogger()
+    {
+    }
 
     static
     {
@@ -62,7 +64,7 @@ public class TixteLogger
         }
         catch (ClassNotFoundException eStatic)
         {
-            // There was no static logger binder (SLF4J pre-1.8.x)
+            // There is no StaticLoggerBinder (SLF4J pre-1.8.x)
 
             try
             {
@@ -73,9 +75,9 @@ public class TixteLogger
             }
             catch (ClassNotFoundException eService)
             {
-                // There was no service provider interface (SLF4J 1.8.x+)
+                // There was no ServiceProvider interface (SLF4J 1.8.x+)
 
-                // Prints warning of missing implementation
+                // Prints warning of missing implementation.
                 LoggerFactory.getLogger(TixteLogger.class);
 
                 SLF4J = false;
@@ -85,7 +87,7 @@ public class TixteLogger
     }
 
     /**
-     * Will get the {@link org.slf4j.Logger} with the given log-name
+     * Will get the {@link Logger} with the given log-name
      * or create and cache a fallback logger if there is no SLF4J implementation present.
      * <br>The fallback logger will be an instance of a slightly modified version of SLF4J's {@code SimpleLogger}.
      *
@@ -107,7 +109,7 @@ public class TixteLogger
     }
 
     /**
-     * Will get the {@link org.slf4j.Logger} for the given class
+     * Will get the {@link Logger} for the given class
      * or create and cache a fallback logger if there is no SLF4J implementation present.
      * <br>The fallback logger will be an instance of a slightly modified version of SLF4J's {@code SimpleLogger}.
      *
