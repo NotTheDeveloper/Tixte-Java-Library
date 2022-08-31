@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package dev.blocky.library.tixte.api.entities;
 import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
-import org.jetbrains.annotations.ApiStatus.Internal;
+import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,13 +29,12 @@ import java.util.concurrent.ExecutionException;
  * Represents your Tixte user-account.
  *
  * @author BlockyDotJar
- * @version v1.2.0
+ * @version v1.3.0
  * @since v1.0.0-beta.1
  */
 public class SelfUser extends RawResponseData
 {
-    @Internal
-    public SelfUser()
+    SelfUser()
     {
     }
 
@@ -51,9 +50,7 @@ public class SelfUser extends RawResponseData
     public boolean isEmailVerified() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getBoolean("email_verified");
+        return DataPath.getBoolean(json, "data.email_verified");
     }
 
     /**
@@ -70,9 +67,7 @@ public class SelfUser extends RawResponseData
     public String getPhoneNumber() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.isNull("phone") ? "" : data.getString("phone");
+        return DataPath.getString(json, "data.phone?");
     }
 
     /**
@@ -90,9 +85,7 @@ public class SelfUser extends RawResponseData
     public String getLastLogin() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getString("last_login");
+        return DataPath.getString(json, "data.last_login");
     }
 
     /**
@@ -106,9 +99,7 @@ public class SelfUser extends RawResponseData
     public int getFlagCount() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getInt("flags");
+        return DataPath.getInt(json, "data.flags");
     }
 
     /**
@@ -122,9 +113,7 @@ public class SelfUser extends RawResponseData
     public int getPremiumTier() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getInt("premium_tier");
+        return DataPath.getInt(json, "data.premium_tier");
     }
 
     /**
@@ -139,9 +128,7 @@ public class SelfUser extends RawResponseData
     public boolean hasMFAEnabled() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getBoolean("mfa_enabled");
+        return DataPath.getBoolean(json, "data.mfa_enabled");
     }
 
     /**
@@ -156,9 +143,7 @@ public class SelfUser extends RawResponseData
     public String getId() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getString("id");
+        return DataPath.getString(json, "data.id");
     }
 
     /**
@@ -175,9 +160,7 @@ public class SelfUser extends RawResponseData
     public String getAvatarId() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.isNull("avatar") ? "" : data.getString("avatar");
+        return DataPath.getString(json, "data.avatar?");
     }
 
     /**
@@ -192,9 +175,7 @@ public class SelfUser extends RawResponseData
     public String getUploadRegion() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getString("upload_region");
+        return DataPath.getString(json, "data.upload_region");
     }
 
     /**
@@ -211,9 +192,7 @@ public class SelfUser extends RawResponseData
     public String getEmail() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.isNull("email") ? "" : data.getString("email");
+        return DataPath.getString(json, "data.email?");
     }
 
     /**
@@ -228,9 +207,7 @@ public class SelfUser extends RawResponseData
     public String getUsername() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getString("username");
+        return DataPath.getString(json, "data.username");
     }
 
     /**
@@ -246,9 +223,7 @@ public class SelfUser extends RawResponseData
     public String getAPIKeyBySessionToken() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getAPIKeyBySessionTokenRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getString("api_key");
+        return DataPath.getString(json, "data.api_key");
     }
 
     /**
@@ -307,7 +282,6 @@ public class SelfUser extends RawResponseData
     public int getExperimentCount() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getExperimentsRaw().get());
-
         return json.getInt("data");
     }
 

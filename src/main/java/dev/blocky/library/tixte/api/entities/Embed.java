@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@ package dev.blocky.library.tixte.api.entities;
 
 import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.api.EmbedEditor;
-import dev.blocky.library.tixte.internal.utils.Helpers;
 import dev.blocky.library.tixte.internal.RawResponseData;
+import dev.blocky.library.tixte.internal.utils.Helpers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
@@ -80,8 +82,8 @@ public class Embed extends RawResponseData
      */
     public static final int EMBED_MAX_LENGTH = 6000;
 
-    private final String authorName, authorURL, title;
-    private final String providerName, providerURL;
+    private final String authorName, authorUrl, title;
+    private final String providerName, providerUrl;
     private final String description, color;
     private final Object mutex = new Object();
     private int length = -1;
@@ -90,7 +92,7 @@ public class Embed extends RawResponseData
      * Instantiates a <b>new</b> embed.
      *
      * @param authorName The author name to be built.
-     * @param authorURL The author url to be built.
+     * @param authorUrl The author url to be built.
      * @param title The title to be built.
      * @param description The description to be built.
      * @param color The color to be built.
@@ -100,29 +102,47 @@ public class Embed extends RawResponseData
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      */
-    public Embed(@Nullable String authorName, @Nullable String authorURL, @Nullable String title, @Nullable String description,
+    public Embed(@Nullable String authorName, @Nullable String authorUrl, @Nullable String title, @Nullable String description,
                  @Nullable String color, @Nullable String providerName, @Nullable String providerUrl)
             throws ExecutionException, InterruptedException
     {
         this.authorName = authorName;
-        this.authorURL = authorURL;
+        this.authorUrl = authorUrl;
         this.title = title;
         this.description = description;
         this.color = color;
         this.providerName = providerName;
-        this.providerURL = providerUrl;
+        this.providerUrl = providerUrl;
 
-        EmbedEditor editor = new EmbedEditor();
 
-        String embedDescription = description == null ? editor.getEmbedDescription() : description;
-        String embedTitle = title == null ? editor.getEmbedTitle() : title;
-        String embedColor = color == null ? editor.getEmbedThemeColor() : color;
-        String embedAuthorName = authorName == null ? editor.getEmbedAuthorName() : authorName;
-        String embedAuthorURL = authorURL == null ? editor.getEmbedAuthorURL() : authorURL;
-        String embedProviderName = providerName == null ? editor.getEmbedProviderName() : providerName;
-        String embedProviderURL = providerURL == null ? editor.getEmbedProviderURL() : providerURL;
+        try
+        {
+            Constructor<?> constructor = EmbedEditor.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            EmbedEditor editor = (EmbedEditor) constructor.newInstance();
 
-        setEmbedRaw(embedDescription, embedTitle, embedColor, embedAuthorName, embedAuthorURL, embedProviderName, embedProviderURL);
+            String embedDescription = description == null ? editor.getEmbedDescription() : description;
+            String embedTitle = title == null ? editor.getEmbedTitle() : title;
+            String embedColor = color == null ? editor.getEmbedThemeColor() : color;
+            String embedAuthorName = authorName == null ? editor.getEmbedAuthorName() : authorName;
+            String embedAuthorUrl = authorUrl == null ? editor.getEmbedAuthorUrl() : authorUrl;
+            String embedProviderName = providerName == null ? editor.getEmbedProviderName() : providerName;
+            String embedProviderUrl = providerUrl == null ? editor.getEmbedProviderUrl() : providerUrl;
+
+            System.out.println(embedDescription);
+            System.out.println(embedTitle);
+            System.out.println(embedColor);
+            System.out.println(embedAuthorName);
+            System.out.println(embedAuthorUrl);
+            System.out.println(embedProviderName);
+            System.out.println(embedProviderUrl);
+
+            setEmbedRaw(embedDescription, embedTitle, embedColor, embedAuthorName, embedAuthorUrl, embedProviderName, embedProviderUrl);
+        }
+        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -173,9 +193,9 @@ public class Embed extends RawResponseData
      */
     @Nullable
     @CheckReturnValue
-    public String getAuthorURL()
+    public String getAuthorUrl()
     {
-        return authorURL;
+        return authorUrl;
     }
 
     /**
@@ -199,9 +219,9 @@ public class Embed extends RawResponseData
      */
     @Nullable
     @CheckReturnValue
-    public String getProviderURL()
+    public String getProviderUrl()
     {
-        return providerURL;
+        return providerUrl;
     }
 
     /**
@@ -273,15 +293,15 @@ public class Embed extends RawResponseData
 
         Embed embed = (Embed) o;
 
-        return length == embed.length && Objects.equals(authorName, embed.authorName) && Objects.equals(authorURL, embed.authorURL)
-                && Objects.equals(title, embed.title) && Objects.equals(providerName, embed.providerName) && Objects.equals(providerURL, embed.providerURL) &&
+        return length == embed.length && Objects.equals(authorName, embed.authorName) && Objects.equals(authorUrl, embed.authorUrl)
+                && Objects.equals(title, embed.title) && Objects.equals(providerName, embed.providerName) && Objects.equals(providerUrl, embed.providerUrl) &&
                 Objects.equals(description, embed.description) && color.equals(embed.color) && Objects.equals(mutex, embed.mutex);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(authorName, authorURL, title, providerName, providerURL, description, color, mutex, length);
+        return Objects.hash(authorName, authorUrl, title, providerName, providerUrl, description, color, mutex, length);
     }
 
     @NotNull
@@ -290,10 +310,10 @@ public class Embed extends RawResponseData
     {
         return "Embed{" +
                 "authorName='" + authorName + "', " +
-                "authorURL='" + authorURL + "', " +
+                "authorUrl='" + authorUrl + "', " +
                 "title='" + title + "', " +
                 "providerName='" + providerName + "', " +
-                "providerURL='" + providerURL + "', " +
+                "providerUrl='" + providerUrl + "', " +
                 "description='" + description + "', " +
                 "color='" + color + "', " +
                 "mutex=" + mutex + ", " +

@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutionException;
  * Some basic examples, how to use an {@link EmbedEditor}.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.0.1
  * @since v1.0.0-beta.3
  */
 public class EmbedEditorExample
@@ -60,6 +60,6 @@ public class EmbedEditorExample
                 .setProvider("You don't need to know more than: Java > *", "https://github.com/BlockyDotJar");
 
         // Builds the embed and sends it to Tixte.
-        return editor.send();
+        return editor.build();
     }
 }

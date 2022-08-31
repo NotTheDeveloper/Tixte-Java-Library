@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataArray;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
+import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import dev.blocky.library.tixte.internal.utils.Checks;
-import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,15 +34,14 @@ import java.util.concurrent.ExecutionException;
  * Represents the 'Domains' tab of the Tixte dashboard and everything else what Tixte offers you with domains.
  *
  * @author BlockyDotJar
- * @version v1.2.0
+ * @version v1.3.0
  * @since v1.0.0-alpha.1
  */
 public class Domains extends RawResponseData
 {
     private String lastDeletedDomain;
 
-    @Internal
-    public Domains()
+    Domains()
     {
     }
 
@@ -57,9 +56,7 @@ public class Domains extends RawResponseData
     public int getUsableDomainCount() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUsableDomainsRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getInt("count");
+        return DataPath.getInt(json, "data.count");
     }
 
     /**
@@ -70,20 +67,18 @@ public class Domains extends RawResponseData
      *
      * @return A {@link List} of every usable domain.
      */
-
     @Nullable
     @CheckReturnValue
     public List<String> getUsableDomainNames() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUsableDomainsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("domains");
+        DataArray domains = DataPath.getDataArray(json, "data.domains");
 
         List<String> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < domains.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getString("domain"));
+            list.add(DataPath.getString(json, "data.domains[" + i + "]?.domain"));
         }
         return new ArrayList<>(list);
     }
@@ -96,17 +91,18 @@ public class Domains extends RawResponseData
      *
      * @return A {@link List} of {@code booleans} that represents if the domain is active at the moment.
      */
+    @Nullable
+    @CheckReturnValue
     public List<Boolean> isActive() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUsableDomainsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("domains");
+        DataArray domains = DataPath.getDataArray(json, "data.domains");
 
         List<Boolean> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < domains.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getBoolean("active"));
+            list.add(DataPath.getBoolean(json, "data.domains[" + i + "]?.active"));
         }
         return new ArrayList<>(list);
     }
@@ -122,9 +118,7 @@ public class Domains extends RawResponseData
     public int getDomainCount() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserDomainsRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getInt("total");
+        return DataPath.getInt(json, "data.total");
     }
 
     /**
@@ -140,14 +134,13 @@ public class Domains extends RawResponseData
     public List<String> getOwnerIds() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserDomainsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("domains");
+        DataArray domains = DataPath.getDataArray(json, "data.domains");
 
         List<String> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < domains.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getString("owner"));
+            list.add(DataPath.getString(json, "data.domains[" + i + "]?.owner"));
         }
         return new ArrayList<>(list);
     }
@@ -165,14 +158,13 @@ public class Domains extends RawResponseData
     public List<String> getDomainNames() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserDomainsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("domains");
+        DataArray domains = DataPath.getDataArray(json, "data.domains");
 
         List<String> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < domains.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getString("name"));
+            list.add(DataPath.getString(json, "data.domains[" + i + "]?.name"));
         }
         return new ArrayList<>(list);
     }
@@ -185,17 +177,18 @@ public class Domains extends RawResponseData
      *
      * @return A {@link List} of upload-counts of the domain.
      */
+    @Nullable
+    @CheckReturnValue
     public List<Integer> getUploadCounts() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserDomainsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("domains");
+        DataArray domains = DataPath.getDataArray(json, "data.domains");
 
         List<Integer> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < domains.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getInt("uploads"));
+            list.add(DataPath.getInt(json, "data.domains[" + i + "]?.uploads"));
         }
         return new ArrayList<>(list);
     }
@@ -212,9 +205,7 @@ public class Domains extends RawResponseData
     public String generateDomain() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(generateDomainRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getString("name");
+        return DataPath.getString(json, "data.name");
     }
 
     /**
@@ -241,7 +232,7 @@ public class Domains extends RawResponseData
      *
      * @param domainName The domain name.
      *
-     * @return The current instance of the domain system.
+     * @return The current instance of the {@link Domains} class.
      */
     @Nullable
     @CheckReturnValue
@@ -265,7 +256,7 @@ public class Domains extends RawResponseData
      *
      * @param domainName The domain name.
      *
-     * @return The current instance of the domain system.
+     * @return The current instance of the {@link Domains} class.
      */
     @Nullable
     @CheckReturnValue
@@ -289,16 +280,15 @@ public class Domains extends RawResponseData
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The current instance of the domain system.
+     * @return The current instance of the {@link Domains} class.
      */
     @Nullable
     @CheckReturnValue
     public Domains deleteDomain(@NotNull String domainName) throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(deleteDomainRaw(domainName).get());
-        DataObject data = json.getDataObject("data");
 
-        lastDeletedDomain = data.getString("domain");
+        lastDeletedDomain = DataPath.getString(json, "data.domain");
         return this;
     }
 

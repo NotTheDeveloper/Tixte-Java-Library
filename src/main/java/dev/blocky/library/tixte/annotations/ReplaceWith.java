@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * This is an annotation, which tells the developers, with which method/class a deprecated method/class should be replaced.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.2.1
  * @since v1.0.0-alpha.1
  */
 @Retention(RUNTIME)
@@ -36,5 +36,5 @@ public @interface ReplaceWith
     /**
      * @return The method/class, which should used instead.
      */
-    String method();
+    String value();
 }

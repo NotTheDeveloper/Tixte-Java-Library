@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
  * Some basic examples, how to upload a {@link File} to Tixte.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.1.1
  * @since v1.0.0-beta.3
  */
 public class FileExample
@@ -42,7 +42,7 @@ public class FileExample
     public static MyFiles uploadFile()
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
-        MyFiles myFiles = client.getFileSystem();
+        MyFiles myFiles = client.getMyFiles();
 
         // Creates a *new* File object.
         // If you initialize a file, which doesn't exist, this will throw an FileNotFoundException, an NoSuchFileException and an IOException.
@@ -62,7 +62,7 @@ public class FileExample
     public static MyFiles uploadFileFromURL() throws IOException
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
-        MyFiles myFiles = client.getFileSystem();
+        MyFiles myFiles = client.getMyFiles();
 
         // Creates a *new* File object.
         // Here you set the path, where the file should be created, but also the name of the file.
@@ -93,7 +93,7 @@ public class FileExample
     public static MyFiles deleteFile() throws ExecutionException, InterruptedException
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
-        MyFiles myFiles = client.getFileSystem();
+        MyFiles myFiles = client.getMyFiles();
 
         // This could throw an HTTPException if there is no file to purge, but I am not sure about that.
         // Also note that this could throw an exception if the file takes too long to delete or if the of the fileId is invalid.
@@ -109,7 +109,7 @@ public class FileExample
     public static MyFiles deleteAllFiles()
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
-        MyFiles myFiles = client.getFileSystem();
+        MyFiles myFiles = client.getMyFiles();
 
         // You must set a password (for some reason) to execute this request, because otherwise it won't work.
         // This could throw an HTTPException if there is no file to purge, but I am not sure about that.

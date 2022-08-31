@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,12 @@ import dev.blocky.library.tixte.api.entities.SelfUser;
 import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
 import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
+import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
@@ -31,13 +34,11 @@ import java.util.concurrent.ExecutionException;
  * Represents the 'Page Design' tab of the Tixte dashboard.
  *
  * @author BlockyDotJar
- * @version v1.2.0
+ * @version v1.3.0
  * @since v1.0.0-alpha.1
  */
 public class PageDesign extends RawResponseData
 {
-    private final SelfUser self = new SelfUser();
-
     PageDesign()
     {
     }
@@ -54,9 +55,7 @@ public class PageDesign extends RawResponseData
     public String getCustomCSS() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getString("custom_css");
+        return DataPath.getString(json, "data.custom_css");
     }
 
     /**
@@ -90,13 +89,24 @@ public class PageDesign extends RawResponseData
     @CanIgnoreReturnValue
     public PageDesign setHideBranding(boolean hideBranding) throws ExecutionException, InterruptedException
     {
-        if (!self.hasTixteSubscription())
+        try
         {
-            throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
-        }
+            Constructor<?> constructor = SelfUser.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            SelfUser self =  (SelfUser) constructor.newInstance();
 
-        setHideBrandingRaw(hideBranding);
-        return this;
+            if (!self.hasTixteSubscription())
+            {
+                throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
+            }
+
+            setHideBrandingRaw(hideBranding);
+            return this;
+        }
+        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -111,9 +121,7 @@ public class PageDesign extends RawResponseData
     public boolean hidesBranding() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getBoolean("hide_branding");
+        return DataPath.getBoolean(json, "data.hide_branding");
     }
 
     @Override

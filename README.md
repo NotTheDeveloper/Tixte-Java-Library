@@ -47,7 +47,7 @@ The `TixteClientBuilder` allows a set of configurations to improve the experienc
 ```java
     public static void main(@NotNull String[] args) throws IOException
     {
-        // Creates a new TixteClient.
+        // Creates a *new* TixteClientBuilder instance.
         TixteClientBuilder builder = new TixteClientBuilder()
         // Sets the API-key, which is required for most of the methods.
         // This method also sets the cache policy. I really recommend to set this to ALL.
@@ -70,12 +70,7 @@ The `TixteClientBuilder` allows a set of configurations to improve the experienc
 
 We provide a small set of examples in the [example directory](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/).
 
-## Internal/Experimental annotation
-
-You should avoid using methods/constructors marked with the `Internal` annotation, because if you use these wrong, it could break the library and yeah thats not goood.
-
-Now you may think, why i didn't make the constructors or methods private.
-<br>This is not the case because i had no other possibility to do so.
+## Experimental annotation
 
 If a class or method is marked with the `Experimental` annotation, you should first check, if you have access to this experiment, because otherwise there could appear a `403 Forbidden` HTTP-code or there will be thrown a `Forbidden` exception.
 <br>Even if you have access to the experiment, you should be careful, because there could appear some bugs/error/exceptions.
@@ -304,7 +299,7 @@ This project requires **Java 8+**
     * Version: **v4.10.0**
     * [Github](https://github.com/square/okhttp)
 * okio
-    * Version: **3.2.0**
+    * Version: **v3.2.0**
     * [Github](https://github.com/square/okio/)
 * jackson
     * Version: **v2.13.3**

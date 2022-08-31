@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar) and QOS.ch
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,8 @@ import static dev.blocky.library.tixte.internal.utils.logging.SimpleLogger.Simpl
 /**
  * A custom {@link SimpleLogger}. (from <a href="https://www.slf4j.org/api/org/slf4j/simple/SimpleLogger.html">slf4j-simple</a>).
  *
- * @author BlockyDotJar
- * @version v1.1.1
+ * @author QOS.ch and BlockyDotJar
+ * @version v1.2.0
  * @since v1.0.0-alpha.3
  */
 public class SimpleLogger extends LegacyAbstractLogger
@@ -68,31 +68,31 @@ public class SimpleLogger extends LegacyAbstractLogger
 
     private transient String shortLogName;
 
-    private static final String SYSTEM_PREFIX = "org.slf4j.simpleLogger.";
+    private static final String SYSTEM_PREFIX = "org.slf4j.Logger.";
 
     private static final String LOG_KEY_PREFIX = SYSTEM_PREFIX + "log.";
 
-    private static final String CACHE_OUTPUT_STREAM_STRING_KEY = SimpleLogger.SYSTEM_PREFIX + "cacheOutputStream";
+    private static final String CACHE_OUTPUT_STREAM_STRING_KEY = SYSTEM_PREFIX + "cacheOutputStream";
 
-    private static final String WARN_LEVEL_STRING_KEY = SimpleLogger.SYSTEM_PREFIX + "warnLevelString";
+    private static final String WARN_LEVEL_STRING_KEY = SYSTEM_PREFIX + "warnLevelString";
 
-    private static final String LEVEL_IN_BRACKETS_KEY = SimpleLogger.SYSTEM_PREFIX + "levelInBrackets";
+    private static final String LEVEL_IN_BRACKETS_KEY = SYSTEM_PREFIX + "levelInBrackets";
 
-    private static final String LOG_FILE_KEY = SimpleLogger.SYSTEM_PREFIX + "logFile";
+    private static final String LOG_FILE_KEY = SYSTEM_PREFIX + "logFile";
 
-    private static final String SHOW_SHORT_LOG_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showShortLogName";
+    private static final String SHOW_SHORT_LOG_NAME_KEY = SYSTEM_PREFIX + "showShortLogName";
 
-    private static final String SHOW_LOG_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showLogName";
+    private static final String SHOW_LOG_NAME_KEY = SYSTEM_PREFIX + "showLogName";
 
-    private static final String SHOW_THREAD_NAME_KEY = SimpleLogger.SYSTEM_PREFIX + "showThreadName";
+    private static final String SHOW_THREAD_NAME_KEY = SYSTEM_PREFIX + "showThreadName";
 
-    private static final String SHOW_THREAD_ID_KEY = SimpleLogger.SYSTEM_PREFIX + "showThreadId";
+    private static final String SHOW_THREAD_ID_KEY = SYSTEM_PREFIX + "showThreadId";
 
-    private static final String DATE_TIME_FORMAT_KEY = SimpleLogger.SYSTEM_PREFIX + "dateTimeFormat";
+    private static final String DATE_TIME_FORMAT_KEY = SYSTEM_PREFIX + "dateTimeFormat";
 
-    private static final String SHOW_DATE_TIME_KEY = SimpleLogger.SYSTEM_PREFIX + "showDateTime";
+    private static final String SHOW_DATE_TIME_KEY = SYSTEM_PREFIX + "showDateTime";
 
-    private static final String DEFAULT_LOG_LEVEL_KEY = SimpleLogger.SYSTEM_PREFIX + "defaultLogLevel";
+    private static final String DEFAULT_LOG_LEVEL_KEY = SYSTEM_PREFIX + "defaultLogLevel";
 
     SimpleLogger(@NotNull String name)
     {
@@ -154,11 +154,7 @@ public class SimpleLogger extends LegacyAbstractLogger
     private synchronized String getFormattedDate()
     {
         Date now = new Date();
-        String dateText;
-
-        dateText = DATE_FORMATTER.format(now);
-
-        return dateText;
+        return DATE_FORMATTER.format(now);
     }
 
     private void innerHandleNormalizedLoggingCall(@NotNull Level level, @NotNull List<Marker> markers, @NotNull String messagePattern,
@@ -349,7 +345,7 @@ public class SimpleLogger extends LegacyAbstractLogger
      */
     static class SimpleLoggerConfiguration
     {
-        private static final String CONFIGURATION_FILE = "simpleLogger.properties";
+        private static final String CONFIGURATION_FILE = "Logger.properties";
 
         private static final int DEFAULT_LOG_LEVEL_DEFAULT = LOG_LEVEL_INFO;
         static int DEFAULT_LOG_LEVEL = DEFAULT_LOG_LEVEL_DEFAULT;
@@ -496,7 +492,7 @@ public class SimpleLogger extends LegacyAbstractLogger
             }
             catch (SecurityException e)
             {
-                // Ignore.
+                // Ignored.
             }
             return (prop == null) ? SIMPLE_LOGGER_PROPS.getProperty(name) : prop;
         }

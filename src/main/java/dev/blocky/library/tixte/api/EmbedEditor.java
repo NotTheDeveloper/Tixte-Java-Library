@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dev.blocky.library.tixte.api.entities.Embed;
 import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
+import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.Helpers;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
-import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  * Builder system used to build {@link Embed embeds}.
  *
  * @author BlockyDotJar
- * @version v1.3.0
+ * @version v1.4.0
  * @since v1.0.0-beta.1
  */
 public class EmbedEditor extends RawResponseData
@@ -44,11 +44,10 @@ public class EmbedEditor extends RawResponseData
     private final Pattern URL_PATTERN = Pattern.compile("\\s*https://\\S+\\s*", Pattern.CASE_INSENSITIVE);
     private final Logger logger = TixteLogger.getLog(EmbedEditor.class);
     private final StringBuilder description = new StringBuilder();
-    private String providerName, providerURL, color;
-    private String authorName, authorURL, title;
+    private String providerName, providerUrl, color;
+    private String authorName, authorUrl, title;
 
-    @Internal
-    public EmbedEditor()
+    EmbedEditor()
     {
     }
 
@@ -81,7 +80,7 @@ public class EmbedEditor extends RawResponseData
      * @return The built, sendable {@link Embed}.
      */
     @NotNull
-    public Embed send() throws ExecutionException, InterruptedException
+    public Embed build() throws ExecutionException, InterruptedException
     {
         if (isEmpty())
         {
@@ -102,7 +101,7 @@ public class EmbedEditor extends RawResponseData
 
         String description = this.description.length() < 1 ? null : this.description.toString();
 
-        return new Embed(authorName, authorURL, title, description, color, providerName, providerURL);
+        return new Embed(authorName, authorUrl, title, description, color, providerName, providerUrl);
     }
 
     /**
@@ -115,12 +114,12 @@ public class EmbedEditor extends RawResponseData
     public EmbedEditor clear()
     {
         authorName = null;
-        authorURL = null;
+        authorUrl = null;
         title = null;
         description.setLength(0);
         color = null;
         providerName = null;
-        providerURL = null;
+        providerUrl = null;
         return this;
     }
 
@@ -136,11 +135,11 @@ public class EmbedEditor extends RawResponseData
         {
             setDescription(editor.description.toString());
             this.authorName = editor.authorName;
-            this.authorURL = editor.authorURL;
+            this.authorUrl = editor.authorUrl;
             this.title = editor.title;
             this.color = editor.color;
             this.providerName = editor.providerName;
-            this.providerURL = editor.providerURL;
+            this.providerUrl = editor.providerUrl;
         }
     }
 
@@ -156,11 +155,11 @@ public class EmbedEditor extends RawResponseData
         {
             setDescription(embed.getDescription());
             this.authorName = embed.getAuthorName();
-            this.authorURL = embed.getAuthorURL();
+            this.authorUrl = embed.getAuthorUrl();
             this.title = embed.getTitle();
             this.color = embed.getColor();
             this.providerName = embed.getProviderName();
-            this.providerURL = embed.getProviderURL();
+            this.providerUrl = embed.getProviderUrl();
         }
     }
 
@@ -174,12 +173,12 @@ public class EmbedEditor extends RawResponseData
     {
         return (title == null || title.trim().isEmpty())
                 && authorName == null
-                && authorURL == null
+                && authorUrl == null
                 && title == null
                 && description.length() == 0
                 && color == null
                 && providerName == null
-                && providerURL == null;
+                && providerUrl == null;
     }
 
     /**
@@ -332,8 +331,8 @@ public class EmbedEditor extends RawResponseData
      *
      * <p><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
      *
-     * @param  authorName The name of the author of the embed. If this is not set, the author will not appear in the embed.
-     * @param  authorURL The url of the author of the embed.
+     * @param authorName The name of the author of the embed. If this is not set, the author will not appear in the embed.
+     * @param authorUrl The url of the author of the embed.
      *
      * @throws IllegalArgumentException
      *         <ul>
@@ -349,7 +348,7 @@ public class EmbedEditor extends RawResponseData
      * @return The editor after the author has been set.
      */
     @NotNull
-    public EmbedEditor setAuthor(@Nullable String authorName, @Nullable String authorURL)
+    public EmbedEditor setAuthor(@Nullable String authorName, @Nullable String authorUrl)
     {
         if (authorName == null)
         {
@@ -360,10 +359,10 @@ public class EmbedEditor extends RawResponseData
         {
             Checks.check(authorName.length() <= Embed.AUTHOR_NAME_MAX_LENGTH, "Name cannot be longer than %d characters.",
                     Embed.AUTHOR_NAME_MAX_LENGTH);
-            urlCheck(authorURL);
+            urlCheck(authorUrl);
 
             this.authorName = authorName;
-            this.authorURL = authorURL;
+            this.authorUrl = authorUrl;
         }
         return this;
     }
@@ -371,7 +370,7 @@ public class EmbedEditor extends RawResponseData
     /**
      * Sets the provider of the embed.
      *
-     * @param  providerName The name of the provider of the embed. If this is not set, the provider will not appear in the embed.
+     * @param providerName The name of the provider of the embed. If this is not set, the provider will not appear in the embed.
      *
      * @throws IllegalArgumentException If {@code name} is longer than {@value Embed#PROVIDER_NAME_MAX_LENGTH} characters,
      *                                  as defined by {@link Embed#PROVIDER_NAME_MAX_LENGTH}.
@@ -388,8 +387,8 @@ public class EmbedEditor extends RawResponseData
      * Sets the provider of the embed.
      * This convenience method sets the name and the url.
      *
-     * @param  providerName The name of the provider of the embed. If this is not set, the provider will not appear in the embed.
-     * @param  providerURL The url of the provider of the embed.
+     * @param providerName The name of the provider of the embed. If this is not set, the provider will not appear in the embed.
+     * @param providerUrl The url of the provider of the embed.
      *
      * @throws IllegalArgumentException
      *         <ul>
@@ -405,7 +404,7 @@ public class EmbedEditor extends RawResponseData
      * @return The editor after the author has been set.
      */
     @NotNull
-    public EmbedEditor setProvider(@Nullable String providerName, @Nullable String providerURL)
+    public EmbedEditor setProvider(@Nullable String providerName, @Nullable String providerUrl)
     {
         if (providerName == null)
         {
@@ -416,10 +415,10 @@ public class EmbedEditor extends RawResponseData
         {
             Checks.check(providerName.length() <= Embed.PROVIDER_NAME_MAX_LENGTH, "Name cannot be longer than %d characters.",
                     Embed.PROVIDER_NAME_MAX_LENGTH);
-            urlCheck(providerURL);
+            urlCheck(providerUrl);
 
             this.providerName = providerName;
-            this.providerURL = providerURL;
+            this.providerUrl = providerUrl;
         }
         return this;
     }
@@ -465,9 +464,7 @@ public class EmbedEditor extends RawResponseData
     public boolean onlyImageEnabled() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getBoolean("only_image");
+        return DataPath.getBoolean(json, "data.only_image");
     }
 
     /**
@@ -485,10 +482,7 @@ public class EmbedEditor extends RawResponseData
     public String getEmbedTitle() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataObject embed = data.getDataObject("embed");
-
-        return embed.getString("title");
+        return DataPath.getString(json, "data.embed.title");
     }
 
     /**
@@ -507,10 +501,7 @@ public class EmbedEditor extends RawResponseData
     public String getEmbedDescription() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataObject embed = data.getDataObject("embed");
-
-        return embed.getString("description");
+        return DataPath.getString(json, "data.embed.description");
     }
 
     /**
@@ -528,17 +519,14 @@ public class EmbedEditor extends RawResponseData
     public String getEmbedAuthorName() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataObject embed = data.getDataObject("embed");
-
-        return embed.getString("author_name");
+        return DataPath.getString(json, "data.embed.author_name");
     }
 
     /**
      * The url to a website from the creator of the embedded content.
      * <br>This is typically used to represent the account on the providing site.
-     * <br>The only difference between this and {@link Embed#getAuthorURL()}is that this method gets the current author url
-     * of the Tixte 'Embed Editor' page, while {@link Embed#getAuthorURL()} only gets the current value of the variable.
+     * <br>The only difference between this and {@link Embed#getAuthorUrl()} ()}is that this method gets the current author url
+     * of the Tixte 'Embed Editor' page, while {@link Embed#getAuthorUrl()} ()} only gets the current value of the variable.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
@@ -546,13 +534,10 @@ public class EmbedEditor extends RawResponseData
      * @return The url to a website from the creator of the embedded content.
      */
     @NotNull
-    public String getEmbedAuthorURL() throws ExecutionException, InterruptedException
+    public String getEmbedAuthorUrl() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataObject embed = data.getDataObject("embed");
-
-        return embed.getString("author_url");
+        return DataPath.getString(json, "data.embed.author_url");
     }
 
     /**
@@ -570,17 +555,14 @@ public class EmbedEditor extends RawResponseData
     public String getEmbedProviderName() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataObject embed = data.getDataObject("embed");
-
-        return embed.getString("provider_name");
+        return DataPath.getString(json, "data.embed.provider_name");
     }
 
     /**
      * The url to a website of the embedded content.
      * <br>This is typically used to represent the account on the providing site.
-     * <br>The only difference between this and {@link Embed#getProviderURL()} is that this method gets the current provider url
-     * of the Tixte 'Embed Editor' page, while {@link Embed#getProviderURL()} only gets the current value of the variable.
+     * <br>The only difference between this and {@link Embed#getProviderUrl()} ()} is that this method gets the current provider url
+     * of the Tixte 'Embed Editor' page, while {@link Embed#getProviderUrl()} ()} only gets the current value of the variable.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
@@ -588,13 +570,10 @@ public class EmbedEditor extends RawResponseData
      * @return The url to a website of the embedded content.
      */
     @NotNull
-    public String getEmbedProviderURL() throws ExecutionException, InterruptedException
+    public String getEmbedProviderUrl() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataObject embed = data.getDataObject("embed");
-
-        return embed.getString("provider_url");
+        return DataPath.getString(json, "data.embed.author_url");
     }
 
     /**
@@ -612,10 +591,7 @@ public class EmbedEditor extends RawResponseData
     public String getEmbedThemeColor() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataObject embed = data.getDataObject("embed");
-
-        return embed.getString("theme_color");
+        return DataPath.getString(json, "data.embed.theme_color");
     }
 
     @Override
@@ -634,14 +610,14 @@ public class EmbedEditor extends RawResponseData
         EmbedEditor that = (EmbedEditor) o;
 
         return URL_PATTERN.equals(that.URL_PATTERN) && Objects.equals(description.toString(), that.description.toString()) &&
-                Objects.equals(providerName, that.providerName) && Objects.equals(providerURL, that.providerURL) && color.equals(that.color)
-                && Objects.equals(authorName, that.authorName) && Objects.equals(authorURL, that.authorURL) && Objects.equals(title, that.title);
+                Objects.equals(providerName, that.providerName) && Objects.equals(providerUrl, that.providerUrl) && color.equals(that.color)
+                && Objects.equals(authorName, that.authorName) && Objects.equals(authorUrl, that.authorUrl) && Objects.equals(title, that.title);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(URL_PATTERN, description, providerName, providerURL, color, authorName, authorURL, title);
+        return Objects.hash(URL_PATTERN, description, providerName, providerUrl, color, authorName, authorUrl, title);
     }
 
     @NotNull
@@ -651,14 +627,13 @@ public class EmbedEditor extends RawResponseData
         try
         {
             return "EmbedEditor{" +
-                    "URL_PATTERN=" + URL_PATTERN + ", " +
                     "only_image=" + onlyImageEnabled() + ", " +
                     "description=" + getEmbedDescription() + ", " +
                     "provider_name='" + getEmbedProviderName() + "', " +
-                    "provider_url='" + getEmbedProviderURL() + "', " +
+                    "provider_url='" + getEmbedProviderUrl() + "', " +
                     "theme_color='" + getEmbedThemeColor() + "', " +
                     "author_name='" + getEmbedAuthorName() + "', " +
-                    "author_url='" + getEmbedAuthorURL() + "', " +
+                    "author_url='" + getEmbedAuthorUrl() + "', " +
                     "title='" + getEmbedTitle() + "', " +
                     '}';
         }

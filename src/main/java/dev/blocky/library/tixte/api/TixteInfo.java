@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package dev.blocky.library.tixte.api;
  * Contains information to this specific build of Tixte4J.
  *
  * @author BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0-beta.5
  */
 public class TixteInfo
@@ -29,6 +29,6 @@ public class TixteInfo
     }
 
     public static final int TIXTE_API_VERSION = 1;
-    public static final String VERSION = "v1.0.0-rc.3";
+    public static final String VERSION = "v1.0.0";
     public static final String GITHUB = "https://github.com/BlockyDotJar/Tixte-Java-Library";
 }

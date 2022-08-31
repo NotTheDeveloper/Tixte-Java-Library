@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,8 @@ import dev.blocky.library.tixte.internal.requests.Route;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.io.IOUtil;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
+import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NonBlocking;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +39,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 import static dev.blocky.library.tixte.api.TixteInfo.GITHUB;
@@ -51,11 +53,11 @@ import static dev.blocky.library.tixte.internal.requests.Route.TIXTE_API_PREFIX;
  * Represents the raw response data from Tixte API-requests.
  *
  * @author BlockyDotJar
- * @version v3.0.0
+ * @version v3.0.1
  * @since v1.0.0-beta.1
  */
 @Internal
-public strictfp class RawResponseData extends TixteClientBuilder
+public strictfp class RawResponseData
 {
     private static final Logger logger = TixteLogger.getLog(RawResponseData.class);
 
@@ -76,7 +78,6 @@ public strictfp class RawResponseData extends TixteClientBuilder
     protected static CompletableFuture<InputStream> getSizeRaw()
     {
         Route.CompiledRoute route = Route.Self.GET_UPLOAD_SIZE.compile();
-
         return request(route, false, null);
     }
 
@@ -100,7 +101,6 @@ public strictfp class RawResponseData extends TixteClientBuilder
     protected static CompletableFuture<InputStream> getUploadsRaw()
     {
         Route.CompiledRoute route = Route.Self.GET_UPLOADS.compile();
-
         return request(route, false, null);
     }
 
@@ -413,7 +413,6 @@ public strictfp class RawResponseData extends TixteClientBuilder
     protected static CompletableFuture<InputStream> getUserInfoRaw()
     {
         Route.CompiledRoute route = Route.Self.GET_SELF.compile();
-
         return request(route, false, null);
     }
 
@@ -450,7 +449,6 @@ public strictfp class RawResponseData extends TixteClientBuilder
     protected static CompletableFuture<InputStream> getUserDomainsRaw()
     {
         Route.CompiledRoute route = Route.Self.GET_DOMAINS.compile();
-
         return request(route, true, null);
     }
 
@@ -465,7 +463,6 @@ public strictfp class RawResponseData extends TixteClientBuilder
     protected static CompletableFuture<InputStream> getUsableDomainsRaw()
     {
         Route.CompiledRoute route = Route.Domain.GET_DOMAINS.compile();
-
         return request(route, false, null);
     }
 
@@ -478,7 +475,6 @@ public strictfp class RawResponseData extends TixteClientBuilder
     protected static CompletableFuture<InputStream> generateDomainRaw()
     {
         Route.CompiledRoute route = Route.Resources.GET_GENERATED_DOMAIN.compile();
-
         return request(route, false, null);
     }
 
@@ -553,7 +549,6 @@ public strictfp class RawResponseData extends TixteClientBuilder
     protected static CompletableFuture<InputStream> getAPIKeyBySessionTokenRaw()
     {
         Route.CompiledRoute route = Route.Self.GET_KEYS.compile();
-
         return request(route, true, null);
     }
 
@@ -561,10 +556,10 @@ public strictfp class RawResponseData extends TixteClientBuilder
      *
      * @see EmbedEditor#getEmbedDescription()
      * @see EmbedEditor#getEmbedAuthorName()
-     * @see EmbedEditor#getEmbedAuthorURL()
+     * @see EmbedEditor#getEmbedAuthorUrl()
      * @see EmbedEditor#getEmbedTitle()
      * @see EmbedEditor#getEmbedProviderName()
-     * @see EmbedEditor#getEmbedProviderURL()
+     * @see EmbedEditor#getEmbedProviderUrl()
      * @see EmbedEditor#getEmbedThemeColor()
      * @see EmbedEditor#onlyImageEnabled()
      * @see TixteClient#baseRedirect()
@@ -577,7 +572,6 @@ public strictfp class RawResponseData extends TixteClientBuilder
     protected static CompletableFuture<InputStream> getConfigRaw()
     {
         Route.CompiledRoute route = Route.Self.GET_CONFIG.compile();
-
         return request(route, false, null);
     }
 
@@ -698,11 +692,50 @@ public strictfp class RawResponseData extends TixteClientBuilder
      * @return The raw response of the request.
      */
     @NotNull
+    @CheckReturnValue
     protected static CompletableFuture<InputStream> getExperimentsRaw()
     {
         Route.CompiledRoute route = Route.Self.GET_EXPERIMENTS.compile();
-
         return request(route, true, null);
+    }
+
+    /**
+     * @return The raw response of the request.
+     */
+    @NotNull
+    @Experimental
+    @CheckReturnValue
+    protected static CompletableFuture<InputStream> getFoldersRaw()
+    {
+        Route.CompiledRoute route = Route.Self.GET_FOLDERS.compile();
+        return request(route, false, null);
+    }
+
+    /**
+     * @param query The search query for searching files.
+     * @param extensions The extensions, the files shall have.
+     * @param domains The domain on which the file should be uploaded.
+     * @param sortBy The value, the files shall be sorted by.
+     * @param minSize The minimum size of the file.
+     * @param maxSize The maximal size of the file.
+     *
+     * @return The raw response of the request.
+     */
+    @NotNull
+    @Experimental
+    @CheckReturnValue
+    protected static CompletableFuture<InputStream> setSearchQueryRaw(@NotNull String query, @Nullable String[] extensions,
+                                                                      @Nullable String[] domains, @NotNull String sortBy,
+                                                                      long minSize, long maxSize)
+    {
+        Route.CompiledRoute route = Route.Self.SEARCH_FILE.compile();
+
+        RequestBody requestBody = RequestBody.create("{ \"query\": \"" + query + "\", " +
+                        "\"extensions\": " + Arrays.toString(extensions) + ", \"domains\": " + Arrays.toString(domains) + ", " +
+                        "\"sort_by\": \"" + sortBy + "\", \"size\": { \"min\": " + minSize + ", \"max\": " + maxSize + " } }",
+                MediaType.get("application/json; charset=utf-8"));
+
+        return request(route, true, requestBody);
     }
 
     @Nullable
@@ -712,46 +745,61 @@ public strictfp class RawResponseData extends TixteClientBuilder
     {
         Request.Builder builder = new Request.Builder()
                 .url(TIXTE_API_PREFIX + route.getCompiledRoute())
-                .addHeader("Authorization", sessionTokenNeeded ? sessionToken : apiKey)
+                .addHeader("Authorization", sessionTokenNeeded ? getClient().getSessionToken().orElse(null) : getClient().getAPIKey())
                 .addHeader("User-Agent", "Tixte4J-Request (" + GITHUB + ", " + VERSION + ")");
 
         CompletableFuture<InputStream> future = new CompletableFuture<>();
 
-        switch (route.getMethod())
+        try
         {
-        case GET:
-            request = builder.build();
-            break;
-        case DELETE:
-            request = requestBody == null ? builder.delete().build() : builder.delete(requestBody).build();
-            break;
-        case PATCH:
-            request = builder.patch(requestBody).build();
-            break;
-        }
+            Field field = TixteClientBuilder.class.getDeclaredField("request");
+            field.setAccessible(true);
 
-        client.newCall(request).enqueue(FunctionalCallback
-                .onFailure((call, e) -> future.completeExceptionally(new UncheckedIOException(e)))
-                .onSuccess((call, response) ->
-                {
-                    if (response.isSuccessful())
+            Request request = (Request) field.get(Request.class);
+
+            switch (route.getMethod())
+            {
+            case GET:
+                request = builder.build();
+                break;
+            case DELETE:
+                request = requestBody == null ? builder.delete().build() : builder.delete(requestBody).build();
+                break;
+            case PATCH:
+                request = builder.patch(requestBody).build();
+                break;
+            case POST:
+                request = builder.post(requestBody).build();
+                break;
+            }
+
+            getHttpClient().newCall(request).enqueue(FunctionalCallback
+                    .onFailure((call, e) -> future.completeExceptionally(new UncheckedIOException(e)))
+                    .onSuccess((call, response) ->
                     {
-                        logger.info("Request successful: " + route.getMethod() + "/" + route.getCompiledRoute());
+                        if (response.isSuccessful())
+                        {
+                            logger.info("Request successful: " + route.getMethod() + "/" + route.getCompiledRoute());
 
-                        InputStream body = IOUtil.getBody(response);
+                            InputStream body = IOUtil.getBody(response);
 
-                        if (!future.complete(body))
+                            if (!future.complete(body))
+                            {
+                                IOUtil.silentClose(response);
+                            }
+                        }
+                        else
                         {
                             IOUtil.silentClose(response);
                         }
-                    }
-                    else
-                    {
-                        IOUtil.silentClose(response);
-                    }
-                }).build()
-        );
-        return future;
+                    }).build()
+            );
+            return future;
+        }
+        catch (NoSuchFieldException | IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Nullable
@@ -761,16 +809,16 @@ public strictfp class RawResponseData extends TixteClientBuilder
     {
         Request request = new Request.Builder()
                 .url(TIXTE_API_PREFIX + Route.File.UPLOAD_FILE.getRoute())
-                .addHeader("Authorization", apiKey)
+                .addHeader("Authorization", getClient().getAPIKey())
                 .addHeader("User-Agent", "Tixte4J-Request (" + GITHUB + ", " + VERSION + ")")
-                .addHeader("domain", domain == null ? defaultDomain : domain)
+                .addHeader("domain", domain == null ? getClient().getDefaultDomain().orElse(null) : domain)
                 .addHeader("type", privateFile ? "2" : "1")
                 .post(multipartBody)
                 .build();
 
         CompletableFuture<InputStream> future = new CompletableFuture<>();
 
-        client.newCall(request).enqueue(FunctionalCallback
+        getHttpClient().newCall(request).enqueue(FunctionalCallback
                 .onFailure((call, e) -> future.completeExceptionally(new UncheckedIOException(e)))
                 .onSuccess((call, response) ->
                 {
@@ -792,5 +840,39 @@ public strictfp class RawResponseData extends TixteClientBuilder
                 }).build()
         );
         return future;
+    }
+
+    @NotNull
+    @NonBlocking
+    @CheckReturnValue
+    private static TixteClient getClient()
+    {
+        try
+        {
+            Constructor<?> constructor = TixteClient.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return (TixteClient) constructor.newInstance();
+        }
+        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Nullable
+    @NonBlocking
+    @CheckReturnValue
+    private static OkHttpClient getHttpClient()
+    {
+        try
+        {
+            Field field = TixteClientBuilder.class.getDeclaredField("client");
+            field.setAccessible(true);
+            return (OkHttpClient) field.get(OkHttpClient.class);
+        }
+        catch (NoSuchFieldException | IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

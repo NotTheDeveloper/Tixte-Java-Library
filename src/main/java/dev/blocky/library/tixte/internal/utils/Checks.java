@@ -1,5 +1,6 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar), Florian Spieß (aka. MinnDevelopment) and
+ * Austin Keener (aka. DV8FromTheWorld)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +20,13 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.regex.Pattern;
+
 /**
  * Utility class for handling errors.
  *
- * @author BlockyDotJar
- * @version v1.2.0
+ * @author MinnDevelopment and BlockyDotJar
+ * @version v1.2.1
  * @since v1.0.0-beta.1
  */
 public class Checks
@@ -133,5 +136,18 @@ public class Checks
         {
             throw new IllegalStateException("\"" + name + "\" may not be negative.");
         }
+    }
+
+    /**
+     * Checks if the following inputs are containing matches.
+     *
+     * @param input The input to match.
+     * @param pattern A compiled representation of a regex.
+     * @param name The name of the object.
+     */
+    public static void matches(@NotNull String input, @NotNull Pattern pattern, @NotNull String name)
+    {
+        notNull(input, name);
+        check(pattern.matcher(input).matches(), "%s must match regex ^%s$. Provided: \"%s\"", name, pattern.pattern(), input);
     }
 }

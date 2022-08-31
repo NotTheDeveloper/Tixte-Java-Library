@@ -1,7 +1,23 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     `java-library`
     `maven-publish`
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
+
+buildscript {
+    repositories {
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
+    }
+    dependencies {
+        classpath("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
+    }
+}
+
+apply(plugin = "com.github.johnrengelman.shadow")
 
 publishing {
     repositories {
@@ -38,7 +54,7 @@ dependencies {
 }
 
 group = "dev.blocky.library"
-version = "1.0.0-rc.3"
+version = "1.0.0"
 description = "A wrapper for the Tixte API in Java."
 
 java {
@@ -54,4 +70,6 @@ val jar by tasks.getting(Jar::class) {
     }
 }
 
-
+val shadowJar by tasks.getting(ShadowJar::class) {
+    minimize()
+}

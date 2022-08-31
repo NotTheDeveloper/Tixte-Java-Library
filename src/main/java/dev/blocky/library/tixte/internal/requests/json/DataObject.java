@@ -1,5 +1,7 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar), Florian Spieß (aka. MinnDevelopment),
+ * Austin Keener (aka. DV8FromTheWorld), Austin Shapiro (aka. Scarsz), Dennis Neufeld (aka. napstr)
+ * and Andre_601 (aka. Andre601)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +41,8 @@ import java.util.function.UnaryOperator;
  * <br>Throws {@link NullPointerException}, if a parameter annotated with {@link NotNull} is provided with {@code null}.
  * <br>This class is not thread-safe.
  *
- * @author BlockyDotJar
- * @version v1.0.1
+ * @author MinnDevelopment, napstr, Andre601 and BlockyDotJar
+ * @version v1.0.2
  * @since v1.0.0-beta.3
  */
 public class DataObject implements SerializableData
@@ -263,7 +265,7 @@ public class DataObject implements SerializableData
      * @return The resolved instance of {@link DataArray} for the key.
      */
     @NotNull
-    public DataArray getArray(@NotNull String key)
+    public DataArray getDataArray(@NotNull String key)
     {
         return optArray(key).orElseThrow(() -> valueError(key, "DataArray"));
     }

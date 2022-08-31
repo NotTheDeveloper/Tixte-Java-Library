@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import java.nio.file.Paths;
  * From this class you can get all data from a JSON file.
  *
  * @author BlockyDotJar
- * @version v1.3.0
+ * @version v1.3.1
  * @since v1.0.0-beta.3
  */
 public class DONOTOPEN

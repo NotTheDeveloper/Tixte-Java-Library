@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package dev.blocky.library.tixte.api.entities;
 import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
+import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import dev.blocky.library.tixte.internal.utils.Checks;
-import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,15 +30,14 @@ import java.util.concurrent.ExecutionException;
  * Represents a Tixte user-account.
  *
  * @author BlockyDotJar
- * @version v1.2.0
+ * @version v1.3.0
  * @since v1.0.0-beta.1
  */
 public class User extends RawResponseData
 {
     private final String userData;
 
-    @Internal
-    public User(@NotNull String userData)
+    User(@NotNull String userData)
     {
         super();
 
@@ -59,9 +58,7 @@ public class User extends RawResponseData
     public int getFlagCount() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw(userData).get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getInt("flags");
+        return DataPath.getInt(json, "data.flags");
     }
 
     /**
@@ -77,9 +74,7 @@ public class User extends RawResponseData
     public String getId() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw(userData).get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getString("id");
+        return DataPath.getString(json, "data.id");
     }
 
     /**
@@ -96,9 +91,7 @@ public class User extends RawResponseData
     public String getAvatarId() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw(userData).get());
-        DataObject data = json.getDataObject("data");
-
-        return data.isNull("avatar") ? "" : data.getString("avatar");
+        return DataPath.getString(json, "data.avatar?");
     }
 
     /**
@@ -114,9 +107,7 @@ public class User extends RawResponseData
     public String getUsername() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw(userData).get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getString("username");
+        return DataPath.getString(json, "data.username");
     }
 
     @Override

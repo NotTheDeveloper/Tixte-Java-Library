@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import dev.blocky.library.tixte.api.entities.SelfUser;
 import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataArray;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
-import dev.blocky.library.tixte.internal.utils.Checks;
+import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +36,7 @@ import java.util.concurrent.ExecutionException;
  * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
  *
  * @author BlockyDotJar
- * @version v1.3.0
+ * @version v1.4.0
  * @since v1.0.0-alpha.1
  */
 public class MyFiles extends RawResponseData
@@ -58,9 +58,7 @@ public class MyFiles extends RawResponseData
     public long getUsedSize() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getSizeRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getInt("used");
+        return DataPath.getInt(json, "data.used");
     }
 
     /**
@@ -78,9 +76,7 @@ public class MyFiles extends RawResponseData
     public long getLimit() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getSizeRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getInt("limit");
+        return DataPath.getInt(json, "data.limit");
     }
 
 
@@ -118,9 +114,7 @@ public class MyFiles extends RawResponseData
     public int getPremiumTier() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getSizeRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getInt("premium_tier");
+        return DataPath.getInt(json, "data.premium_tier");
     }
 
     /**
@@ -134,9 +128,7 @@ public class MyFiles extends RawResponseData
     public int getTotalUploadCount() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getInt("total");
+        return DataPath.getInt(json, "data.total");
     }
 
     /**
@@ -150,9 +142,7 @@ public class MyFiles extends RawResponseData
     public int getResults() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getInt("results");
+        return DataPath.getInt(json, "data.results");
     }
 
     /**
@@ -163,17 +153,18 @@ public class MyFiles extends RawResponseData
      *
      * @return A {@link List} of permission level, which the files are containing.
      */
+    @Nullable
+    @CheckReturnValue
     public List<Integer> getPermissionLevels() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("uploads");
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<Integer> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < uploads.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getInt("permission_level"));
+            list.add(DataPath.getInt(json, "data.uploads[" + i + "]?.permission_level"));
         }
         return new ArrayList<>(list);
     }
@@ -189,18 +180,18 @@ public class MyFiles extends RawResponseData
      *
      * @return A {@link List} of extensions from the files.
      */
-    @NotNull
+    @Nullable
+    @CheckReturnValue
     public List<String> getExtensions() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("uploads");
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < uploads.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getString("extension"));
+            list.add(DataPath.getString(json, "data.uploads[" + i + "]?.extension"));
         }
         return new ArrayList<>(list);
     }
@@ -213,17 +204,18 @@ public class MyFiles extends RawResponseData
      *
      * @return A {@link List} of sizes from the files in bytes.
      */
+    @Nullable
+    @CheckReturnValue
     public List<Integer> getSizes() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("uploads");
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<Integer> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < uploads.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getInt("size"));
+            list.add(DataPath.getInt(json, "data.uploads[" + i + "]?.size"));
         }
         return new ArrayList<>(list);
     }
@@ -240,18 +232,18 @@ public class MyFiles extends RawResponseData
      *
      * @return A {@link List} of upload dates from the files as a ISO string.
      */
-    @NotNull
+    @Nullable
+    @CheckReturnValue
     public List<String> getUploadDates() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("uploads");
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < uploads.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getString("uploaded_at"));
+            list.add(DataPath.getString(json, "data.uploads[" + i + "]?.uploaded_at"));
         }
         return new ArrayList<>(list);
     }
@@ -264,18 +256,18 @@ public class MyFiles extends RawResponseData
      *
      * @return A {@link List} of domains, on which the files got uploaded.
      */
-    @NotNull
+    @Nullable
+    @CheckReturnValue
     public List<String> getDomains() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("uploads");
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < uploads.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getString("domain"));
+            list.add(DataPath.getString(json, "data.uploads[" + i + "]?.domain"));
         }
         return new ArrayList<>(list);
     }
@@ -288,18 +280,18 @@ public class MyFiles extends RawResponseData
      *
      * @return A {@link List} of names from the files.
      */
-    @NotNull
+    @Nullable
+    @CheckReturnValue
     public List<String> getNames() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("uploads");
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < uploads.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getString("name"));
+            list.add(DataPath.getString(json, "data.uploads[" + i + "]?.name"));
         }
         return new ArrayList<>(list);
     }
@@ -317,18 +309,18 @@ public class MyFiles extends RawResponseData
      *
      * @return A {@link List} of mime-types from the files.
      */
-    @NotNull
+    @Nullable
+    @CheckReturnValue
     public List<String> getMimeTypes() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("uploads");
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < uploads.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getString("mimetype"));
+            list.add(DataPath.getString(json, "data.uploads[" + i + "]?.mimetype"));
         }
         return new ArrayList<>(list);
     }
@@ -350,21 +342,13 @@ public class MyFiles extends RawResponseData
     public List<Object> getExpirationTimes() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("uploads");
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<Object> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < uploads.toList().size(); i++)
         {
-            if (array.getDataObject(i).isNull("expiration"))
-            {
-                list.add(0);
-            }
-            else
-            {
-                list.add(array.getDataObject(i).get("expiration"));
-            }
+            list.add(DataPath.getString(json, "data.uploads[" + i + "]?.expiration?"));
         }
         return new ArrayList<>(list);
     }
@@ -377,18 +361,18 @@ public class MyFiles extends RawResponseData
      *
      * @return A {@link List} od IDs from the files.
      */
-    @NotNull
+    @Nullable
+    @CheckReturnValue
     public List<String> getAssetIds() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("uploads");
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < uploads.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getString("asset_id"));
+            list.add(DataPath.getString(json, "data.uploads[" + i + "]?.asset_id"));
         }
         return new ArrayList<>(list);
     }
@@ -404,25 +388,24 @@ public class MyFiles extends RawResponseData
      *
      * @return A {@link List} of types from the files. (public/private)
      */
+    @Nullable
+    @CheckReturnValue
     public List<Integer> getTypes() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUploadsRaw().get());
-        DataObject data = json.getDataObject("data");
-        DataArray array = data.getArray("uploads");
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<Integer> list = new ArrayList<>();
 
-        for (int i = 0; i < array.toList().size(); i++)
+        for (int i = 0; i < uploads.toList().size(); i++)
         {
-            list.add(array.getDataObject(i).getInt("type"));
+            list.add(DataPath.getInt(json, "data.uploads[" + i + "]?.type"));
         }
         return new ArrayList<>(list);
     }
 
     /**
      * Checks if the specified file is public or not.
-     *
-     * @param index The file at the specific index.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
@@ -432,17 +415,24 @@ public class MyFiles extends RawResponseData
      * @return <b>true</b> - If the file is public.
      *         <br><b>false</b> - If the file is private.
      */
-    public boolean isPublic(int index) throws ExecutionException, InterruptedException
+    @Nullable
+    @CheckReturnValue
+    public List<Boolean> isPublic() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        return getTypes().get(index) == 1;
+        List<Boolean> list = new ArrayList<>();
+
+        for (int i = 0; i < uploads.toList().size(); i++)
+        {
+            list.add(getTypes().get(i) == 1);
+        }
+        return new ArrayList<>(list);
     }
 
     /**
      * Checks if the specified file is private or not.
-     *
-     * @param index The file at the specific index.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
@@ -452,11 +442,20 @@ public class MyFiles extends RawResponseData
      * @return <b>true</b> - If the file is private.
      *         <br><b>false</b> - If the file is public.
      */
-    public boolean isPrivate(int index) throws ExecutionException, InterruptedException
+    @Nullable
+    @CheckReturnValue
+    public List<Boolean> isPrivate() throws ExecutionException, InterruptedException
     {
-        Checks.notNegative(index, "index");
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        return getTypes().get(index) == 2;
+        List<Boolean> list = new ArrayList<>();
+
+        for (int i = 0; i < uploads.toList().size(); i++)
+        {
+            list.add(getTypes().get(i) == 2);
+        }
+        return new ArrayList<>(list);
     }
 
     /**
@@ -466,12 +465,6 @@ public class MyFiles extends RawResponseData
      * <br>An extension is the file type.
      * <br>For example: "png" or "jpg".
      *
-     * <p>index 0 = the newest file
-     * <br>index 1 = the second-newest file
-     * <br>And so on.
-     *
-     * @param index The file at the specific index.
-     *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
      *
@@ -480,10 +473,20 @@ public class MyFiles extends RawResponseData
      *
      * @return The complete name of the file.
      */
-    @NotNull
-    public String getFileName(int index) throws ExecutionException, InterruptedException
+    @Nullable
+    @CheckReturnValue
+    public List<String> getFileNames() throws ExecutionException, InterruptedException
     {
-        return getNames().get(index) + "." + getExtensions().get(index);
+        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < uploads.toList().size(); i++)
+        {
+            list.add(getNames().get(i) + "." + getExtensions().get(i));
+        }
+        return new ArrayList<>(list);
     }
 
     /**
@@ -498,9 +501,7 @@ public class MyFiles extends RawResponseData
     public String getUploadRegion() throws ExecutionException, InterruptedException
     {
         DataObject json = DataObject.fromJson(getUserInfoRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.getString("upload_region");
+        return DataPath.getString(json, "data.upload_region");
     }
 
     /**
@@ -572,11 +573,10 @@ public class MyFiles extends RawResponseData
         try
         {
             DataObject json = DataObject.fromJson(uploadFileRaw(file).get());
-            DataObject data = json.getDataObject("data");
 
-            url = data.getString("url");
-            directURL = data.getString("direct_url");
-            deletionURL = data.getString("deletion_url");
+            url = DataPath.getString(json, "data.url");
+            directURL = DataPath.getString(json, "data.direct_url");
+            deletionURL = DataPath.getString(json, "data.deletion_url");
         }
         catch (ExecutionException | InterruptedException | FileNotFoundException e)
         {
@@ -612,11 +612,10 @@ public class MyFiles extends RawResponseData
         try
         {
             DataObject json = DataObject.fromJson(uploadPrivateFileRaw(file).get());
-            DataObject data = json.getDataObject("data");
 
-            url = data.getString("url");
-            directURL = data.getString("direct_url");
-            deletionURL = data.getString("deletion_url");
+            url = DataPath.getString(json, "data.url");
+            directURL = DataPath.getString(json, "data.direct_url");
+            deletionURL = DataPath.getString(json, "data.deletion_url");
         }
         catch (ExecutionException | InterruptedException | FileNotFoundException e)
         {
@@ -652,11 +651,10 @@ public class MyFiles extends RawResponseData
         try
         {
             DataObject json = DataObject.fromJson(uploadFileRaw(file, domain).get());
-            DataObject data = json.getDataObject("data");
 
-            url = data.getString("url");
-            directURL = data.getString("direct_url");
-            deletionURL = data.getString("deletion_url");
+            url = DataPath.getString(json, "data.url");
+            directURL = DataPath.getString(json, "data.direct_url");
+            deletionURL = DataPath.getString(json, "data.deletion_url");
         }
         catch (ExecutionException | InterruptedException | FileNotFoundException e)
         {
@@ -692,11 +690,10 @@ public class MyFiles extends RawResponseData
         try
         {
             DataObject json = DataObject.fromJson(uploadPrivateFileRaw(file, domain).get());
-            DataObject data = json.getDataObject("data");
 
-            url = data.getString("url");
-            directURL = data.getString("direct_url");
-            deletionURL = data.getString("deletion_url");
+            url = DataPath.getString(json, "data.url");
+            directURL = DataPath.getString(json, "data.direct_url");
+            deletionURL = DataPath.getString(json, "data.deletion_url");
         }
         catch (ExecutionException | InterruptedException | FileNotFoundException e)
         {
@@ -732,11 +729,10 @@ public class MyFiles extends RawResponseData
         try
         {
             DataObject json = DataObject.fromJson(uploadFileRaw(filePath).get());
-            DataObject data = json.getDataObject("data");
 
-            url = data.getString("url");
-            directURL = data.getString("direct_url");
-            deletionURL = data.getString("deletion_url");
+            url = DataPath.getString(json, "data.url");
+            directURL = DataPath.getString(json, "data.direct_url");
+            deletionURL = DataPath.getString(json, "data.deletion_url");
         }
         catch (ExecutionException | InterruptedException | FileNotFoundException e)
         {
@@ -772,11 +768,10 @@ public class MyFiles extends RawResponseData
         try
         {
             DataObject json = DataObject.fromJson(uploadPrivateFileRaw(filePath).get());
-            DataObject data = json.getDataObject("data");
 
-            url = data.getString("url");
-            directURL = data.getString("direct_url");
-            deletionURL = data.getString("deletion_url");
+            url = DataPath.getString(json, "data.url");
+            directURL = DataPath.getString(json, "data.direct_url");
+            deletionURL = DataPath.getString(json, "data.deletion_url");
         }
         catch (ExecutionException | InterruptedException | FileNotFoundException e)
         {
@@ -812,11 +807,10 @@ public class MyFiles extends RawResponseData
         try
         {
             DataObject json = DataObject.fromJson(uploadFileRaw(filePath, domain).get());
-            DataObject data = json.getDataObject("data");
 
-            url = data.getString("url");
-            directURL = data.getString("direct_url");
-            deletionURL = data.getString("deletion_url");
+            url = DataPath.getString(json, "data.url");
+            directURL = DataPath.getString(json, "data.direct_url");
+            deletionURL = DataPath.getString(json, "data.deletion_url");
         }
         catch (ExecutionException | InterruptedException | FileNotFoundException e)
         {
@@ -852,11 +846,10 @@ public class MyFiles extends RawResponseData
         try
         {
             DataObject json = DataObject.fromJson(uploadPrivateFileRaw(filePath, domain).get());
-            DataObject data = json.getDataObject("data");
 
-            url = data.getString("url");
-            directURL = data.getString("direct_url");
-            deletionURL = data.getString("deletion_url");
+            url = DataPath.getString(json, "data.url");
+            directURL = DataPath.getString(json, "data.direct_url");
+            deletionURL = DataPath.getString(json, "data.deletion_url");
         }
         catch (ExecutionException | InterruptedException | FileNotFoundException e)
         {

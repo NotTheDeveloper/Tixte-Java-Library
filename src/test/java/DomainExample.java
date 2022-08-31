@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Some basic examples, how to use the {@link Domains domain system}.
+ * Some basic examples, how to use {@link Domains}.
  *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.1.1
  * @since v1.0.0-beta.3
  */
 public class DomainExample
@@ -39,7 +39,7 @@ public class DomainExample
     public static Domains createDomain()
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
-        Domains domains = client.getDomainSystem();
+        Domains domains = client.getDomains();
 
         // Adds a *new* domain to the dashboard.
         // You cannot use domain endings, you don't own.
@@ -58,7 +58,7 @@ public class DomainExample
     public static Domains createRandomDomain() throws ExecutionException, InterruptedException
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
-        Domains domains = client.getDomainSystem();
+        Domains domains = client.getDomains();
 
         // You should note everything I said above.
         // This will only create the beginning of the domain, because otherwise it could create a domain, you don*t own.
@@ -75,7 +75,7 @@ public class DomainExample
     public static Domains deleteDomain() throws ExecutionException, InterruptedException
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
-        Domains domains = client.getDomainSystem();
+        Domains domains = client.getDomains();
 
         // This will delete the domain.
         // Of course, you cannot delete a domain, that doesn't exist

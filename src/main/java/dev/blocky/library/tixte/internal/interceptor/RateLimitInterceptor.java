@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import java.io.IOException;
  * Handles rate-limits using an {@link Interceptor}.
  *
  * @author BlockyDotJar
- * @version v1.0.1
+ * @version v1.0.2
  * @since v1.0.0-alpha.1
  */
 public class RateLimitInterceptor implements Interceptor

@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,16 +30,19 @@ import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
-import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
 
 /**
  * The core of Tixte4J.
@@ -47,15 +50,12 @@ import java.util.concurrent.ExecutionException;
  * <br>All parts of the API can be accessed starting from this class.
  *
  * @author BlockyDotJar
- * @version v1.2.1
+ * @version v1.3.0
  * @since v1.0.0-alpha.1
  */
 public class TixteClient extends RawResponseData
 {
-    private final SelfUser self = new SelfUser();
-
-    @Internal
-    protected TixteClient()
+    TixteClient()
     {
     }
 
@@ -104,7 +104,16 @@ public class TixteClient extends RawResponseData
     @NotNull
     public SelfUser getSelfUser()
     {
-        return new SelfUser();
+        try
+        {
+            Constructor<?> constructor = SelfUser.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return (SelfUser) constructor.newInstance();
+        }
+        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -118,16 +127,25 @@ public class TixteClient extends RawResponseData
     @CheckReturnValue
     public User getUserByData(@NotNull String userData)
     {
-        return new User(userData);
+        try
+        {
+            Constructor<?> constructor = User.class.getDeclaredConstructor(String.class);
+            constructor.setAccessible(true);
+            return (User) constructor.newInstance(userData);
+        }
+        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
      *
-     * @return Instantiates a <b>new</b> {@link MyFiles File-System}.
+     * @return Instantiates a <b>new</b> {@link MyFiles}.
      */
     @NotNull
-    public MyFiles getFileSystem()
+    public MyFiles getMyFiles()
     {
         return new MyFiles();
     }
@@ -135,12 +153,21 @@ public class TixteClient extends RawResponseData
     /**
      * Represents the 'Domains' tab of the Tixte dashboard and everything else what Tixte offers you with domains.
      *
-     * @return Instantiates a <b>new</b> {@link Domains Domain-System}.
+     * @return Instantiates a <b>new</b> {@link Domains}.
      */
     @NotNull
-    public Domains getDomainSystem()
+    public Domains getDomains()
     {
-        return new Domains();
+        try
+        {
+            Constructor<?> constructor = Domains.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return (Domains) constructor.newInstance();
+        }
+        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -287,7 +314,7 @@ public class TixteClient extends RawResponseData
     @CheckReturnValue
     public TixteClient setBaseRedirect(@NotNull String redirectURL) throws ExecutionException, InterruptedException
     {
-        if (!self.hasTixteSubscription())
+        if (!getSelfUser().hasTixteSubscription())
         {
             throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
         }

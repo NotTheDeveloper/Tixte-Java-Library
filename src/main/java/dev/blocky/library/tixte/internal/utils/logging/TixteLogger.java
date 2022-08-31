@@ -1,5 +1,6 @@
 /**
- * Copyright 2022 Dominic (aka. BlockyDotJar)
+ * Copyright 2022 Dominic R. (aka. BlockyDotJar), Florian Spieß (aka. MinnDevelopment),
+ * Austin Keener (aka. DV8FromTheWorld) and enveeed (aka. enveeed)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +35,8 @@ import java.util.ServiceLoader;
  * or an instance of a custom {@link SimpleLogger}. (from slf4j-simple)
  * <br>It also has the utility method {@link #getLazyString(LazyEvaluation)} which is used to lazily construct strings for logging.
  *
- * @author BlockyDotJar
- * @version v1.2.0
+ * @author MinnDevelopment, enveeed and BlockyDotJar
+ * @version v1.2.1
  * @since v1.0.0-alpha.3
  */
 public class TixteLogger
@@ -65,20 +66,14 @@ public class TixteLogger
         }
         catch (ClassNotFoundException eStatic)
         {
-            // There is no StaticLoggerBinder (SLF4J pre-1.8.x)
-
             try
             {
                 Class<?> serviceProviderInterface = Class.forName("org.slf4j.spi.SLF4JServiceProvider");
 
-                // Check if there is a service implementation for the service, indicating a provider for SLF4J 1.8.x+ is installed
                 SLF4J = ServiceLoader.load(serviceProviderInterface).iterator().hasNext();
             }
             catch (ClassNotFoundException eService)
             {
-                // There was no ServiceProvider interface (SLF4J 1.8.x+)
-
-                // Prints warning of missing implementation.
                 LoggerFactory.getLogger(TixteLogger.class);
 
                 SLF4J = false;

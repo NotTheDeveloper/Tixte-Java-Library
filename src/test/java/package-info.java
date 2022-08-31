@@ -14,7 +14,7 @@
  * <br>Some basic examples, how to format an ISO string to a {@link java.util.Date}.</li>
  *
  * <li>{@link DomainExample}
- * <br>Some basic examples, how to use the {@link dev.blocky.library.tixte.api.entities.Domains domain system}.</li>
+ * <br>Some basic examples, how to use {@link dev.blocky.library.tixte.api.entities.Domains}.</li>
  *
  * <li>{@link EmbedEditorExample}
  * <br>Some basic examples, how to use an {@link dev.blocky.library.tixte.api.EmbedEditor}.</li>
