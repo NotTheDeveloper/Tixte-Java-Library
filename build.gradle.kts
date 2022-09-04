@@ -6,19 +6,6 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-buildscript {
-    repositories {
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-        }
-    }
-    dependencies {
-        classpath("gradle.plugin.com.github.johnrengelman:shadow:7.1.2")
-    }
-}
-
-apply(plugin = "com.github.johnrengelman.shadow")
-
 publishing {
     repositories {
         maven {
@@ -54,7 +41,7 @@ dependencies {
 }
 
 group = "dev.blocky.library"
-version = "1.0.0"
+version = "1.0.1"
 description = "A wrapper for the Tixte API in Java."
 
 java {

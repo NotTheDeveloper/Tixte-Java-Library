@@ -43,7 +43,7 @@ public class EmbedEditorExample
     {
         TixteClient client = BasicTixteClientExample.getTixteClient();
 
-        // Creates a new EmbedEditor.
+        // Creates a *new* EmbedEditor.
         EmbedEditor editor = client.getEmbedEditor();
 
         // Sets the author name and url of the embed. If you only want to set the author name, you can use setAuthorName(@Nullable String).

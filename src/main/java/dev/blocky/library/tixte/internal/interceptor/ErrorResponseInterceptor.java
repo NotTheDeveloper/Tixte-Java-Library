@@ -41,7 +41,7 @@ public class ErrorResponseInterceptor implements Interceptor
         Request request = chain.request();
         Response response = chain.proceed(request);
 
-        DataObject json = DataObject.fromJson(response.peekBody(2048).string());
+        DataObject json = DataObject.fromJson(response.peekBody(1000000).string());
 
         if (!response.isSuccessful())
         {

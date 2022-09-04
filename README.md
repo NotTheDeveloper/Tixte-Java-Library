@@ -59,7 +59,7 @@ The `TixteClientBuilder` allows a set of configurations to improve the experienc
         // Sets a default domain. (Optional)
         .setDefaultDomain(getDefaultDomain());
 
-        // Builds a new TixteClient instance and uses the provided API-key and session-token to start the login process.
+        // Builds a *new* TixteClient instance and uses the provided API-key and session-token to start the login process.
         client = builder.build();
     }
 ```
@@ -238,15 +238,25 @@ That means you should add some SLF4J implementation to your build path in additi
 If no implementation is found, following message will be printed to the console on startup:
 
 ```php
-SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: No SLF4J providers were found.
 SLF4J: Defaulting to no-operation (NOP) logger implementation
-SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+SLF4J: See http://www.slf4j.org/codes.html#noProviders for further details.
+```
+Or if you use an outdated version of it, something like this will appear in your console:
+
+```php
+SLF4J: No SLF4J providers were found.
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#noProviders for further details.
+SLF4J: Class path contains SLF4J bindings targeting slf4j-api versions prior to 1.8.
+SLF4J: Ignoring binding found at [jar:file:/C:/Users/UserName/.gradle/caches/modules-2/files-2.1/ch.qos.logback/logback-classic/1.2.11/4741689214e9d1e8408b206506cbe76d1c6a7d60/logback-classic-1.2.11.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#ignoredBindings for an explanation.
 ```
 
 Tixte4J is currently providing a fallback logger in case that no SLF4J implementation is present.
 We strongly recommend to use one though, as that can improve speed and allows you to customize the logger as well as logging to some files.
 
-There is a guide for logback-classic available at the Tixte4J wiki: [Logging-Setup](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Logging).
+There is a guide for logback-classic available at the Tixte4J wiki: [Logging-Setup](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Setup#logging).
 
 ## Documentation
 

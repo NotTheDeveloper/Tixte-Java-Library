@@ -299,11 +299,11 @@ public class TixteClient extends RawResponseData
     }
 
     /**
-     * Sets the redirect-URL.
-     * <br>A redirect is a server- or client-side automatic forwarding from one URL to another URL.
+     * Sets the redirect-url.
+     * <br>A redirect is a server- or client-side automatic forwarding from one url to another url.
      * <br>This requires a Tixte turbo/turbo-charged subscription or else there will be thrown a {@link TixteWantsYourMoneyException}.
      *
-     * @param redirectURL The redirect-URL.
+     * @param redirectUrl The redirect-url.
      *
      * @throws ExecutionException If this future completed exceptionally.
      * @throws InterruptedException If the current thread was interrupted.
@@ -312,14 +312,14 @@ public class TixteClient extends RawResponseData
      */
     @NotNull
     @CheckReturnValue
-    public TixteClient setBaseRedirect(@NotNull String redirectURL) throws ExecutionException, InterruptedException
+    public TixteClient setBaseRedirect(@NotNull String redirectUrl) throws ExecutionException, InterruptedException
     {
         if (!getSelfUser().hasTixteSubscription())
         {
             throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
         }
 
-        setBaseRedirectRaw(redirectURL);
+        setBaseRedirectRaw(redirectUrl);
         return this;
     }
 

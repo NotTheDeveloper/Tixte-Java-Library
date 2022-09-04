@@ -553,7 +553,6 @@ public strictfp class RawResponseData
     }
 
     /**
-     *
      * @see EmbedEditor#getEmbedDescription()
      * @see EmbedEditor#getEmbedAuthorName()
      * @see EmbedEditor#getEmbedAuthorUrl()
@@ -668,7 +667,7 @@ public strictfp class RawResponseData
     }
 
     /**
-     * @param redirectURL The redirect url to be built.
+     * @param redirectUrl The redirect url to be built.
      *
      * @see TixteClient#setBaseRedirect(String)
      *
@@ -676,11 +675,14 @@ public strictfp class RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    protected static CompletableFuture<InputStream> setBaseRedirectRaw(@NotNull String redirectURL)
+    protected static CompletableFuture<InputStream> setBaseRedirectRaw(@NotNull String redirectUrl)
     {
+        Checks.notEmpty(redirectUrl, "redirectUrl");
+        Checks.noWhitespace(redirectUrl, "redirectUrl");
+
         Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
-        RequestBody requestBody = RequestBody.create("{ \"base_redirect\": " + redirectURL + " }",
+        RequestBody requestBody = RequestBody.create("{ \"base_redirect\": " + redirectUrl + " }",
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, false, requestBody);
@@ -728,6 +730,9 @@ public strictfp class RawResponseData
                                                                       @Nullable String[] domains, @NotNull String sortBy,
                                                                       long minSize, long maxSize)
     {
+        Checks.notNegative((int) minSize, "minSize");
+        Checks.notNegative((int) maxSize, "maxSize");
+
         Route.CompiledRoute route = Route.Self.SEARCH_FILE.compile();
 
         RequestBody requestBody = RequestBody.create("{ \"query\": \"" + query + "\", " +

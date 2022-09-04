@@ -50,7 +50,7 @@ public class BasicTixteClientExample
                 // Sets a default domain. (Optional)
                 .setDefaultDomain(DONOTOPEN.getDefaultDomain());
 
-        // Builds a new TixteClient instance and uses the provided API-key and session-token to start the login process.
+        // Builds a *new* TixteClient instance and uses the provided API-key and session-token to start the login process.
         client = builder.build();
 
         logger.info("Successfully logged in!");

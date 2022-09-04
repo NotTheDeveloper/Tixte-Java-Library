@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
@@ -648,6 +650,7 @@ public class MyFiles extends RawResponseData
     @NotNull
     public MyFiles uploadFile(@NotNull File file, @NotNull String domain)
     {
+        checkDomain(domain);
         try
         {
             DataObject json = DataObject.fromJson(uploadFileRaw(file, domain).get());
@@ -687,6 +690,7 @@ public class MyFiles extends RawResponseData
     @NotNull
     public MyFiles uploadPrivateFile(@NotNull File file, @NotNull String domain)
     {
+        checkDomain(domain);
         try
         {
             DataObject json = DataObject.fromJson(uploadPrivateFileRaw(file, domain).get());
@@ -804,6 +808,7 @@ public class MyFiles extends RawResponseData
     @NotNull
     public MyFiles uploadFile(@NotNull String filePath, @NotNull String domain)
     {
+        checkDomain(domain);
         try
         {
             DataObject json = DataObject.fromJson(uploadFileRaw(filePath, domain).get());
@@ -843,6 +848,7 @@ public class MyFiles extends RawResponseData
     @NotNull
     public MyFiles uploadPrivateFile(@NotNull String filePath, @NotNull String domain)
     {
+        checkDomain(domain);
         try
         {
             DataObject json = DataObject.fromJson(uploadPrivateFileRaw(filePath, domain).get());
@@ -896,6 +902,22 @@ public class MyFiles extends RawResponseData
     {
         purgeFilesRaw(password);
         return this;
+    }
+
+    private void checkDomain(@Nullable String domain)
+    {
+        if (domain.startsWith("https://") || domain.startsWith("http://"))
+        {
+            throw new IllegalArgumentException("Don't use 'http(s)://' at the beginning of the domain!");
+        }
+
+        final Pattern pattern = Pattern.compile("^([a-zA-Z\\d_-])+.([a-zA-Z\\d_-])+.([a-zA-Z\\d])+$");
+        final Matcher matcher = pattern.matcher(domain);
+
+        if (!matcher.find())
+        {
+            throw new IllegalArgumentException("Regex doesn't match with your default-domain. Please check if you specified a valid domain.");
+        }
     }
 
     @Override

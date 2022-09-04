@@ -33,6 +33,8 @@ import org.slf4j.Logger;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Used to create <b>new</b> {@link TixteClient} instances.
@@ -74,7 +76,18 @@ public class TixteClientBuilder
         Checks.notEmpty(apiKey, "apiKey");
         Checks.noWhitespace(apiKey, "apiKey");
 
-        TixteClientBuilder.apiKey = apiKey;
+        final Pattern pattern = Pattern.compile("^([a-z\\d]){8}-([a-z\\d]){4}-([a-z\\d]){4}-([a-z\\d]){4}-([a-z\\d]){12}$");
+        final Matcher matcher = pattern.matcher(apiKey);
+
+        if (matcher.find())
+        {
+            TixteClientBuilder.apiKey = apiKey;
+        }
+        else
+        {
+            throw new IllegalArgumentException("Regex doesn't match with your API-key. Please check if you specified the right key. (session-token != API-key)");
+        }
+
         TixteClientBuilder.policy = policy;
         return this;
     }
@@ -105,7 +118,17 @@ public class TixteClientBuilder
         Checks.notEmpty(sessionToken, "sessionToken");
         Checks.noWhitespace(sessionToken, "sessionToken");
 
-        TixteClientBuilder.sessionToken = sessionToken;
+        final Pattern pattern = Pattern.compile("^tx.(mfa.)?([a-zA-Z\\d]){16}.([a-zA-Z\\d]){16}.([a-zA-Z\\d]){16}.([a-zA-Z\\d]){4}$");
+        final Matcher matcher = pattern.matcher(sessionToken);
+
+        if (matcher.find())
+        {
+            TixteClientBuilder.sessionToken = sessionToken;
+        }
+        else
+        {
+            throw new IllegalArgumentException("Regex doesn't match with your session-token. Please check if you specified the right token. (API-key != session-token)");
+        }
         return this;
     }
 
@@ -122,7 +145,22 @@ public class TixteClientBuilder
         Checks.notEmpty(defaultDomain, "defaultDomain");
         Checks.noWhitespace(defaultDomain, "defaultDomain");
 
-        TixteClientBuilder.defaultDomain = defaultDomain;
+        if (defaultDomain.startsWith("https://") || defaultDomain.startsWith("http://"))
+        {
+            throw new IllegalArgumentException("Don't use 'http(s)://' at the beginning of the domain!");
+        }
+
+        final Pattern pattern = Pattern.compile("^([a-zA-Z\\d_-])+.([a-zA-Z\\d_-])+.([a-zA-Z\\d])+$");
+        final Matcher matcher = pattern.matcher(defaultDomain);
+
+        if (matcher.find())
+        {
+            TixteClientBuilder.defaultDomain = defaultDomain;
+        }
+        else
+        {
+            throw new IllegalArgumentException("Regex doesn't match with your default-domain. Please check if you specified a valid domain.");
+        }
         return this;
     }
 
