@@ -44,17 +44,18 @@ import java.util.stream.Stream;
  * <br>Throws {@link IndexOutOfBoundsException} if provided with index out of bounds.
  * <br>This class is not thread-safe.
  *
+ * @param data A {@link List} of objects.
+ *
  * @author MinnDevelopment, napstr and BlockyDotJar
- * @version v1.1.0
+ * @version v1.1.1
  * @since v1.0.0-beta.3
  */
-public class DataArray implements Iterable<Object>, SerializableArray
+public record DataArray(@NotNull List<Object> data) implements Iterable<Object>, SerializableArray
 {
     private static final Logger log = TixteLogger.getLog(DataArray.class);
     private static final ObjectMapper mapper;
     private static final SimpleModule module;
     private static final CollectionType listType;
-    final List<Object> data;
 
     static
     {
@@ -64,11 +65,6 @@ public class DataArray implements Iterable<Object>, SerializableArray
         module.addAbstractTypeMapping(List.class, ArrayList.class);
         mapper.registerModule(module);
         listType = mapper.getTypeFactory().constructRawCollectionType(ArrayList.class);
-    }
-
-    DataArray(@NotNull List<Object> data)
-    {
-        this.data = data;
     }
 
     /**
@@ -538,7 +534,7 @@ public class DataArray implements Iterable<Object>, SerializableArray
     {
         if (value instanceof SerializableData)
         {
-            data.add(((SerializableData) value).toData().data);
+            data.add(((SerializableData) value).toData().data());
         }
         else if (value instanceof SerializableArray)
         {
@@ -591,7 +587,7 @@ public class DataArray implements Iterable<Object>, SerializableArray
     {
         if (value instanceof SerializableData)
         {
-            data.add(index, ((SerializableData) value).toData().data);
+            data.add(index, ((SerializableData) value).toData().data());
         }
         else if (value instanceof SerializableArray)
         {

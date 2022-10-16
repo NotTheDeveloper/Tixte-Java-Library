@@ -25,13 +25,13 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 /**
- * Handles tixte caches using an {@link Interceptor}.
+ * Handles Tixtes cache using an {@link Interceptor}.
  *
  * @author BlockyDotJar
- * @version v1.0.2
+ * @version v1.0.3
  * @since v1.0.0-alpha.3
  */
-public strictfp class ForceCacheInterceptor implements Interceptor
+public class ForceCacheInterceptor implements Interceptor
 {
 
     @NotNull
@@ -39,7 +39,7 @@ public strictfp class ForceCacheInterceptor implements Interceptor
     public Response intercept(@NotNull Interceptor.Chain chain) throws IOException
     {
         Request.Builder builder = chain.request().newBuilder();
-        Network network = Network.createNetwork("8.8.8.8", 53);
+        Network network = new Network("8.8.8.8", 53);
 
         if (!network.isInternetAvailable())
         {

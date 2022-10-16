@@ -1,12 +1,8 @@
 /**
  * Root package of all Tixte4J requests.
- *
  * <br>From here you can navigate to all requests.
  *
  * <ul>
- * <li>{@link dev.blocky.library.tixte.internal.requests.FunctionalCallback}
- * <br>Utility class for creating async {@link okhttp3.Request requests}.</li>
- *
  * <li>{@link dev.blocky.library.tixte.internal.requests.Method}
  * <br>Represents HTTP-methods.</li>
  *

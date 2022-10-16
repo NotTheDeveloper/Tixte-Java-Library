@@ -14,35 +14,35 @@
  * limitations under the License.
  */
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.api.MyFiles;
-import dev.blocky.library.tixte.api.TixteClient;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Some basic examples, how to upload a {@link File} to Tixte.
  *
  * @author BlockyDotJar
- * @version v1.1.1
+ * @version v1.1.2
  * @since v1.0.0-beta.3
  */
 public class FileExample
 {
     /**
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return Upload a file to Tixte by initializing a <b>new</b> {@link File}.
      */
     @NotNull
-    @CheckReturnValue
-    public static MyFiles uploadFile()
+    public static MyFiles uploadFile() throws InterruptedException, IOException
     {
-        TixteClient client = BasicTixteClientExample.getTixteClient();
-        MyFiles myFiles = client.getMyFiles();
+        MyFiles myFiles = new MyFiles();
 
         // Creates a *new* File object.
         // If you initialize a file, which doesn't exist, this will throw an FileNotFoundException, an NoSuchFileException and an IOException.
@@ -57,12 +57,16 @@ public class FileExample
     }
 
     /**
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return Upload a file from a specific {@link URL} to Tixte by initializing a <b>new</b> {@link File}.
      */
-    public static MyFiles uploadFileFromURL() throws IOException
+    public static MyFiles uploadFileFromURL() throws InterruptedException, IOException
     {
-        TixteClient client = BasicTixteClientExample.getTixteClient();
-        MyFiles myFiles = client.getMyFiles();
+        MyFiles myFiles = new MyFiles();
 
         // Creates a *new* File object.
         // Here you set the path, where the file should be created, but also the name of the file.
@@ -83,17 +87,17 @@ public class FileExample
     }
 
     /**
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Delete any kind of file from your Tixte dashboard.
      */
     @NotNull
-    @CheckReturnValue
-    public static MyFiles deleteFile() throws ExecutionException, InterruptedException
+    public static MyFiles deleteFile() throws InterruptedException, IOException
     {
-        TixteClient client = BasicTixteClientExample.getTixteClient();
-        MyFiles myFiles = client.getMyFiles();
+        MyFiles myFiles = new MyFiles();
 
         // This could throw an HTTPException if there is no file to purge, but I am not sure about that.
         // Also note that this could throw an exception if the file takes too long to delete or if the of the fileId is invalid.
@@ -102,14 +106,17 @@ public class FileExample
     }
 
     /**
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return Deletes every file from your Tixte dashboard.
      */
     @NotNull
-    @CheckReturnValue
-    public static MyFiles deleteAllFiles()
+    public static MyFiles deleteAllFiles() throws InterruptedException, IOException
     {
-        TixteClient client = BasicTixteClientExample.getTixteClient();
-        MyFiles myFiles = client.getMyFiles();
+        MyFiles myFiles = new MyFiles();
 
         // You must set a password (for some reason) to execute this request, because otherwise it won't work.
         // This could throw an HTTPException if there is no file to purge, but I am not sure about that.

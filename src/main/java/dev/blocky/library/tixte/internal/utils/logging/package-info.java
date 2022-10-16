@@ -1,6 +1,5 @@
 /**
  * Root package of all Tixte4J logging utils.
- *
  * <br>From here you can navigate to all logging utils.
  *
  * <ul>

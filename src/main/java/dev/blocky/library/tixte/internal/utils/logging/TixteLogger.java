@@ -39,7 +39,7 @@ import java.util.ServiceLoader;
  * @version v1.2.1
  * @since v1.0.0-alpha.3
  */
-public class TixteLogger
+public non-sealed class TixteLogger extends SimpleLogger
 {
     /**
      * Marks whether a SLF4J {@code StaticLoggerBinder} (pre 1.8.x) or
@@ -49,11 +49,12 @@ public class TixteLogger
      */
     public static final boolean SLF4J_ENABLED;
 
-    private static final Map<String, Logger> LOGS = new CaseInsensitiveMap<>();
-
-    TixteLogger()
+    TixteLogger(@NotNull String name)
     {
+        super(name);
     }
+
+    private static final Map<String, Logger> LOGS = new CaseInsensitiveMap<>();
 
     static
     {
@@ -175,6 +176,7 @@ public class TixteLogger
          *
          * @return The string for log message.
          */
+        @NotNull
         String getString() throws IOException;
     }
 }

@@ -31,9 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -43,18 +41,23 @@ import java.util.regex.Pattern;
  * <br>Each call to {@link #build()} creates a <b>new</b> {@link TixteClient} instance using the same information.
  *
  * @author BlockyDotJar
- * @version v1.2.0
+ * @version v1.3.0
  * @since v1.0.0-alpha.1
  */
-public class TixteClientBuilder
+public record TixteClientBuilder()
 {
-    protected final Dispatcher dispatcher = new Dispatcher();
-    protected static String apiKey, sessionToken, defaultDomain;
-    protected static CachePolicy policy;
-    protected static OkHttpClient client;
-    protected static Request request;
+    private static final Pattern SESSION_TOKEN_PATTERN = Pattern.compile("^tx.(mfa.)?([a-zA-Z\\d]){16}.([a-zA-Z\\d]){16}.([a-zA-Z\\d]){16}.([a-zA-Z\\d]){4}$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern API_KEY_PATTERN = Pattern.compile("^([a-z\\d]){8}-([a-z\\d]){4}-([a-z\\d]){4}-([a-z\\d]){4}-([a-z\\d]){12}$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DEFAULT_DOMAIN_PATTERN = Pattern.compile("^(?!.*https?://)([a-zA-Z\\d_-])+.([a-zA-Z-])+.([a-zA-Z])+$", Pattern.CASE_INSENSITIVE);
+    private static final Logger logger = TixteLogger.getLog(TixteClientBuilder.class);
+    private static final TixteClient tixteClient = new TixteClient();
 
-    private final Logger logger = TixteLogger.getLog(TixteClientBuilder.class);
+    static final Dispatcher dispatcher = new Dispatcher();
+
+    static String apiKey, sessionToken, defaultDomain;
+    static CachePolicy policy;
+    static OkHttpClient client;
+    static Request request;
 
     /**
      * Creates a <b>new</b> {@link TixteClientBuilder} instance by initializing the builder with your API-key.
@@ -76,18 +79,9 @@ public class TixteClientBuilder
         Checks.notEmpty(apiKey, "apiKey");
         Checks.noWhitespace(apiKey, "apiKey");
 
-        final Pattern pattern = Pattern.compile("^([a-z\\d]){8}-([a-z\\d]){4}-([a-z\\d]){4}-([a-z\\d]){4}-([a-z\\d]){12}$");
-        final Matcher matcher = pattern.matcher(apiKey);
+        Checks.check(API_KEY_PATTERN.matcher(apiKey).matches(), "Regex doesn't match with your API-key. Please check if you specified the right key. (session-token != API-key)");
 
-        if (matcher.find())
-        {
-            TixteClientBuilder.apiKey = apiKey;
-        }
-        else
-        {
-            throw new IllegalArgumentException("Regex doesn't match with your API-key. Please check if you specified the right key. (session-token != API-key)");
-        }
-
+        TixteClientBuilder.apiKey = apiKey;
         TixteClientBuilder.policy = policy;
         return this;
     }
@@ -118,17 +112,9 @@ public class TixteClientBuilder
         Checks.notEmpty(sessionToken, "sessionToken");
         Checks.noWhitespace(sessionToken, "sessionToken");
 
-        final Pattern pattern = Pattern.compile("^tx.(mfa.)?([a-zA-Z\\d]){16}.([a-zA-Z\\d]){16}.([a-zA-Z\\d]){16}.([a-zA-Z\\d]){4}$");
-        final Matcher matcher = pattern.matcher(sessionToken);
+        Checks.check(SESSION_TOKEN_PATTERN.matcher(sessionToken).matches(), "Regex doesn't match with your session-token. Please check if you specified the right token. (API-key != session-token)");
 
-        if (matcher.find())
-        {
-            TixteClientBuilder.sessionToken = sessionToken;
-        }
-        else
-        {
-            throw new IllegalArgumentException("Regex doesn't match with your session-token. Please check if you specified the right token. (API-key != session-token)");
-        }
+        TixteClientBuilder.sessionToken = sessionToken;
         return this;
     }
 
@@ -145,22 +131,9 @@ public class TixteClientBuilder
         Checks.notEmpty(defaultDomain, "defaultDomain");
         Checks.noWhitespace(defaultDomain, "defaultDomain");
 
-        if (defaultDomain.startsWith("https://") || defaultDomain.startsWith("http://"))
-        {
-            throw new IllegalArgumentException("Don't use 'http(s)://' at the beginning of the domain!");
-        }
+        Checks.check(DEFAULT_DOMAIN_PATTERN.matcher(defaultDomain).matches(), "Regex doesn't match with your default-domain. Please check if you specified a valid domain.");
 
-        final Pattern pattern = Pattern.compile("^([a-zA-Z\\d_-])+.([a-zA-Z\\d_-])+.([a-zA-Z\\d])+$");
-        final Matcher matcher = pattern.matcher(defaultDomain);
-
-        if (matcher.find())
-        {
-            TixteClientBuilder.defaultDomain = defaultDomain;
-        }
-        else
-        {
-            throw new IllegalArgumentException("Regex doesn't match with your default-domain. Please check if you specified a valid domain.");
-        }
+        TixteClientBuilder.defaultDomain = defaultDomain;
         return this;
     }
 
@@ -197,11 +170,12 @@ public class TixteClientBuilder
     {
         dispatcher.setMaxRequestsPerHost(25);
 
-        ConnectionPool connectionPool = new ConnectionPool(5, 10, TimeUnit.SECONDS);
+        final ConnectionPool connectionPool = new ConnectionPool(5, 5, TimeUnit.SECONDS);
 
-        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+        final OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .dispatcher(dispatcher)
                 .connectionPool(connectionPool)
+                .retryOnConnectionFailure(true)
                 .addInterceptor(new RateLimitInterceptor())
                 .addInterceptor(new ErrorResponseInterceptor());
 
@@ -213,44 +187,21 @@ public class TixteClientBuilder
 
         switch (policy)
         {
-        case NONE:
-            client = builder.build();
-            break;
-        case ONLY_FORCE_CACHE:
-            client = builder
-                    .addInterceptor(new ForceCacheInterceptor())
-                    .build();
-            break;
-        case ONLY_NETWORK_CACHE:
-            client = builder
-                    .addNetworkInterceptor(new CacheInterceptor())
-                    .build();
-            break;
-        case ALL:
-            client = builder
-                    .addInterceptor(new ForceCacheInterceptor())
-                    .addNetworkInterceptor(new CacheInterceptor())
-                    .build();
-            break;
+        case NONE -> client = builder.build();
+        case ONLY_FORCE_CACHE ->
+                client = builder
+                .addInterceptor(new ForceCacheInterceptor())
+                .build();
+        case ONLY_NETWORK_CACHE ->
+                client = builder
+                .addNetworkInterceptor(new CacheInterceptor())
+                .build();
+        case ALL -> client =
+                builder
+                .addInterceptor(new ForceCacheInterceptor())
+                .addNetworkInterceptor(new CacheInterceptor())
+                .build();
         }
-        return new TixteClient();
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(new TixteClientBuilder());
-    }
-
-    @NotNull
-    @Override
-    public String toString()
-    {
-        return "TixteClientBuilder{" +
-                "API_KEY='" + apiKey + "', " +
-                "SESSION_TOKEN='" + sessionToken + "', " +
-                "DEFAULT_DOMAIN='" + defaultDomain + "', " +
-                "policy=" + policy +
-                '}';
+        return tixteClient;
     }
 }

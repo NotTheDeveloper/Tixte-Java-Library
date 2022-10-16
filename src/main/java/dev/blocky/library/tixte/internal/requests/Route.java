@@ -35,7 +35,7 @@ import static dev.blocky.library.tixte.internal.requests.Method.*;
  * Utility class for creating {@link Request requests}.
  *
  * @author MinnDevelopment and BlockyDotJar
- * @version v2.1.1
+ * @version v2.1.2
  * @since v1.0.0-alpha.3
  */
 @Internal
@@ -306,12 +306,10 @@ public class Route
     @Override
     public boolean equals(@Nullable Object o)
     {
-        if (!(o instanceof Route))
+        if (!(o instanceof Route oRoute))
         {
             return false;
         }
-
-        Route oRoute = (Route) o;
 
         return method.equals(oRoute.method) && route.equals(oRoute.route);
     }
@@ -327,7 +325,7 @@ public class Route
      * Represents the current compiled route.
      *
      * @author BlockyDotJar
-     * @version v1.3.0
+     * @version v1.3.1
      * @since v1.0.0-beta.3
      */
     public class CompiledRoute
@@ -428,12 +426,10 @@ public class Route
         @Override
         public boolean equals(@Nullable Object o)
         {
-            if (!(o instanceof CompiledRoute))
+            if (!(o instanceof CompiledRoute oCompiled))
             {
                 return false;
             }
-
-            CompiledRoute oCompiled = (CompiledRoute) o;
 
             return baseRoute.equals(oCompiled.getBaseRoute()) && compiledRoute.equals(oCompiled.compiledRoute);
         }

@@ -1,6 +1,5 @@
 /**
  * Root package of all Tixte4J secrets.
- *
  * <br>From here you can navigate to all secrets.
  *
  * <ul>

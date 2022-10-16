@@ -14,32 +14,33 @@
  * limitations under the License.
  */
 
-import com.google.errorprone.annotations.CheckReturnValue;
-import dev.blocky.library.tixte.api.entities.Domains;
-import dev.blocky.library.tixte.api.TixteClient;
+import dev.blocky.library.tixte.api.Domains;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.ExecutionException;
+import java.io.IOException;
 
 /**
  * Some basic examples, how to use {@link Domains}.
  *
  * @author BlockyDotJar
- * @version v1.1.1
+ * @version v1.1.2
  * @since v1.0.0-beta.3
  */
 public class DomainExample
 {
     /**
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return Adds a subdomain to our other domains.
      */
     @NotNull
-    @CheckReturnValue
-    public static Domains createDomain()
+    public static Domains createDomain() throws InterruptedException, IOException
     {
-        TixteClient client = BasicTixteClientExample.getTixteClient();
-        Domains domains = client.getDomains();
+        Domains domains = new Domains();
 
         // Adds a *new* domain to the dashboard.
         // You cannot use domain endings, you don't own.
@@ -49,16 +50,17 @@ public class DomainExample
     }
 
     /**
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Adds a subdomain with random name to our other domains.
      */
     @NotNull
-    public static Domains createRandomDomain() throws ExecutionException, InterruptedException
+    public static Domains createRandomDomain() throws InterruptedException, IOException
     {
-        TixteClient client = BasicTixteClientExample.getTixteClient();
-        Domains domains = client.getDomains();
+        Domains domains = new Domains();
 
         // You should note everything I said above.
         // This will only create the beginning of the domain, because otherwise it could create a domain, you don*t own.
@@ -66,16 +68,17 @@ public class DomainExample
     }
 
     /**
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Deletes a domain of your domain collection.
      */
     @Nullable
-    public static Domains deleteDomain() throws ExecutionException, InterruptedException
+    public static Domains deleteDomain() throws InterruptedException, IOException
     {
-        TixteClient client = BasicTixteClientExample.getTixteClient();
-        Domains domains = client.getDomains();
+        Domains domains = new Domains();
 
         // This will delete the domain.
         // Of course, you cannot delete a domain, that doesn't exist

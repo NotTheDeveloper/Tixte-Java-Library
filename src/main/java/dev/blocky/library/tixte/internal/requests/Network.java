@@ -26,38 +26,15 @@ import java.net.SocketAddress;
 /**
  * Utility class for handling network connectivity.
  *
+ * @param hostName The host name.
+ * @param port The port number.
+ *
  * @author BlockyDotJar
- * @version v1.1.2
+ * @version v1.1.3
  * @since v1.0.0-alpha.3
  */
-public strictfp class Network
+public record Network(@NotNull String hostName, int port)
 {
-    private final String hostName;
-    private final int port;
-
-    Network(@NotNull String hostName, int port)
-    {
-        Checks.notEmpty(hostName, "hostName");
-        Checks.noWhitespace(hostName, "hostName");
-
-        Checks.notNegative(port, "port");
-
-        this.hostName = hostName;
-        this.port = port;
-    }
-
-    /**
-     * Creates a network connection.
-     *
-     * @param hostName The host name.
-     * @param port The port number.
-     * @return Creates a <b>new</b> network.
-     */
-    @NotNull
-    public static Network createNetwork(@NotNull String hostName, int port)
-    {
-        return new Network(hostName, port);
-    }
 
     /**
      * Checks if you can connect to internet or not.
@@ -67,6 +44,11 @@ public strictfp class Network
      */
     public boolean isInternetAvailable()
     {
+        Checks.notEmpty(hostName, "hostName");
+        Checks.noWhitespace(hostName, "hostName");
+
+        Checks.notNegative(port, "port");
+
         try
         {
             Socket socket = new Socket();

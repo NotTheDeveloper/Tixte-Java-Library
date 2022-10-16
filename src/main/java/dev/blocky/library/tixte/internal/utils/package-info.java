@@ -1,6 +1,5 @@
 /**
  * Root package of all Tixte4J utils.
- *
  * <br>From here you can navigate to all utils.
  *
  * <ul>

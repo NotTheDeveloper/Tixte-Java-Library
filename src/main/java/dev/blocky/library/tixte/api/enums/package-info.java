@@ -1,6 +1,5 @@
 /**
  * Root package of all Tixte4J enums.
- *
  * <br>From here you can navigate to all enums.
  *
  * <ul>

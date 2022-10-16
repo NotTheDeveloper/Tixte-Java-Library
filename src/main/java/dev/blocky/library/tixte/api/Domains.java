@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.api.entities;
+package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataArray;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.requests.json.DataPath;
@@ -24,54 +23,53 @@ import dev.blocky.library.tixte.internal.utils.Checks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Represents the 'Domains' tab of the Tixte dashboard and everything else what Tixte offers you with domains.
  *
  * @author BlockyDotJar
- * @version v1.3.0
+ * @version v1.4.0
  * @since v1.0.0-alpha.1
  */
-public class Domains extends RawResponseData
+public record Domains() implements RawResponseData
 {
-    private String lastDeletedDomain;
-
-    Domains()
-    {
-    }
+    private static String lastDeletedDomain;
 
     /**
      * Gets the count of domains that you can use.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The count of domains that you can use.
      */
-    public int getUsableDomainCount() throws ExecutionException, InterruptedException
+    public int getUsableDomainCount() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUsableDomainsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
         return DataPath.getInt(json, "data.count");
     }
 
     /**
      * Gets a {@link List} of every usable domain.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of every usable domain.
      */
     @Nullable
     @CheckReturnValue
-    public List<String> getUsableDomainNames() throws ExecutionException, InterruptedException
+    public List<String> getUsableDomainNames() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUsableDomainsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
         DataArray domains = DataPath.getDataArray(json, "data.domains");
 
         List<String> list = new ArrayList<>();
@@ -80,22 +78,24 @@ public class Domains extends RawResponseData
         {
             list.add(DataPath.getString(json, "data.domains[" + i + "]?.domain"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Gets a {@link List} of {@code booleans} that represents if the domain is active at the moment.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of {@code booleans} that represents if the domain is active at the moment.
      */
     @Nullable
     @CheckReturnValue
-    public List<Boolean> isActive() throws ExecutionException, InterruptedException
+    public List<Boolean> isActive() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUsableDomainsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
         DataArray domains = DataPath.getDataArray(json, "data.domains");
 
         List<Boolean> list = new ArrayList<>();
@@ -104,36 +104,40 @@ public class Domains extends RawResponseData
         {
             list.add(DataPath.getBoolean(json, "data.domains[" + i + "]?.active"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Gets the count of how many domains you own.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The count of how many domains you own.
      */
-    public int getDomainCount() throws ExecutionException, InterruptedException
+    public int getDomainCount() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUserDomainsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
         return DataPath.getInt(json, "data.total");
     }
 
     /**
      * Gets a {@link List} of every owner by id of the domain.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of every owner by id of the domain.
      */
     @Nullable
     @CheckReturnValue
-    public List<String> getOwnerIds() throws ExecutionException, InterruptedException
+    public List<String> getOwnerIds() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUserDomainsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
         DataArray domains = DataPath.getDataArray(json, "data.domains");
 
         List<String> list = new ArrayList<>();
@@ -142,22 +146,24 @@ public class Domains extends RawResponseData
         {
             list.add(DataPath.getString(json, "data.domains[" + i + "]?.owner"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Gets a {@link List} of domain names.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of domain names.
      */
     @Nullable
     @CheckReturnValue
-    public List<String> getDomainNames() throws ExecutionException, InterruptedException
+    public List<String> getDomainNames() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUserDomainsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
         DataArray domains = DataPath.getDataArray(json, "data.domains");
 
         List<String> list = new ArrayList<>();
@@ -166,22 +172,24 @@ public class Domains extends RawResponseData
         {
             list.add(DataPath.getString(json, "data.domains[" + i + "]?.name"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Gets a {@link List} of upload-counts of the domain.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of upload-counts of the domain.
      */
     @Nullable
     @CheckReturnValue
-    public List<Integer> getUploadCounts() throws ExecutionException, InterruptedException
+    public List<Integer> getUploadCounts() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUserDomainsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
         DataArray domains = DataPath.getDataArray(json, "data.domains");
 
         List<Integer> list = new ArrayList<>();
@@ -190,21 +198,23 @@ public class Domains extends RawResponseData
         {
             list.add(DataPath.getInt(json, "data.domains[" + i + "]?.uploads"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Generates you a random domain.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The random domain.
      */
     @NotNull
-    public String generateDomain() throws ExecutionException, InterruptedException
+    public String generateDomain() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(generateDomainRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.generateDomainRaw().resultNow());
         return DataPath.getString(json, "data.name");
     }
 
@@ -236,12 +246,12 @@ public class Domains extends RawResponseData
      */
     @Nullable
     @CheckReturnValue
-    public Domains addSubdomain(@NotNull String domainName)
+    public Domains addSubdomain(@NotNull String domainName) throws InterruptedException, IOException
     {
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
 
-        addSubdomainRaw(domainName);
+        RawResponseData.addSubdomainRaw(domainName);
         return this;
     }
 
@@ -260,12 +270,12 @@ public class Domains extends RawResponseData
      */
     @Nullable
     @CheckReturnValue
-    public Domains addCustomDomain(@NotNull String domainName)
+    public Domains addCustomDomain(@NotNull String domainName) throws InterruptedException, IOException
     {
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
 
-        addCustomDomainRaw(domainName);
+        RawResponseData.addCustomDomainRaw(domainName);
         return this;
     }
 
@@ -277,42 +287,20 @@ public class Domains extends RawResponseData
      *
      * @param domainName The domain name.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The current instance of the {@link Domains} class.
      */
     @Nullable
     @CheckReturnValue
-    public Domains deleteDomain(@NotNull String domainName) throws ExecutionException, InterruptedException
+    public Domains deleteDomain(@NotNull String domainName) throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(deleteDomainRaw(domainName).get());
+        DataObject json = DataObject.fromJson(RawResponseData.deleteDomainRaw(domainName).resultNow());
 
         lastDeletedDomain = DataPath.getString(json, "data.domain");
         return this;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(new Domains());
-    }
-
-    @NotNull
-    @Override
-    public String toString()
-    {
-        try
-        {
-            return "Domains{" +
-                    "count=" + getUsableDomainCount() + ", " +
-                    "total=" + getDomainCount() + ", " +
-                    "lastDeletedDomain='" + lastDeletedDomain + '\'' +
-                    '}';
-        }
-        catch (ExecutionException | InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 }

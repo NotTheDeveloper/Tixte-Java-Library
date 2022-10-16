@@ -23,10 +23,10 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * This is an annotation, which tells the developers since when a method/class is deprecated.
+ * This is an annotation, which tells the developers since when a method or class is deprecated.
  *
  * @author BlockyDotJar
- * @version v1.1.1
+ * @version v1.1.2
  * @since v1.0.0-alpha.1
  */
 @Retention(RUNTIME)
@@ -34,7 +34,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface DeprecatedSince
 {
     /**
-     * @return The version, since when the method/class is deprecated.
+     * @return The version, since when the method or class is deprecated.
      */
     String version();
 }

@@ -16,45 +16,39 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import dev.blocky.library.tixte.api.entities.Embed;
-import dev.blocky.library.tixte.api.entities.SelfUser;
 import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
-import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
+import java.io.IOException;
 
 /**
  * Represents the 'Page Design' tab of the Tixte dashboard.
  *
  * @author BlockyDotJar
- * @version v1.3.0
+ * @version v1.4.0
  * @since v1.0.0-alpha.1
  */
-public class PageDesign extends RawResponseData
+public record PageDesign() implements RawResponseData
 {
-    PageDesign()
-    {
-    }
+    private static final SelfUser self = new SelfUser();
 
     /**
      * Gets your custom CSS code from the 'Page Design' tab of the Tixte dashboard.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The custom CSS code.
      */
     @NotNull
-    public String getCustomCSS() throws ExecutionException, InterruptedException
+    public String getCustomCSS() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.custom_css");
     }
 
@@ -65,12 +59,17 @@ public class PageDesign extends RawResponseData
      *
      * @param customCSS The custom CSS code for your page design.
      *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The current instance of the {@link PageDesign}.
      */
     @NotNull
-    public PageDesign setCustomCSS(@Nullable String customCSS)
+    public PageDesign setCustomCSS(@Nullable String customCSS) throws InterruptedException, IOException
     {
-        setCustomCSSRaw(customCSS == null ? "" : customCSS);
+        RawResponseData.setCustomCSSRaw(customCSS == null ? "" : customCSS);
         return this;
     }
 
@@ -80,70 +79,40 @@ public class PageDesign extends RawResponseData
      *
      * @param hideBranding If the page should have the Tixte branding.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The current instance of the {@link PageDesign}.
      */
     @NotNull
     @CanIgnoreReturnValue
-    public PageDesign setHideBranding(boolean hideBranding) throws ExecutionException, InterruptedException
+    public PageDesign setHideBranding(boolean hideBranding) throws InterruptedException, IOException
     {
-        try
+        if (!self.hasTixteSubscription())
         {
-            Constructor<?> constructor = SelfUser.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            SelfUser self =  (SelfUser) constructor.newInstance();
-
-            if (!self.hasTixteSubscription())
-            {
-                throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
-            }
-
-            setHideBrandingRaw(hideBranding);
-            return this;
+            throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
         }
-        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
-        }
+
+        RawResponseData.setHideBrandingRaw(hideBranding);
+        return this;
     }
 
     /**
      * Checks if the branding of the {@link Embed} is hidden.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return <b>true</b> - If the branding is hidden.
      *         <br><b>false</b> - If the branding is not hidden.
      */
-    public boolean hidesBranding() throws ExecutionException, InterruptedException
+    public boolean hidesBranding() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getBoolean(json, "data.hide_branding");
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(new PageDesign());
-    }
-
-    @NotNull
-    @Override
-    public String toString()
-    {
-        try
-        {
-            return "PageDesign{" +
-                    "custom_css='" + getCustomCSS() + '\'' +
-                    "hide_branding=" + hidesBranding() +
-                    '}';
-        }
-        catch (ExecutionException | InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 }

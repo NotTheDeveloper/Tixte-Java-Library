@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -32,7 +31,7 @@ import java.nio.file.Paths;
  * From this class you can get all data from a JSON file.
  *
  * @author BlockyDotJar
- * @version v1.3.1
+ * @version v1.3.2
  * @since v1.0.0-beta.3
  */
 public class DONOTOPEN
@@ -91,7 +90,7 @@ public class DONOTOPEN
     @Nullable
     private static String getString(@NotNull String jsonObject) throws IOException
     {
-        String content = new String(Files.readAllBytes(Paths.get(file.toURI())), StandardCharsets.UTF_8);
+        String content = Files.readString(Paths.get(file.toURI()));
         DataObject json = DataObject.fromJson(content);
 
         return json.getString(jsonObject);

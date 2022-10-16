@@ -14,38 +14,36 @@
  * limitations under the License.
  */
 
-import com.google.errorprone.annotations.CheckReturnValue;
-import dev.blocky.library.tixte.api.entities.SelfUser;
-import dev.blocky.library.tixte.api.TixteClient;
+import dev.blocky.library.tixte.api.SelfUser;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Some basic examples, how to format an ISO string to a {@link Date}.
  *
  * @author BlockyDotJar
- * @version v1.1.1
+ * @version v1.1.2
  * @since v1.0.0-beta.3
  */
 public class DateFormatExample
 {
     /**
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A valid datetime.
      */
     @NotNull
-    @CheckReturnValue
-    public static Date formatDateTime() throws ExecutionException, InterruptedException
+    public static Date formatDateTime() throws InterruptedException, IOException
     {
-        TixteClient client = BasicTixteClientExample.getTixteClient();
-        SelfUser self = client.getSelfUser();
+        SelfUser self = new SelfUser();
 
         // Fully parses the text producing a temporal object.
         // This parses the entire text producing a temporal object.

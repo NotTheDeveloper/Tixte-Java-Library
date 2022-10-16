@@ -14,37 +14,26 @@
  * limitations under the License.
  */
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import dev.blocky.library.tixte.api.entities.Embed;
+import dev.blocky.library.tixte.api.Embed;
 import dev.blocky.library.tixte.api.EmbedEditor;
-import dev.blocky.library.tixte.api.TixteClient;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * Some basic examples, how to use an {@link EmbedEditor}.
  *
  * @author BlockyDotJar
- * @version v1.0.1
+ * @version v1.0.2
  * @since v1.0.0-beta.3
  */
 public class EmbedEditorExample
 {
     /**
-     * @throws ExecutionException If this future completed exceptionally.
-     * @throws InterruptedException If the current thread was interrupted.
-     *
      * @return A {@link Embed} that has been checked as being valid for sending.
      */
     @NotNull
-    @CanIgnoreReturnValue
-    public static Embed buildEmbed() throws ExecutionException, InterruptedException
+    public static Embed buildEmbed()
     {
-        TixteClient client = BasicTixteClientExample.getTixteClient();
-
-        // Creates a *new* EmbedEditor.
-        EmbedEditor editor = client.getEmbedEditor();
+        EmbedEditor editor = new EmbedEditor();
 
         // Sets the author name and url of the embed. If you only want to set the author name, you can use setAuthorName(@Nullable String).
         // You can not only set the author url, because that doesn't make much sense.

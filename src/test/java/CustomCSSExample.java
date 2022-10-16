@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.api.PageDesign;
-import dev.blocky.library.tixte.api.TixteClient;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -27,22 +25,23 @@ import java.nio.file.Files;
  * Some basic examples, how to change the {@link PageDesign} of Tixte.
  *
  * @author BlockyDotJar
- * @version v1.1.1
+ * @version v1.1.2
  * @since v1.0.0-beta.3
  */
 public class CustomCSSExample
 {
     /**
-     * @throws IOException If an I/O error occurs reading from the file or a malformed or unmappable byte sequence is read.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Builds the custom CSS code from the 'Page Design' tab of the Tixte dashboard.
      */
     @NotNull
-    @CheckReturnValue
-    public static PageDesign setCustomCSS() throws IOException
+    public static PageDesign setCustomCSS() throws InterruptedException, IOException
     {
-        TixteClient client = BasicTixteClientExample.getTixteClient();
-        PageDesign pageDesign = client.getPageDesign();
+        PageDesign pageDesign = new PageDesign();
 
         // Creates a new File object for the CSS file. (You don't have to do this, but it's a good idea to do so.)
         // You can do this much simpler, by just using a string instead of a File object.

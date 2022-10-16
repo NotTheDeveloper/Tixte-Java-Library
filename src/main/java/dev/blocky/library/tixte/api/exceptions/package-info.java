@@ -1,6 +1,5 @@
 /**
  * Root package of all Tixte4J exceptions.
- *
  * <br>From here you can navigate to all exceptions.
  *
  * <ul>

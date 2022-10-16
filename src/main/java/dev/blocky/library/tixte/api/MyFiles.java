@@ -16,50 +16,49 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import dev.blocky.library.tixte.api.entities.SelfUser;
-import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataArray;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.requests.json.DataPath;
+import dev.blocky.library.tixte.internal.utils.Checks;
+import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
  *
  * @author BlockyDotJar
- * @version v1.4.0
+ * @version v1.5.0
  * @since v1.0.0-alpha.1
  */
-public class MyFiles extends RawResponseData
+public record MyFiles() implements RawResponseData
 {
-    private String url, directURL, deletionURL;
-
-    MyFiles()
-    {
-    }
+    private static final Pattern DOMAIN_PATTERN = Pattern.compile("^(?!.*https?://)([a-zA-Z\\d_-])+.([a-zA-Z-])+.([a-zA-Z])+$", Pattern.CASE_INSENSITIVE);
+    private static final SearchBar searchBar = new SearchBar();
+    private static final Folders folders = new Folders();
+    private static String url, directURL, deletionURL;
 
     /**
      * Gets the current used file size in bytes.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The current used file size in bytes.
      */
-    public long getUsedSize() throws ExecutionException, InterruptedException
+    public long getUsedSize() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getSizeRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getSizeRaw().resultNow());
         return DataPath.getInt(json, "data.used");
     }
 
@@ -70,14 +69,16 @@ public class MyFiles extends RawResponseData
      * <br>You can have a storage of 200.0 GB with a Tixte turbo subscription and with a Tixte turbo-charged subscription
      * you can have up to 500.0 GB storage.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The current limit of storage in bytes.
      */
-    public long getLimit() throws ExecutionException, InterruptedException
+    public long getLimit() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getSizeRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getSizeRaw().resultNow());
         return DataPath.getInt(json, "data.limit");
     }
 
@@ -85,7 +86,9 @@ public class MyFiles extends RawResponseData
     /**
      * Gets the current remaining storage size in bytes.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @see #getLimit()
@@ -93,7 +96,7 @@ public class MyFiles extends RawResponseData
      *
      * @return The current remaining storage size in bytes.
      */
-    public long getRemainingSize() throws ExecutionException, InterruptedException
+    public long getRemainingSize() throws InterruptedException, IOException
     {
         return getLimit() - getUsedSize();
     }
@@ -108,58 +111,66 @@ public class MyFiles extends RawResponseData
      * <p>If you don't want to make your own method for checking, if the user has a subscription you can use
      * {@link SelfUser#hasTixteSubscription()} instead.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Your current premium tier as an integer.
      */
-    public int getPremiumTier() throws ExecutionException, InterruptedException
+    public int getPremiumTier() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getSizeRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getSizeRaw().resultNow());
         return DataPath.getInt(json, "data.premium_tier");
     }
 
     /**
      * Gets your current upload count.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Your current upload count.
      */
-    public int getTotalUploadCount() throws ExecutionException, InterruptedException
+    public int getTotalUploadCount() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         return DataPath.getInt(json, "data.total");
     }
 
     /**
      * Gets your current upload count on a specific page.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Your current upload count on a specific page.
      */
-    public int getResults() throws ExecutionException, InterruptedException
+    public int getResults() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         return DataPath.getInt(json, "data.results");
     }
 
     /**
      * Gets a {@link List} of permission level, which the files are containing.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of permission level, which the files are containing.
      */
     @Nullable
     @CheckReturnValue
-    public List<Integer> getPermissionLevels() throws ExecutionException, InterruptedException
+    public List<Integer> getPermissionLevels() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<Integer> list = new ArrayList<>();
@@ -168,7 +179,7 @@ public class MyFiles extends RawResponseData
         {
             list.add(DataPath.getInt(json, "data.uploads[" + i + "]?.permission_level"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
@@ -177,16 +188,18 @@ public class MyFiles extends RawResponseData
      * <p>An extension is the file type.
      * <br>For example: "png" or "jpg".
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of extensions from the files.
      */
     @Nullable
     @CheckReturnValue
-    public List<String> getExtensions() throws ExecutionException, InterruptedException
+    public List<String> getExtensions() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
@@ -195,22 +208,24 @@ public class MyFiles extends RawResponseData
         {
             list.add(DataPath.getString(json, "data.uploads[" + i + "]?.extension"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Gets a {@link List} of sizes from the files in bytes.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of sizes from the files in bytes.
      */
     @Nullable
     @CheckReturnValue
-    public List<Integer> getSizes() throws ExecutionException, InterruptedException
+    public List<Integer> getSizes() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<Integer> list = new ArrayList<>();
@@ -219,7 +234,7 @@ public class MyFiles extends RawResponseData
         {
             list.add(DataPath.getInt(json, "data.uploads[" + i + "]?.size"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
@@ -229,16 +244,18 @@ public class MyFiles extends RawResponseData
      * <br>There is an <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/java/DateFormatExample.java">example</a>
      * for formatting the ISO string.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of upload dates from the files as a ISO string.
      */
     @Nullable
     @CheckReturnValue
-    public List<String> getUploadDates() throws ExecutionException, InterruptedException
+    public List<String> getUploadDates() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
@@ -247,22 +264,24 @@ public class MyFiles extends RawResponseData
         {
             list.add(DataPath.getString(json, "data.uploads[" + i + "]?.uploaded_at"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Gets a {@link List} of domains, on which the files got uploaded.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of domains, on which the files got uploaded.
      */
     @Nullable
     @CheckReturnValue
-    public List<String> getDomains() throws ExecutionException, InterruptedException
+    public List<String> getDomains() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
@@ -271,22 +290,24 @@ public class MyFiles extends RawResponseData
         {
             list.add(DataPath.getString(json, "data.uploads[" + i + "]?.domain"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Gets a {@link List} of names from the files.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of names from the files.
      */
     @Nullable
     @CheckReturnValue
-    public List<String> getNames() throws ExecutionException, InterruptedException
+    public List<String> getNames() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
@@ -295,7 +316,7 @@ public class MyFiles extends RawResponseData
         {
             list.add(DataPath.getString(json, "data.uploads[" + i + "]?.name"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
@@ -306,16 +327,18 @@ public class MyFiles extends RawResponseData
      * <br>An extension is the file type.
      * <br>For example: "png" or "jpg".
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of mime-types from the files.
      */
     @Nullable
     @CheckReturnValue
-    public List<String> getMimeTypes() throws ExecutionException, InterruptedException
+    public List<String> getMimeTypes() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
@@ -324,7 +347,7 @@ public class MyFiles extends RawResponseData
         {
             list.add(DataPath.getString(json, "data.uploads[" + i + "]?.mimetype"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
@@ -334,16 +357,18 @@ public class MyFiles extends RawResponseData
      * <br>There is an <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/java/DateFormatExample.java">example</a>
      * for formatting the ISO string.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of expiration times from the files as a ISO string.
      */
     @Nullable
     @CheckReturnValue
-    public List<Object> getExpirationTimes() throws ExecutionException, InterruptedException
+    public List<Object> getExpirationTimes() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<Object> list = new ArrayList<>();
@@ -352,22 +377,24 @@ public class MyFiles extends RawResponseData
         {
             list.add(DataPath.getString(json, "data.uploads[" + i + "]?.expiration?"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Gets a {@link List} of IDs from the files.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} od IDs from the files.
      */
     @Nullable
     @CheckReturnValue
-    public List<String> getAssetIds() throws ExecutionException, InterruptedException
+    public List<String> getAssetIds() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
@@ -376,7 +403,7 @@ public class MyFiles extends RawResponseData
         {
             list.add(DataPath.getString(json, "data.uploads[" + i + "]?.asset_id"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
@@ -385,16 +412,18 @@ public class MyFiles extends RawResponseData
      * <p>1 = public file
      * <br>2 = private file
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return A {@link List} of types from the files. (public/private)
      */
     @Nullable
     @CheckReturnValue
-    public List<Integer> getTypes() throws ExecutionException, InterruptedException
+    public List<Integer> getTypes() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<Integer> list = new ArrayList<>();
@@ -403,13 +432,15 @@ public class MyFiles extends RawResponseData
         {
             list.add(DataPath.getInt(json, "data.uploads[" + i + "]?.type"));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Checks if the specified file is public or not.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @see #getTypes()
@@ -419,9 +450,9 @@ public class MyFiles extends RawResponseData
      */
     @Nullable
     @CheckReturnValue
-    public List<Boolean> isPublic() throws ExecutionException, InterruptedException
+    public List<Boolean> isPublic() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<Boolean> list = new ArrayList<>();
@@ -430,13 +461,15 @@ public class MyFiles extends RawResponseData
         {
             list.add(getTypes().get(i) == 1);
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Checks if the specified file is private or not.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @see #getTypes()
@@ -446,9 +479,9 @@ public class MyFiles extends RawResponseData
      */
     @Nullable
     @CheckReturnValue
-    public List<Boolean> isPrivate() throws ExecutionException, InterruptedException
+    public List<Boolean> isPrivate() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<Boolean> list = new ArrayList<>();
@@ -457,7 +490,7 @@ public class MyFiles extends RawResponseData
         {
             list.add(getTypes().get(i) == 2);
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
@@ -467,7 +500,9 @@ public class MyFiles extends RawResponseData
      * <br>An extension is the file type.
      * <br>For example: "png" or "jpg".
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @see #getNames()
@@ -477,9 +512,9 @@ public class MyFiles extends RawResponseData
      */
     @Nullable
     @CheckReturnValue
-    public List<String> getFileNames() throws ExecutionException, InterruptedException
+    public List<String> getFileNames() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUploadsRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
         List<String> list = new ArrayList<>();
@@ -488,21 +523,23 @@ public class MyFiles extends RawResponseData
         {
             list.add(getNames().get(i) + "." + getExtensions().get(i));
         }
-        return new ArrayList<>(list);
+        return list;
     }
 
     /**
      * Gets the current upload-region, which you are using.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The current upload-region, which you are using.
      */
     @NotNull
-    public String getUploadRegion() throws ExecutionException, InterruptedException
+    public String getUploadRegion() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getUserInfoRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getString(json, "data.upload_region");
     }
 
@@ -567,23 +604,22 @@ public class MyFiles extends RawResponseData
      *
      * @param file The file to be uploaded.
      *
+     * @throws FileNotFoundException If the file is not found.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles uploadFile(@NotNull File file)
+    public MyFiles uploadFile(@NotNull File file) throws InterruptedException, IOException
     {
-        try
-        {
-            DataObject json = DataObject.fromJson(uploadFileRaw(file).get());
+        DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(file).resultNow());
 
-            url = DataPath.getString(json, "data.url");
-            directURL = DataPath.getString(json, "data.direct_url");
-            deletionURL = DataPath.getString(json, "data.deletion_url");
-        }
-        catch (ExecutionException | InterruptedException | FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        url = DataPath.getString(json, "data.url");
+        directURL = DataPath.getString(json, "data.direct_url");
+        deletionURL = DataPath.getString(json, "data.deletion_url");
         return this;
     }
 
@@ -606,23 +642,22 @@ public class MyFiles extends RawResponseData
      *
      * @param file The file to be uploaded.
      *
+     * @throws FileNotFoundException If the file is not found.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles uploadPrivateFile(@NotNull File file)
+    public MyFiles uploadPrivateFile(@NotNull File file) throws InterruptedException, IOException
     {
-        try
-        {
-            DataObject json = DataObject.fromJson(uploadPrivateFileRaw(file).get());
+        DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(file).resultNow());
 
-            url = DataPath.getString(json, "data.url");
-            directURL = DataPath.getString(json, "data.direct_url");
-            deletionURL = DataPath.getString(json, "data.deletion_url");
-        }
-        catch (ExecutionException | InterruptedException | FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        url = DataPath.getString(json, "data.url");
+        directURL = DataPath.getString(json, "data.direct_url");
+        deletionURL = DataPath.getString(json, "data.deletion_url");
         return this;
     }
 
@@ -645,24 +680,24 @@ public class MyFiles extends RawResponseData
      * @param file The file to be uploaded.
      * @param domain The domain to upload the file to.
      *
+     * @throws FileNotFoundException If the file is not found.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles uploadFile(@NotNull File file, @NotNull String domain)
+    public MyFiles uploadFile(@NotNull File file, @NotNull String domain) throws InterruptedException, IOException
     {
-        checkDomain(domain);
-        try
-        {
-            DataObject json = DataObject.fromJson(uploadFileRaw(file, domain).get());
+        domainCheck(domain);
 
-            url = DataPath.getString(json, "data.url");
-            directURL = DataPath.getString(json, "data.direct_url");
-            deletionURL = DataPath.getString(json, "data.deletion_url");
-        }
-        catch (ExecutionException | InterruptedException | FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(file, domain).resultNow());
+
+        url = DataPath.getString(json, "data.url");
+        directURL = DataPath.getString(json, "data.direct_url");
+        deletionURL = DataPath.getString(json, "data.deletion_url");
         return this;
     }
 
@@ -685,24 +720,24 @@ public class MyFiles extends RawResponseData
      * @param file The file to be uploaded.
      * @param domain The domain to upload the file to.
      *
+     * @throws FileNotFoundException If the file is not found.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles uploadPrivateFile(@NotNull File file, @NotNull String domain)
+    public MyFiles uploadPrivateFile(@NotNull File file, @NotNull String domain) throws InterruptedException, IOException
     {
-        checkDomain(domain);
-        try
-        {
-            DataObject json = DataObject.fromJson(uploadPrivateFileRaw(file, domain).get());
+        domainCheck(domain);
 
-            url = DataPath.getString(json, "data.url");
-            directURL = DataPath.getString(json, "data.direct_url");
-            deletionURL = DataPath.getString(json, "data.deletion_url");
-        }
-        catch (ExecutionException | InterruptedException | FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(file, domain).resultNow());
+
+        url = DataPath.getString(json, "data.url");
+        directURL = DataPath.getString(json, "data.direct_url");
+        deletionURL = DataPath.getString(json, "data.deletion_url");
         return this;
     }
 
@@ -725,23 +760,22 @@ public class MyFiles extends RawResponseData
      *
      * @param filePath The string to initialize the file, which should be uploaded.
      *
+     * @throws FileNotFoundException If the file is not found.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles uploadFile(@NotNull String filePath)
+    public MyFiles uploadFile(@NotNull String filePath) throws InterruptedException, IOException
     {
-        try
-        {
-            DataObject json = DataObject.fromJson(uploadFileRaw(filePath).get());
+        DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(filePath).resultNow());
 
-            url = DataPath.getString(json, "data.url");
-            directURL = DataPath.getString(json, "data.direct_url");
-            deletionURL = DataPath.getString(json, "data.deletion_url");
-        }
-        catch (ExecutionException | InterruptedException | FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        url = DataPath.getString(json, "data.url");
+        directURL = DataPath.getString(json, "data.direct_url");
+        deletionURL = DataPath.getString(json, "data.deletion_url");
         return this;
     }
 
@@ -764,23 +798,22 @@ public class MyFiles extends RawResponseData
      *
      * @param filePath The string to initialize the file, which should be uploaded.
      *
+     * @throws FileNotFoundException If the file is not found.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles uploadPrivateFile(@NotNull String filePath)
+    public MyFiles uploadPrivateFile(@NotNull String filePath) throws InterruptedException, IOException
     {
-        try
-        {
-            DataObject json = DataObject.fromJson(uploadPrivateFileRaw(filePath).get());
+        DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(filePath).resultNow());
 
-            url = DataPath.getString(json, "data.url");
-            directURL = DataPath.getString(json, "data.direct_url");
-            deletionURL = DataPath.getString(json, "data.deletion_url");
-        }
-        catch (ExecutionException | InterruptedException | FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        url = DataPath.getString(json, "data.url");
+        directURL = DataPath.getString(json, "data.direct_url");
+        deletionURL = DataPath.getString(json, "data.deletion_url");
         return this;
     }
 
@@ -803,24 +836,24 @@ public class MyFiles extends RawResponseData
      * @param filePath The string to initialize the file, which should be uploaded.
      * @param domain The domain to upload the file to.
      *
+     * @throws FileNotFoundException If the file is not found.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles uploadFile(@NotNull String filePath, @NotNull String domain)
+    public MyFiles uploadFile(@NotNull String filePath, @NotNull String domain) throws InterruptedException, IOException
     {
-        checkDomain(domain);
-        try
-        {
-            DataObject json = DataObject.fromJson(uploadFileRaw(filePath, domain).get());
+        domainCheck(domain);
 
-            url = DataPath.getString(json, "data.url");
-            directURL = DataPath.getString(json, "data.direct_url");
-            deletionURL = DataPath.getString(json, "data.deletion_url");
-        }
-        catch (ExecutionException | InterruptedException | FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(filePath, domain).resultNow());
+
+        url = DataPath.getString(json, "data.url");
+        directURL = DataPath.getString(json, "data.direct_url");
+        deletionURL = DataPath.getString(json, "data.deletion_url");
         return this;
     }
 
@@ -843,24 +876,24 @@ public class MyFiles extends RawResponseData
      * @param filePath The string to initialize the file, which should be uploaded.
      * @param domain The domain to upload the file to.
      *
+     * @throws FileNotFoundException If the file is not found.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles uploadPrivateFile(@NotNull String filePath, @NotNull String domain)
+    public MyFiles uploadPrivateFile(@NotNull String filePath, @NotNull String domain) throws InterruptedException, IOException
     {
-        checkDomain(domain);
-        try
-        {
-            DataObject json = DataObject.fromJson(uploadPrivateFileRaw(filePath, domain).get());
+        domainCheck(domain);
 
-            url = DataPath.getString(json, "data.url");
-            directURL = DataPath.getString(json, "data.direct_url");
-            deletionURL = DataPath.getString(json, "data.deletion_url");
-        }
-        catch (ExecutionException | InterruptedException | FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(filePath, domain).resultNow());
+
+        url = DataPath.getString(json, "data.url");
+        directURL = DataPath.getString(json, "data.direct_url");
+        deletionURL = DataPath.getString(json, "data.deletion_url");
         return this;
     }
 
@@ -876,12 +909,17 @@ public class MyFiles extends RawResponseData
      *
      * @param fileId The ID of the file as a string.
      *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles deleteFile(@NotNull String fileId)
+    public MyFiles deleteFile(@NotNull String fileId) throws InterruptedException, IOException
     {
-        deleteFileRaw(fileId);
+        RawResponseData.deleteFileRaw(fileId);
         return this;
     }
 
@@ -895,76 +933,81 @@ public class MyFiles extends RawResponseData
      *
      * @param password The password of your Tixte account.
      *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The current instance of this class.
      */
     @NotNull
-    public MyFiles purgeFiles(@NotNull String password)
+    public MyFiles purgeFiles(@NotNull String password) throws InterruptedException, IOException
     {
-        purgeFilesRaw(password);
+        RawResponseData.purgeFilesRaw(password);
         return this;
     }
 
-    private void checkDomain(@Nullable String domain)
-    {
-        if (domain.startsWith("https://") || domain.startsWith("http://"))
-        {
-            throw new IllegalArgumentException("Don't use 'http(s)://' at the beginning of the domain!");
-        }
-
-        final Pattern pattern = Pattern.compile("^([a-zA-Z\\d_-])+.([a-zA-Z\\d_-])+.([a-zA-Z\\d])+$");
-        final Matcher matcher = pattern.matcher(domain);
-
-        if (!matcher.find())
-        {
-            throw new IllegalArgumentException("Regex doesn't match with your default-domain. Please check if you specified a valid domain.");
-        }
-    }
-
-    @Override
-    public boolean equals(@Nullable Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        MyFiles myFiles = (MyFiles) o;
-
-        return Objects.equals(url, myFiles.url) && Objects.equals(directURL, myFiles.directURL) &&
-                Objects.equals(deletionURL, myFiles.deletionURL);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(new MyFiles());
-    }
-
+    /**
+     * Gets every folder of the 'My Files' tab.
+     * <br>Getting this at the moment is pretty useless because the actual record doesn't have something in it.
+     *
+     * @return The current instance of the {@link Folders} subclass.
+     */
     @NotNull
-    @Override
-    public String toString()
+    @Experimental
+    public Folders getFolders()
     {
-        try
+        return folders;
+    }
+
+    /**
+     * Gets the search bar of the 'My Files' tab.
+     * <br>Getting this at the moment is pretty useless because the actual record doesn't have something in it.
+     *
+     * @return The current instance of the {@link SearchBar} subclass.
+     */
+    @NotNull
+    @Experimental
+    public SearchBar getSearchBar()
+    {
+        return searchBar;
+    }
+
+    private void domainCheck(@Nullable String domain)
+    {
+        if (domain != null)
         {
-            return "MyFiles{" +
-                    "used=" + getUsedSize() + ", " +
-                    "limit=" + getLimit() + ", " +
-                    "remaining=" + getRemainingSize() + ", " +
-                    "premium_tier=" + getPremiumTier() + ", " +
-                    "total=" + getTotalUploadCount() + ", " +
-                    "url='" + url + "', " +
-                    "directURL='" + directURL + "', " +
-                    "deletionURL='" + deletionURL + '\'' +
-                    '}';
+            Checks.check(DOMAIN_PATTERN.matcher(domain).matches(), "Regex doesn't match with your specified domain. Please check if you specified a valid domain.");
         }
-        catch (ExecutionException | InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
+    }
+
+    /**
+     * Represents every folder of the 'My Files' tab.
+     * <br>Because this is an experimental feature and I don't have access to it, I can't implement it already.
+     *
+     * @author BlockyDotJar
+     * @version v1.0.0-alpha.1
+     * @since v1.0.2
+     */
+    @Experimental
+    @SuppressWarnings("unused")
+    public record Folders()
+    {
+        // Can't implement because I don't have access to it.
+    }
+
+    /**
+     * Represents the search bar of the 'My Files' tab.
+     * <br>Because this is an experimental feature and I don't have access to it, I can't implement it already.
+     *
+     * @author BlockyDotJar
+     * @version v1.0.0-alpha.1
+     * @since v1.0.2
+     */
+    @Experimental
+    @SuppressWarnings("unused")
+    public record SearchBar()
+    {
+        // Can't implement because I don't have access to it.
     }
 }

@@ -63,7 +63,7 @@ import java.util.regex.Pattern;
  * @version v1.0.0
  * @since v1.0.0
  */
-public class DataPath
+public record DataPath()
 {
     private static final Pattern INDEX_EXPRESSION = Pattern.compile("^\\[\\d+].*");
     private static final Pattern NAME_EXPRESSION = Pattern.compile("^[^\\[.].*");

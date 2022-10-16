@@ -26,10 +26,10 @@ import java.util.Locale;
  * <br>Specifically {@code StringUtils.java} and {@code ExceptionUtils.java}
  *
  * @author MinnDevelopment and BlockyDotJar
- * @version v1.0.2
+ * @version v1.0.3
  * @since v1.0.0-beta.2
  */
-public final class Helpers
+public class Helpers
 {
     Helpers()
     {

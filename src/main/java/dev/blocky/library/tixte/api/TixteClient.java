@@ -16,31 +16,20 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import dev.blocky.library.tixte.api.entities.Domains;
-import dev.blocky.library.tixte.api.entities.Embed;
-import dev.blocky.library.tixte.api.entities.SelfUser;
-import dev.blocky.library.tixte.api.entities.User;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
 import dev.blocky.library.tixte.api.exceptions.TixteWantsYourMoneyException;
-import dev.blocky.library.tixte.internal.RawResponseData;
-import dev.blocky.library.tixte.internal.requests.FunctionalCallback;
+import dev.blocky.library.tixte.internal.interceptor.CacheInterceptor;
+import dev.blocky.library.tixte.internal.interceptor.ErrorResponseInterceptor;
+import dev.blocky.library.tixte.internal.interceptor.ForceCacheInterceptor;
+import dev.blocky.library.tixte.internal.interceptor.RateLimitInterceptor;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
-import dev.blocky.library.tixte.internal.utils.io.IOUtil;
-import okhttp3.Cache;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Request;
+import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
 
@@ -50,11 +39,13 @@ import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
  * <br>All parts of the API can be accessed starting from this class.
  *
  * @author BlockyDotJar
- * @version v1.3.0
+ * @version v1.4.0
  * @since v1.0.0-alpha.1
  */
-public class TixteClient extends RawResponseData
+public class TixteClient implements RawResponseData
 {
+    private final SelfUser self = new SelfUser();
+
     TixteClient()
     {
     }
@@ -97,127 +88,17 @@ public class TixteClient extends RawResponseData
     }
 
     /**
-     * Represents your Tixte user-account.
+     * An HTTP-request.
+     * <br>Instances of this class are immutable if their {@link Request#body()} is {@code null} or itself immutable.
+     * <br>Note that you must send a request to an endpoint before using this method.
      *
-     * @return Instantiates a <b>new</b> {@link SelfUser}.
-     */
-    @NotNull
-    public SelfUser getSelfUser()
-    {
-        try
-        {
-            Constructor<?> constructor = SelfUser.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return (SelfUser) constructor.newInstance();
-        }
-        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Represents a Tixte user-account.
-     *
-     * @param userData A specific user-name or id.
-     *
-     * @return Instantiates a <b>new</b> {@link User}.
+     * @return An HTTP-request.
      */
     @Nullable
     @CheckReturnValue
-    public User getUserByData(@NotNull String userData)
+    public Optional<Request> getRequest()
     {
-        try
-        {
-            Constructor<?> constructor = User.class.getDeclaredConstructor(String.class);
-            constructor.setAccessible(true);
-            return (User) constructor.newInstance(userData);
-        }
-        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
-     *
-     * @return Instantiates a <b>new</b> {@link MyFiles}.
-     */
-    @NotNull
-    public MyFiles getMyFiles()
-    {
-        return new MyFiles();
-    }
-
-    /**
-     * Represents the 'Domains' tab of the Tixte dashboard and everything else what Tixte offers you with domains.
-     *
-     * @return Instantiates a <b>new</b> {@link Domains}.
-     */
-    @NotNull
-    public Domains getDomains()
-    {
-        try
-        {
-            Constructor<?> constructor = Domains.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return (Domains) constructor.newInstance();
-        }
-        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Builder system used to build {@link Embed embeds}.
-     *
-     * @return A <b>new</b> {@link EmbedEditor} instance, which can be used to create {@link Embed embeds}.
-     */
-    @NotNull
-    public EmbedEditor getEmbedEditor()
-    {
-        return new EmbedEditor();
-    }
-
-    /**
-     * Builder system used to build {@link Embed embeds}.
-     *
-     * @param editor The existing editor.
-     *
-     * @return An {@link EmbedEditor} using fields from an existing editor.
-     */
-    @Nullable
-    @CheckReturnValue
-    public EmbedEditor getEmbedEditor(@Nullable EmbedEditor editor)
-    {
-        return new EmbedEditor(editor);
-    }
-
-    /**
-     * Builder system used to build {@link Embed embeds}.
-     *
-     * @param embed The embed.
-     *
-     * @return An {@link EmbedEditor} using fields in an existing embed.
-     */
-    @Nullable
-    @CheckReturnValue
-    public EmbedEditor getEmbedEditor(@Nullable Embed embed)
-    {
-        return new EmbedEditor(embed);
-    }
-
-    /**
-     * Represents the 'Page Design' tab of the Tixte dashboard.
-     *
-     * @return Instantiates a <b>new</b> {@link PageDesign}.
-     */
-    @NotNull
-    public PageDesign getPageDesign()
-    {
-        return new PageDesign();
+        return Optional.ofNullable(request);
     }
 
     /**
@@ -234,54 +115,89 @@ public class TixteClient extends RawResponseData
     }
 
     /**
-     * An HTTP-request.
-     * <br>Instances of this class are immutable if their {@link Request#body()} is {@code null} or itself immutable.
-     * <br>Note that you must send a request to an endpoint before using this method.
+     * Gets the current {@link OkHttpClient}.
+     * <br>The client gets created when <code>this</code> {@link TixteClient} gets created.
      *
-     * @return An HTTP-request.
+     * <p>This client uses:
+     * <ul>
+     *     <li>A {@link Dispatcher}, which sets a rate-limit of 25 requests per host</li>
+     *     <li>A {@link ConnectionPool}, which sets the count of <code>maxIdleConnections</code> to 5 and allows them to be kept alive for 5 seconds</li>
+     *     <li>A Retry system, if the connections fails</li>
+     *     <li>A {@link RateLimitInterceptor}, which handles rate-limits</li>
+     *     <li>A {@link ErrorResponseInterceptor}, which handles different error responses</li>
+     *     <li>(Optional) A {@link ForceCacheInterceptor}, which handles cache without internet connectivity</li>
+     *     <li>(Optional) A {@link CacheInterceptor}, which handles cache with internet connectivity</li>
+     * </ul>
+     *
+     * @return The current {@link OkHttpClient}.
      */
-    @Nullable
-    @CheckReturnValue
-    public Optional<Request> getRequest()
+    @NotNull
+    public OkHttpClient getHttpClient()
     {
-        return Optional.ofNullable(request);
+        return client;
     }
 
     /**
-     * Gets the HTTP-headers of the request.
-     * <br>Note that you must send a request to an endpoint before using this method.
+     * Gets the current {@link Dispatcher}.
+     * <br>This dispatcher gets active, when <code>this</code> {@link TixteClient} gets created.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * <p>This dispatcher a rate-limit of 25 requests per host.
+     *
+     * @return The current {@link Dispatcher}.
+     */
+    @NotNull
+    public Dispatcher getDispatcher()
+    {
+        return dispatcher;
+    }
+
+    /**
+     * Sets the redirect-url.
+     * <br>A redirect is a server- or client-side automatic forwarding from one url to another url.
+     * <br>This requires a Tixte turbo/turbo-charged subscription or else there will be thrown a {@link TixteWantsYourMoneyException}.
+     *
+     * @param redirectUrl The redirect-url.
+     *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return The HTTP-headers of the request.
+     * @return The current instance of the {@link TixteClient}.
      */
-    @Nullable
+    @NotNull
     @CheckReturnValue
-    public Optional<String> getHeader() throws ExecutionException, InterruptedException
+    public TixteClient setBaseRedirect(@NotNull String redirectUrl) throws InterruptedException, IOException
     {
-        CompletableFuture<String> future = new CompletableFuture<>();
+        if (!self.hasTixteSubscription())
+        {
+            throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
+        }
 
-        client.newCall(request).enqueue(FunctionalCallback
-                .onFailure((call, e) -> future.completeExceptionally(new UncheckedIOException(e)))
-                .onSuccess((call, response) ->
-                {
-                    if (response.isSuccessful())
-                    {
-                        String body = response.headers().toString();
+        RawResponseData.setBaseRedirectRaw(redirectUrl);
+        return this;
+    }
 
-                        if (!future.complete(body))
-                        {
-                            IOUtil.silentClose(response);
-                        }
-                    }
-                    else
-                    {
-                        IOUtil.silentClose(response);
-                    }
-                }).build()
-        );
-        return Optional.ofNullable(future.get());
+    /**
+     * This will return <b>false</b> if you have not set a redirect-url or this will return a string if you have set one.
+     * <br>You can set the redirect-url by using {@link TixteClient#setBaseRedirect(String)}.
+     *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
+     * @return <b>false</b> - If you are not redirected to the redirect-url.
+     *         <br><b>Otherwise</b> - The redirect-url as a string.
+     */
+    @NotNull
+    @CheckReturnValue
+    public Object baseRedirect() throws InterruptedException, IOException
+    {
+        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        DataObject data = json.getDataObject("data");
+
+        return data.get("base_redirect");
     }
 
     /**
@@ -295,52 +211,9 @@ public class TixteClient extends RawResponseData
         try (Cache cache = client.cache())
         {
             cache.delete();
+
+            logger.info("Deleted cache successfully.");
         }
-    }
-
-    /**
-     * Sets the redirect-url.
-     * <br>A redirect is a server- or client-side automatic forwarding from one url to another url.
-     * <br>This requires a Tixte turbo/turbo-charged subscription or else there will be thrown a {@link TixteWantsYourMoneyException}.
-     *
-     * @param redirectUrl The redirect-url.
-     *
-     * @throws ExecutionException If this future completed exceptionally.
-     * @throws InterruptedException If the current thread was interrupted.
-     *
-     * @return The current instance of the {@link TixteClient}.
-     */
-    @NotNull
-    @CheckReturnValue
-    public TixteClient setBaseRedirect(@NotNull String redirectUrl) throws ExecutionException, InterruptedException
-    {
-        if (!getSelfUser().hasTixteSubscription())
-        {
-            throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
-        }
-
-        setBaseRedirectRaw(redirectUrl);
-        return this;
-    }
-
-    /**
-     * This will return <b>false</b> if you have not set a redirect-url or this will return a string if you have set one.
-     * <br>You can set the redirect-url by using {@link TixteClient#setBaseRedirect(String)}.
-     *
-     * @throws ExecutionException If this future completed exceptionally.
-     * @throws InterruptedException If the current thread was interrupted.
-     *
-     * @return <b>false</b> - If you are not redirected to the redirect-url.
-     *         <br><b>Otherwise</b> - The redirect-url as a string.
-     */
-    @NotNull
-    @CheckReturnValue
-    public Object baseRedirect() throws ExecutionException, InterruptedException
-    {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
-        DataObject data = json.getDataObject("data");
-
-        return data.get("base_redirect");
     }
 
     /**
@@ -353,29 +226,35 @@ public class TixteClient extends RawResponseData
     }
 
     @Override
+    public boolean equals(@Nullable Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        TixteClient that = (TixteClient) o;
+
+        return Objects.equals(self, that.self);
+    }
+
+    @Override
     public int hashCode()
     {
-        return Objects.hash(new TixteClient());
+        return Objects.hash(self);
     }
 
     @NotNull
     @Override
     public String toString()
     {
-        try
-        {
-            return "TixteClient{" +
-                    "API_KEY='" + getAPIKey() + "', " +
-                    "SESSION_TOKEN='" + getSessionToken() + "', " +
-                    "DEFAULT_DOMAIN='" + getDefaultDomain() + "', " +
-                    "policy=" + policy + ", " +
-                    "request=" + request + ", " +
-                    "base_redirect='" + baseRedirect() + "'" +
-                    '}';
-        }
-        catch (ExecutionException | InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return "TixteClient{" +
+                "self=" + self +
+                '}';
     }
 }

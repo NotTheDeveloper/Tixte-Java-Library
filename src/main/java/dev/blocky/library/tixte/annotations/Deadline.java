@@ -23,10 +23,10 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * This is an annotation, which tells the developers that a method/class should be finish in the future.
+ * This is an annotation, which tells the developers that a method or class should be finish in the future.
  *
  * @author BlockyDotJar
- * @version v1.1.1
+ * @version v1.1.2
  * @since v1.0.0-alpha.1
  */
 @Retention(RUNTIME)
@@ -34,7 +34,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Deadline
 {
     /**
-     * @return The version, in which the <b>new</b> method/class should be finished.
+     * @return The version, in which the <b>new</b> method or class should be finished.
      */
     String version();
 }

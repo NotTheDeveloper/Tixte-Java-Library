@@ -13,29 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.api.entities;
+package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CheckReturnValue;
-import dev.blocky.library.tixte.api.EmbedEditor;
-import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.utils.Helpers;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
+import java.io.IOException;
 
 /**
  * Represents an embed displayed by Discord.
  * <br>This class has many possibilities for null values, so be careful!
  *
+ * @param authorName The author name to be built.
+ * @param authorUrl The author url to be built.
+ * @param title The title to be built.
+ * @param description The description to be built.
+ * @param color The color to be built.
+ * @param providerName The provider name to be built.
+ * @param providerUrl The provider url to be built.
+ *
  * @author BlockyDotJar
- * @version v1.1.0
+ * @version v1.2.0
  * @since v1.0.0-beta.1
  */
-public class Embed extends RawResponseData
+public record Embed(@Nullable String authorName, @Nullable String authorUrl, @Nullable String title,
+                    @Nullable String description, @Nullable String color, @Nullable String providerName,
+                    @Nullable String providerUrl) implements RawResponseData
 {
     /**
      * The maximum length an embed title can have.
@@ -82,14 +86,11 @@ public class Embed extends RawResponseData
      */
     public static final int EMBED_MAX_LENGTH = 6000;
 
-    private final String authorName, authorUrl, title;
-    private final String providerName, providerUrl;
-    private final String description, color;
-    private final Object mutex = new Object();
-    private int length = -1;
+    private static final Object mutex = new Object();
+    private static int length = -1;
 
     /**
-     * Instantiates a <b>new</b> embed.
+     * Instantiates a <b>new</b> {@link Embed}.
      *
      * @param authorName The author name to be built.
      * @param authorUrl The author url to be built.
@@ -98,29 +99,23 @@ public class Embed extends RawResponseData
      * @param color The color to be built.
      * @param providerName The provider name to be built.
      * @param providerUrl The provider url to be built.
-     *
-     * @throws ExecutionException If this future completed exceptionally.
-     * @throws InterruptedException If the current thread was interrupted.
      */
-    public Embed(@Nullable String authorName, @Nullable String authorUrl, @Nullable String title, @Nullable String description,
-                 @Nullable String color, @Nullable String providerName, @Nullable String providerUrl)
-            throws ExecutionException, InterruptedException
+    public Embed(@Nullable String authorName, @Nullable String authorUrl, @Nullable String title,
+                 @Nullable String description, @Nullable String color, @Nullable String providerName,
+                 @Nullable String providerUrl)
     {
+        EmbedEditor editor = new EmbedEditor();
+
+        this.description = description;
+        this.title = title;
+        this.color = color;
         this.authorName = authorName;
         this.authorUrl = authorUrl;
-        this.title = title;
-        this.description = description;
-        this.color = color;
         this.providerName = providerName;
         this.providerUrl = providerUrl;
 
-
         try
         {
-            Constructor<?> constructor = EmbedEditor.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            EmbedEditor editor = (EmbedEditor) constructor.newInstance();
-
             String embedDescription = description == null ? editor.getEmbedDescription() : description;
             String embedTitle = title == null ? editor.getEmbedTitle() : title;
             String embedColor = color == null ? editor.getEmbedThemeColor() : color;
@@ -129,17 +124,9 @@ public class Embed extends RawResponseData
             String embedProviderName = providerName == null ? editor.getEmbedProviderName() : providerName;
             String embedProviderUrl = providerUrl == null ? editor.getEmbedProviderUrl() : providerUrl;
 
-            System.out.println(embedDescription);
-            System.out.println(embedTitle);
-            System.out.println(embedColor);
-            System.out.println(embedAuthorName);
-            System.out.println(embedAuthorUrl);
-            System.out.println(embedProviderName);
-            System.out.println(embedProviderUrl);
-
-            setEmbedRaw(embedDescription, embedTitle, embedColor, embedAuthorName, embedAuthorUrl, embedProviderName, embedProviderUrl);
+            RawResponseData.setEmbedRaw(embedDescription, embedTitle, embedColor, embedAuthorName, embedAuthorUrl, embedProviderName, embedProviderUrl);
         }
-        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
+        catch (InterruptedException | IOException e)
         {
             e.printStackTrace();
         }
@@ -276,48 +263,5 @@ public class Embed extends RawResponseData
             }
             return length;
         }
-    }
-
-    @Override
-    public boolean equals(@Nullable Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-
-        Embed embed = (Embed) o;
-
-        return length == embed.length && Objects.equals(authorName, embed.authorName) && Objects.equals(authorUrl, embed.authorUrl)
-                && Objects.equals(title, embed.title) && Objects.equals(providerName, embed.providerName) && Objects.equals(providerUrl, embed.providerUrl) &&
-                Objects.equals(description, embed.description) && color.equals(embed.color) && Objects.equals(mutex, embed.mutex);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(authorName, authorUrl, title, providerName, providerUrl, description, color, mutex, length);
-    }
-
-    @NotNull
-    @Override
-    public String toString()
-    {
-        return "Embed{" +
-                "authorName='" + authorName + "', " +
-                "authorUrl='" + authorUrl + "', " +
-                "title='" + title + "', " +
-                "providerName='" + providerName + "', " +
-                "providerUrl='" + providerUrl + "', " +
-                "description='" + description + "', " +
-                "color='" + color + "', " +
-                "mutex=" + mutex + ", " +
-                "length=" + length +
-                '}';
     }
 }

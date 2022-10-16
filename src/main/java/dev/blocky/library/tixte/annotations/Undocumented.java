@@ -22,10 +22,10 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * This is an annotation, which tells the developers that a method/class/constructor/package is not documented yet.
+ * This is an annotation, which tells the developers that a method, class, constructor or package is not documented yet.
  *
  * @author BlockyDotJar
- * @version v1.1.1
+ * @version v1.1.2
  * @since v1.0.0
  */
 @Retention(RUNTIME)

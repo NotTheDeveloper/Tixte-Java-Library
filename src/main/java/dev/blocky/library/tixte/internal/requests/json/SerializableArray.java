@@ -15,15 +15,18 @@
  */
 package dev.blocky.library.tixte.internal.requests.json;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Allows custom serialization for JSON payloads of an array.
  *
  * @author MinnDevelopment and BlockyDotJar
- * @version v1.0.3
+ * @version v1.0.4
  * @since v1.0.0-beta.3
  */
+@JsonSerialize
+@FunctionalInterface
 public interface SerializableArray
 {
     /**

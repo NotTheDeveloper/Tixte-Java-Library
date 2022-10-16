@@ -26,8 +26,6 @@ import org.slf4j.helpers.Util;
 import org.slf4j.spi.LocationAwareLogger;
 
 import java.io.*;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,12 +39,12 @@ import static dev.blocky.library.tixte.internal.utils.logging.SimpleLogger.Simpl
  * A custom {@link SimpleLogger}. (from <a href="https://www.slf4j.org/api/org/slf4j/simple/SimpleLogger.html">slf4j-simple</a>).
  *
  * @author QOS.ch and BlockyDotJar
- * @version v1.2.0
+ * @version v1.2.1
  * @since v1.0.0-alpha.3
  */
-public class SimpleLogger extends LegacyAbstractLogger
+public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogger
 {
-
+    @Serial
     private static final long serialVersionUID = -632788891211436180L;
 
     private static final long START_TIME = System.currentTimeMillis();
@@ -186,7 +184,7 @@ public class SimpleLogger extends LegacyAbstractLogger
         if (SHOW_THREAD_ID)
         {
             buf.append(TID_PREFIX);
-            buf.append(Thread.currentThread().getId());
+            buf.append(Thread.currentThread().threadId());
             buf.append(SP);
         }
 
@@ -340,7 +338,7 @@ public class SimpleLogger extends LegacyAbstractLogger
      * <br>The values are computed at runtime.
      *
      * @author BlockyDotJar
-     * @version v1.0.0
+     * @version v1.1.0
      * @since v1.0.0-beta.2
      */
     static class SimpleLoggerConfiguration
@@ -385,43 +383,31 @@ public class SimpleLogger extends LegacyAbstractLogger
 
         private static final Properties SIMPLE_LOGGER_PROPS = new Properties();
 
-        private static void loadProperties()
+        private static synchronized void loadProperties()
         {
-            InputStream in = AccessController.doPrivileged((PrivilegedAction<InputStream>) () ->
-            {
-                ClassLoader threadCL = Thread.currentThread().getContextClassLoader();
+            ClassLoader threadCL = Thread.currentThread().getContextClassLoader();
 
-                if (threadCL != null)
-                {
-                    return threadCL.getResourceAsStream(CONFIGURATION_FILE);
-                }
-                else
-                {
-                    return ClassLoader.getSystemResourceAsStream(CONFIGURATION_FILE);
-                }
-            });
-
-            if (null != in)
+            try (InputStream in = threadCL.getResourceAsStream(CONFIGURATION_FILE))
             {
-                try
+                if (null != in)
                 {
-                    SIMPLE_LOGGER_PROPS.load(in);
-                }
-                catch (IOException e)
-                {
-                    // Ignored.
-                }
-                finally
-                {
-                    try
+                    try (in)
                     {
-                        in.close();
+                        SIMPLE_LOGGER_PROPS.load(in);
                     }
                     catch (IOException e)
                     {
                         // Ignored.
                     }
                 }
+                else
+                {
+                    ClassLoader.getSystemResourceAsStream(CONFIGURATION_FILE);
+                }
+            }
+            catch (IOException e)
+            {
+                ClassLoader.getSystemResourceAsStream(CONFIGURATION_FILE);
             }
         }
 
@@ -535,22 +521,22 @@ public class SimpleLogger extends LegacyAbstractLogger
             {
                 if (cacheOutputStream)
                 {
-                    return new OutputChoice(OutputChoiceType.CACHED_SYS_ERR);
+                    return new OutputChoice(OutputChoice.OutputChoiceType.CACHED_SYS_ERR);
                 }
                 else
                 {
-                    return new OutputChoice(OutputChoiceType.SYS_ERR);
+                    return new OutputChoice(OutputChoice.OutputChoiceType.SYS_ERR);
                 }
             }
             else if ("System.out".equalsIgnoreCase(logFile))
             {
                 if (cacheOutputStream)
                 {
-                    return new OutputChoice(OutputChoiceType.CACHED_SYS_OUT);
+                    return new OutputChoice(OutputChoice.OutputChoiceType.CACHED_SYS_OUT);
                 }
                 else
                 {
-                    return new OutputChoice(OutputChoiceType.SYS_OUT);
+                    return new OutputChoice(OutputChoice.OutputChoiceType.SYS_OUT);
                 }
             }
             else
@@ -564,7 +550,7 @@ public class SimpleLogger extends LegacyAbstractLogger
                 catch (FileNotFoundException e)
                 {
                     Util.report("Could not open [" + logFile + "]. Defaulting to System.err", e);
-                    return new OutputChoice(OutputChoiceType.SYS_ERR);
+                    return new OutputChoice(OutputChoice.OutputChoiceType.SYS_ERR);
                 }
             }
         }
@@ -574,7 +560,7 @@ public class SimpleLogger extends LegacyAbstractLogger
      * This class encapsulates the user's choice of output target.
      *
      * @author BlockyDotJar
-     * @version v1.0.0
+     * @version v1.1.0
      * @since v1.0.0-beta.2
      */
     private static class OutputChoice
@@ -614,24 +600,17 @@ public class SimpleLogger extends LegacyAbstractLogger
         @NotNull
         private PrintStream getTargetPrintStream()
         {
-            switch (OUTPUT_CHOICE_TYPE)
-            {
-            case SYS_OUT:
-                return System.out;
-            case SYS_ERR:
-                return System.err;
-            case CACHED_SYS_ERR:
-            case CACHED_SYS_OUT:
-            case FILE:
-                return TARGET_PRINT_STREAM;
-            default:
-                throw new IllegalArgumentException();
-            }
+            return switch (OUTPUT_CHOICE_TYPE)
+                    {
+                        case SYS_OUT -> System.out;
+                        case SYS_ERR -> System.err;
+                        case CACHED_SYS_ERR, CACHED_SYS_OUT, FILE -> TARGET_PRINT_STREAM;
+                    };
         }
-    }
 
-    private enum OutputChoiceType
-    {
-        SYS_OUT, CACHED_SYS_OUT, SYS_ERR, CACHED_SYS_ERR, FILE
+        private enum OutputChoiceType
+        {
+            SYS_OUT, CACHED_SYS_OUT, SYS_ERR, CACHED_SYS_ERR, FILE
+        }
     }
 }

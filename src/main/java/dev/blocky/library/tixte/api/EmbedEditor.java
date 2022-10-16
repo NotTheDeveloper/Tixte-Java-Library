@@ -16,8 +16,6 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import dev.blocky.library.tixte.api.entities.Embed;
-import dev.blocky.library.tixte.internal.RawResponseData;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import dev.blocky.library.tixte.internal.utils.Checks;
@@ -28,26 +26,26 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 /**
  * Builder system used to build {@link Embed embeds}.
  *
  * @author BlockyDotJar
- * @version v1.4.0
+ * @version v1.5.0
  * @since v1.0.0-beta.1
  */
-public class EmbedEditor extends RawResponseData
+public class EmbedEditor implements RawResponseData
 {
-    private final Pattern URL_PATTERN = Pattern.compile("\\s*https://\\S+\\s*", Pattern.CASE_INSENSITIVE);
+    private final Pattern URL_PATTERN = Pattern.compile("^ht{2}ps?://[a-zA-Z\\d]+.[a-zA-Z\\d]+(.[a-zA-Z._/-]+)?([a-zA-Z\\d._/-]+)?", Pattern.CASE_INSENSITIVE);
     private final Logger logger = TixteLogger.getLog(EmbedEditor.class);
     private final StringBuilder description = new StringBuilder();
     private String providerName, providerUrl, color;
     private String authorName, authorUrl, title;
 
-    EmbedEditor()
+    public EmbedEditor()
     {
     }
 
@@ -56,7 +54,7 @@ public class EmbedEditor extends RawResponseData
      *
      * @param editor The existing editor.
      */
-    EmbedEditor(@Nullable EmbedEditor editor)
+    public EmbedEditor(@Nullable EmbedEditor editor)
     {
         copyFrom(editor);
     }
@@ -66,7 +64,7 @@ public class EmbedEditor extends RawResponseData
      *
      * @param embed The existing embed.
      */
-    EmbedEditor(@Nullable Embed embed)
+    public EmbedEditor(@Nullable Embed embed)
     {
         copyFrom(embed);
     }
@@ -74,13 +72,10 @@ public class EmbedEditor extends RawResponseData
     /**
      * Returns a {@link Embed} that has been checked as being valid for sending.
      *
-     * @throws ExecutionException If this future completed exceptionally.
-     * @throws InterruptedException If the current thread was interrupted.
-     *
      * @return The built, sendable {@link Embed}.
      */
     @NotNull
-    public Embed build() throws ExecutionException, InterruptedException
+    public Embed build()
     {
         if (isEmpty())
         {
@@ -446,24 +441,26 @@ public class EmbedEditor extends RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    public EmbedEditor setOnlyImagedEnabled(boolean onlyImagedEnabled)
+    public EmbedEditor setOnlyImagedEnabled(boolean onlyImagedEnabled) throws InterruptedException, IOException
     {
-        setOnlyImageEnabledRaw(onlyImagedEnabled);
+        RawResponseData.setOnlyImageEnabledRaw(onlyImagedEnabled);
         return this;
     }
 
     /**
      * Checks if there is only the image of the {@link Embed} enabled.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return <b>true</b> - If only the image of the {@link Embed} is enabled.
      *         <br><b>false</b> - If the {@link Embed} is not only the image.
      */
-    public boolean onlyImageEnabled() throws ExecutionException, InterruptedException
+    public boolean onlyImageEnabled() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getBoolean(json, "data.only_image");
     }
 
@@ -473,15 +470,17 @@ public class EmbedEditor extends RawResponseData
      * <br>The only difference between this and {@link Embed#getTitle()} is that this method gets the current title
      * of the Tixte 'Embed Editor' page, while {@link Embed#getTitle()} only gets the current value of the variable.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Possibly-empty string containing the title of the embedded resource.
      */
     @NotNull
-    public String getEmbedTitle() throws ExecutionException, InterruptedException
+    public String getEmbedTitle() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.title");
     }
 
@@ -492,15 +491,17 @@ public class EmbedEditor extends RawResponseData
      * <br>The only difference between this and {@link Embed#getDescription()} is that this method gets the current description
      * of the Tixte 'Embed Editor' page, while {@link Embed#getDescription()} only gets the current value of the variable.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Possibly-empty string containing a description of the embedded resource.
      */
     @NotNull
-    public String getEmbedDescription() throws ExecutionException, InterruptedException
+    public String getEmbedDescription() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.description");
     }
 
@@ -510,15 +511,17 @@ public class EmbedEditor extends RawResponseData
      * <br>The only difference between this and {@link Embed#getAuthorName()} is that this method gets the current author name
      * of the Tixte 'Embed Editor' page, while {@link Embed#getAuthorName()} only gets the current value of the variable.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The name on the creator of the embedded content.
      */
     @NotNull
-    public String getEmbedAuthorName() throws ExecutionException, InterruptedException
+    public String getEmbedAuthorName() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.author_name");
     }
 
@@ -528,15 +531,17 @@ public class EmbedEditor extends RawResponseData
      * <br>The only difference between this and {@link Embed#getAuthorUrl()} ()}is that this method gets the current author url
      * of the Tixte 'Embed Editor' page, while {@link Embed#getAuthorUrl()} ()} only gets the current value of the variable.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The url to a website from the creator of the embedded content.
      */
     @NotNull
-    public String getEmbedAuthorUrl() throws ExecutionException, InterruptedException
+    public String getEmbedAuthorUrl() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.author_url");
     }
 
@@ -546,15 +551,17 @@ public class EmbedEditor extends RawResponseData
      * <br>The only difference between this and {@link Embed#getProviderName()} is that this method gets the current provider name
      * of the Tixte 'Embed Editor' page, while {@link Embed#getProviderName()} only gets the current value of the variable.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The name on the provider of the embedded content.
      */
     @NotNull
-    public String getEmbedProviderName() throws ExecutionException, InterruptedException
+    public String getEmbedProviderName() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.provider_name");
     }
 
@@ -564,15 +571,17 @@ public class EmbedEditor extends RawResponseData
      * <br>The only difference between this and {@link Embed#getProviderUrl()} ()} is that this method gets the current provider url
      * of the Tixte 'Embed Editor' page, while {@link Embed#getProviderUrl()} ()} only gets the current value of the variable.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return The url to a website of the embedded content.
      */
     @NotNull
-    public String getEmbedProviderUrl() throws ExecutionException, InterruptedException
+    public String getEmbedProviderUrl() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.author_url");
     }
 
@@ -582,15 +591,17 @@ public class EmbedEditor extends RawResponseData
      * <br>The only difference between this and {@link Embed#getColor()} is that this method gets the current theme color
      * of the Tixte 'Embed Editor' page, while {@link Embed#getColor()} only gets the current value of the variable.
      *
-     * @throws ExecutionException If this future completed exceptionally.
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
+     *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @return Possibly-empty color.
      */
     @NotNull
-    public String getEmbedThemeColor() throws ExecutionException, InterruptedException
+    public String getEmbedThemeColor() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(getConfigRaw().get());
+        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.theme_color");
     }
 
@@ -607,39 +618,34 @@ public class EmbedEditor extends RawResponseData
             return false;
         }
 
-        EmbedEditor that = (EmbedEditor) o;
+        EmbedEditor editor = (EmbedEditor) o;
 
-        return URL_PATTERN.equals(that.URL_PATTERN) && Objects.equals(description.toString(), that.description.toString()) &&
-                Objects.equals(providerName, that.providerName) && Objects.equals(providerUrl, that.providerUrl) && color.equals(that.color)
-                && Objects.equals(authorName, that.authorName) && Objects.equals(authorUrl, that.authorUrl) && Objects.equals(title, that.title);
+        return URL_PATTERN.equals(editor.URL_PATTERN) && logger.equals(editor.logger) &&
+                Objects.equals(description.toString(), editor.description.toString()) && Objects.equals(providerName, editor.providerName) &&
+                Objects.equals(providerUrl, editor.providerUrl) && Objects.equals(color, editor.color) &&
+                Objects.equals(authorName, editor.authorName) && Objects.equals(authorUrl, editor.authorUrl) &&
+                Objects.equals(title, editor.title);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(URL_PATTERN, description, providerName, providerUrl, color, authorName, authorUrl, title);
+        return Objects.hash(URL_PATTERN, logger, description, providerName, providerUrl, color, authorName, authorUrl, title);
     }
 
     @NotNull
     @Override
     public String toString()
     {
-        try
-        {
-            return "EmbedEditor{" +
-                    "only_image=" + onlyImageEnabled() + ", " +
-                    "description=" + getEmbedDescription() + ", " +
-                    "provider_name='" + getEmbedProviderName() + "', " +
-                    "provider_url='" + getEmbedProviderUrl() + "', " +
-                    "theme_color='" + getEmbedThemeColor() + "', " +
-                    "author_name='" + getEmbedAuthorName() + "', " +
-                    "author_url='" + getEmbedAuthorUrl() + "', " +
-                    "title='" + getEmbedTitle() + "', " +
-                    '}';
-        }
-        catch (ExecutionException | InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
+        return "EmbedEditor{" +
+                "URL_PATTERN=" + URL_PATTERN +
+                ", description=" + description +
+                ", providerName='" + providerName + '\'' +
+                ", providerUrl='" + providerUrl + '\'' +
+                ", color='" + color + '\'' +
+                ", authorName='" + authorName + '\'' +
+                ", authorUrl='" + authorUrl + '\'' +
+                ", title='" + title + '\'' +
+                '}';
     }
 }

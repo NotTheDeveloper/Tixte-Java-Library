@@ -60,15 +60,15 @@ The `TixteClientBuilder` allows a set of configurations to improve the experienc
         .setDefaultDomain(getDefaultDomain());
 
         // Builds a *new* TixteClient instance and uses the provided API-key and session-token to start the login process.
-        client = builder.build();
+        TixteClient client = builder.build();
     }
 ```
 
-> See [TixteClientBuilder](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/main/java/dev/blocky/library/tixte/api/TixteClientBuilder.java)
+> See [TixteClientBuilder](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/main/java/dev/blocky/library/tixte/api/TixteClientBuilder.java) class
 
 ### More Examples
 
-We provide a small set of examples in the [example directory](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/).
+We provide a small set of examples in our [example directory](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/).
 
 ## Experimental annotation
 
@@ -201,12 +201,18 @@ Be sure to replace the **`GITHUB_USERNAME`** key below with your GitHub username
 ```gradle
 repositories {
     maven {
-        url = uri("https://maven.pkg.github.com/BlockyDotJar/Tixte-Java-Library")
+        url = uri 'https://maven.pkg.github.com/BlockyDotJar/Tixte-Java-Library'
         credentials {
-            username = project.findProperty("gpr.user") ?: "GITHUB_USERNAME"
-            password = project.findProperty("gpr.key") ?: "GITHUB_TOKEN"
+            username = project.findProperty('gpr.user') ?: 'GITHUB_USERNAME'
+            password = project.findProperty('gpr.key') ?: 'GITHUB_TOKEN'
         }
     }
+}
+```
+
+```gradle
+dependencies {
+    implementation 'dev.blocky.library:tixte4j:VERSION'
 }
 ```
 
@@ -302,7 +308,7 @@ version was by looking at the [release page](https://github.com/BlockyDotJar/Tix
 
 ## Dependencies:
 
-This project requires **Java 8+**
+This project requires **Java 19+**
 <br>All dependencies are managed automatically by Gradle.
 
 * okhttp
@@ -312,16 +318,16 @@ This project requires **Java 8+**
     * Version: **v3.2.0**
     * [Github](https://github.com/square/okio/)
 * jackson
-    * Version: **v2.13.3**
+    * Version: **v2.13.4.2**
     * [Github](https://github.com/stleary/JSON-java)
 * slf4j-api
-    * Version: **v2.0.0**
+    * Version: **v2.0.3**
     * [Github](https://github.com/qos-ch/slf4j)
 * jetbrains-annotations
     * Version: **v23.0.0**
     * [Github](https://github.com/JetBrains/java-annotations)
 * error-prone-annotations
-    * Version: **v2.15.0**
+    * Version: **v2.16**
     * [Github](https://github.com/google/error-prone)
 * commons-collections4
     * Version: **v4.4**

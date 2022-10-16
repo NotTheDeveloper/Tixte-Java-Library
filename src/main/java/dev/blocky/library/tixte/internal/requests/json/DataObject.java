@@ -41,17 +41,18 @@ import java.util.function.UnaryOperator;
  * <br>Throws {@link NullPointerException}, if a parameter annotated with {@link NotNull} is provided with {@code null}.
  * <br>This class is not thread-safe.
  *
+ * @param data A {@link List} of objects.
+ *
  * @author MinnDevelopment, napstr, Andre601 and BlockyDotJar
- * @version v1.0.2
+ * @version v1.0.3
  * @since v1.0.0-beta.3
  */
-public class DataObject implements SerializableData
+public record DataObject(@NotNull Map<String, Object> data) implements SerializableData
 {
     private static final Logger log = TixteLogger.getLog(DataObject.class);
     private static final ObjectMapper mapper;
     private static final SimpleModule module;
     private static final MapType mapType;
-    final Map<String, Object> data;
 
     static
     {
@@ -61,11 +62,6 @@ public class DataObject implements SerializableData
         module.addAbstractTypeMapping(List.class, ArrayList.class);
         mapper.registerModule(module);
         mapType = mapper.getTypeFactory().constructRawMapType(HashMap.class);
-    }
-
-    DataObject(@NotNull Map<String, Object> data)
-    {
-        this.data = data;
     }
 
     /**
@@ -634,7 +630,7 @@ public class DataObject implements SerializableData
         }
         else if (value instanceof SerializableArray)
         {
-            data.put(key, ((SerializableArray) value).toDataArray().data);
+            data.put(key, ((SerializableArray) value).toDataArray().data());
         }
         else
         {

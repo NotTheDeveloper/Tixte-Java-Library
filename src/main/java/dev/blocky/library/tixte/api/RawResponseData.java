@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.blocky.library.tixte.internal;
+package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.CheckReturnValue;
-import dev.blocky.library.tixte.api.*;
-import dev.blocky.library.tixte.api.entities.Domains;
-import dev.blocky.library.tixte.api.entities.Embed;
-import dev.blocky.library.tixte.api.entities.SelfUser;
-import dev.blocky.library.tixte.api.entities.User;
-import dev.blocky.library.tixte.internal.requests.FunctionalCallback;
 import dev.blocky.library.tixte.internal.requests.Route;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.io.IOUtil;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
+import jdk.incubator.concurrent.StructuredTaskScope;
 import okhttp3.*;
 import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.ApiStatus.Internal;
@@ -35,15 +30,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.io.*;
 import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
+import java.util.Optional;
+import java.util.concurrent.Future;
 
 import static dev.blocky.library.tixte.api.TixteInfo.GITHUB;
 import static dev.blocky.library.tixte.api.TixteInfo.VERSION;
@@ -53,17 +43,14 @@ import static dev.blocky.library.tixte.internal.requests.Route.TIXTE_API_PREFIX;
  * Represents the raw response data from Tixte API-requests.
  *
  * @author BlockyDotJar
- * @version v3.0.1
+ * @version v3.0.2
  * @since v1.0.0-beta.1
  */
 @Internal
-public strictfp class RawResponseData
+public interface RawResponseData
 {
-    private static final Logger logger = TixteLogger.getLog(RawResponseData.class);
-
-    protected RawResponseData()
-    {
-    }
+    Logger logger = TixteLogger.getLog(RawResponseData.class);
+    TixteClient tixteClient = new TixteClient();
 
     /**
      * @see MyFiles#getUsedSize() MyFiles#getUsedSize()
@@ -75,7 +62,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> getSizeRaw()
+    static Future<String> getSizeRaw() throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.GET_UPLOAD_SIZE.compile();
         return request(route, false, null);
@@ -98,7 +85,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> getUploadsRaw()
+    static Future<String> getUploadsRaw() throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.GET_UPLOADS.compile();
         return request(route, false, null);
@@ -114,7 +101,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> uploadFileRaw(@NotNull File file) throws FileNotFoundException
+    static Future<String> uploadFileRaw(@NotNull File file) throws IOException, InterruptedException
     {
         if (!file.exists())
         {
@@ -141,7 +128,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> uploadPrivateFileRaw(@NotNull File file) throws FileNotFoundException
+    static Future<String> uploadPrivateFileRaw(@NotNull File file) throws IOException, InterruptedException
     {
         if (!file.exists())
         {
@@ -169,7 +156,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> uploadFileRaw(@NotNull File file, @NotNull String domain) throws FileNotFoundException
+    static Future<String> uploadFileRaw(@NotNull File file, @NotNull String domain) throws IOException, InterruptedException
     {
         if (!file.exists())
         {
@@ -200,7 +187,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> uploadPrivateFileRaw(@NotNull File file, @NotNull String domain) throws FileNotFoundException
+    static Future<String> uploadPrivateFileRaw(@NotNull File file, @NotNull String domain) throws IOException, InterruptedException
     {
         if (!file.exists())
         {
@@ -230,7 +217,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> uploadFileRaw(@NotNull String filePath) throws FileNotFoundException
+    static Future<String> uploadFileRaw(@NotNull String filePath) throws IOException, InterruptedException
     {
         Checks.notEmpty(filePath, "filePath");
 
@@ -261,7 +248,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> uploadPrivateFileRaw(@NotNull String filePath) throws FileNotFoundException
+    static Future<String> uploadPrivateFileRaw(@NotNull String filePath) throws IOException, InterruptedException
     {
         Checks.notEmpty(filePath, "filePath");
 
@@ -293,7 +280,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> uploadFileRaw(@NotNull String filePath, @NotNull String domain) throws FileNotFoundException
+    static Future<String> uploadFileRaw(@NotNull String filePath, @NotNull String domain) throws IOException, InterruptedException
     {
         Checks.notEmpty(filePath, "filePath");
 
@@ -328,7 +315,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> uploadPrivateFileRaw(@NotNull String filePath, @NotNull String domain) throws FileNotFoundException
+    static Future<String> uploadPrivateFileRaw(@NotNull String filePath, @NotNull String domain) throws IOException, InterruptedException
     {
         Checks.notEmpty(filePath, "filePath");
 
@@ -361,7 +348,7 @@ public strictfp class RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    protected static CompletableFuture<InputStream> deleteFileRaw(@NotNull String fileId)
+    static Future<String> deleteFileRaw(@NotNull String fileId) throws IOException, InterruptedException
     {
         Checks.notEmpty(fileId, "fileId");
         Checks.noWhitespace(fileId, "fileId");
@@ -380,7 +367,7 @@ public strictfp class RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    protected static CompletableFuture<InputStream> purgeFilesRaw(@NotNull String password)
+    static Future<String> purgeFilesRaw(@NotNull String password) throws IOException, InterruptedException
     {
         Checks.notEmpty(password, "password");
         Checks.noWhitespace(password, "password");
@@ -410,7 +397,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> getUserInfoRaw()
+    static Future<String> getUserInfoRaw() throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.GET_SELF.compile();
         return request(route, false, null);
@@ -427,7 +414,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> getUserInfoRaw(@NotNull String userData)
+    static Future<String> getUserInfoRaw(@NotNull String userData) throws IOException, InterruptedException
     {
         Checks.notEmpty(userData, "userData");
         Checks.noWhitespace(userData, "userData");
@@ -446,7 +433,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> getUserDomainsRaw()
+    static Future<String> getUserDomainsRaw() throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.GET_DOMAINS.compile();
         return request(route, true, null);
@@ -460,7 +447,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> getUsableDomainsRaw()
+    static Future<String> getUsableDomainsRaw() throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Domain.GET_DOMAINS.compile();
         return request(route, false, null);
@@ -472,7 +459,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> generateDomainRaw()
+    static Future<String> generateDomainRaw() throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Resources.GET_GENERATED_DOMAIN.compile();
         return request(route, false, null);
@@ -487,7 +474,7 @@ public strictfp class RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    protected static CompletableFuture<InputStream> addSubdomainRaw(@NotNull String domainName)
+    static Future<String> addSubdomainRaw(@NotNull String domainName) throws IOException, InterruptedException
     {
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
@@ -503,13 +490,18 @@ public strictfp class RawResponseData
     /**
      * @param domainName The domain name.
      *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @see Domains#addCustomDomain(String)
      *
      * @return The raw response of the request.
      */
     @NotNull
     @CanIgnoreReturnValue
-    protected static CompletableFuture<InputStream> addCustomDomainRaw(@NotNull String domainName)
+    static Future<String> addCustomDomainRaw(@NotNull String domainName) throws IOException, InterruptedException
     {
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
@@ -525,12 +517,17 @@ public strictfp class RawResponseData
     /**
      * @param domainName The domain name.
      *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @see Domains#deleteDomain(String)
      *
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> deleteDomainRaw(@NotNull String domainName)
+    static Future<String> deleteDomainRaw(@NotNull String domainName) throws IOException, InterruptedException
     {
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
@@ -546,13 +543,18 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> getAPIKeyBySessionTokenRaw()
+    static Future<String> getAPIKeyBySessionTokenRaw() throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.GET_KEYS.compile();
         return request(route, true, null);
     }
 
     /**
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @see EmbedEditor#getEmbedDescription()
      * @see EmbedEditor#getEmbedAuthorName()
      * @see EmbedEditor#getEmbedAuthorUrl()
@@ -568,7 +570,7 @@ public strictfp class RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    protected static CompletableFuture<InputStream> getConfigRaw()
+    static Future<String> getConfigRaw() throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.GET_CONFIG.compile();
         return request(route, false, null);
@@ -577,13 +579,18 @@ public strictfp class RawResponseData
     /**
      * @param customCSS The custom CSS code for your page design.
      *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @see PageDesign#setCustomCSS(String)
      *
      * @return The raw response of the request.
      */
     @NotNull
     @CanIgnoreReturnValue
-    protected static CompletableFuture<InputStream> setCustomCSSRaw(@NotNull String customCSS)
+    static Future<String> setCustomCSSRaw(@NotNull String customCSS) throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
@@ -602,15 +609,20 @@ public strictfp class RawResponseData
      * @param providerName The provider name to be built.
      * @param providerURL The provider url to be built.
      *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @see Embed#Embed(String, String, String, String, String, String, String)
      *
      * @return The raw response of the request.
      */
     @NotNull
     @CanIgnoreReturnValue
-    protected static CompletableFuture<InputStream> setEmbedRaw(@Nullable String description, @Nullable String title, @Nullable String color,
-                                                                @Nullable String authorName, @Nullable String authorURL, @Nullable String providerName,
-                                                                @Nullable String providerURL)
+    static Future<String> setEmbedRaw(@Nullable String description, @Nullable String title, @Nullable String color,
+                                      @Nullable String authorName, @Nullable String authorURL, @Nullable String providerName,
+                                      @Nullable String providerURL) throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
@@ -631,13 +643,18 @@ public strictfp class RawResponseData
     /**
      * @param hideBranding Whether the branding is hidden or not.
      *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @see PageDesign#setHideBranding(boolean)
      *
      * @return The raw response of the request.
      */
     @NotNull
     @CanIgnoreReturnValue
-    protected static CompletableFuture<InputStream> setHideBrandingRaw(boolean hideBranding)
+    static Future<String> setHideBrandingRaw(boolean hideBranding) throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
@@ -650,13 +667,18 @@ public strictfp class RawResponseData
     /**
      * @param onlyImagedEnabled Whether only images are enabled or not.
      *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @see EmbedEditor#setOnlyImagedEnabled(boolean)
      *
      * @return The raw response of the request.
      */
     @NotNull
     @CanIgnoreReturnValue
-    protected static CompletableFuture<InputStream> setOnlyImageEnabledRaw(boolean onlyImagedEnabled)
+    static Future<String> setOnlyImageEnabledRaw(boolean onlyImagedEnabled) throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
@@ -669,13 +691,18 @@ public strictfp class RawResponseData
     /**
      * @param redirectUrl The redirect url to be built.
      *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @see TixteClient#setBaseRedirect(String)
      *
      * @return The raw response of the request.
      */
     @NotNull
     @CanIgnoreReturnValue
-    protected static CompletableFuture<InputStream> setBaseRedirectRaw(@NotNull String redirectUrl)
+    static Future<String> setBaseRedirectRaw(@NotNull String redirectUrl) throws IOException, InterruptedException
     {
         Checks.notEmpty(redirectUrl, "redirectUrl");
         Checks.noWhitespace(redirectUrl, "redirectUrl");
@@ -689,25 +716,35 @@ public strictfp class RawResponseData
     }
 
     /**
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @see SelfUser#getExperimentCount()
      *
      * @return The raw response of the request.
      */
     @NotNull
     @CheckReturnValue
-    protected static CompletableFuture<InputStream> getExperimentsRaw()
+    static Future<String> getExperimentsRaw() throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.GET_EXPERIMENTS.compile();
         return request(route, true, null);
     }
 
     /**
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The raw response of the request.
      */
     @NotNull
     @Experimental
     @CheckReturnValue
-    protected static CompletableFuture<InputStream> getFoldersRaw()
+    static Future<String> getFoldersRaw() throws IOException, InterruptedException
     {
         Route.CompiledRoute route = Route.Self.GET_FOLDERS.compile();
         return request(route, false, null);
@@ -721,14 +758,19 @@ public strictfp class RawResponseData
      * @param minSize The minimum size of the file.
      * @param maxSize The maximal size of the file.
      *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
      * @return The raw response of the request.
      */
     @NotNull
     @Experimental
     @CheckReturnValue
-    protected static CompletableFuture<InputStream> setSearchQueryRaw(@NotNull String query, @Nullable String[] extensions,
-                                                                      @Nullable String[] domains, @NotNull String sortBy,
-                                                                      long minSize, long maxSize)
+    static Future<String> setSearchQueryRaw(@NotNull String query, @Nullable String[] extensions,
+                                            @Nullable String[] domains, @NotNull String sortBy,
+                                            long minSize, long maxSize) throws IOException, InterruptedException
     {
         Checks.notNegative((int) minSize, "minSize");
         Checks.notNegative((int) maxSize, "maxSize");
@@ -743,141 +785,92 @@ public strictfp class RawResponseData
         return request(route, true, requestBody);
     }
 
+    /**
+     * Gets the HTTP-headers of the request.
+     * <br>Note that you must send a request to an endpoint before using this method.
+     *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
+     * @return The HTTP-headers of the request.
+     */
     @Nullable
-    @NonBlocking
     @CheckReturnValue
-    private static CompletableFuture<InputStream> request(@NotNull Route.CompiledRoute route, boolean sessionTokenNeeded, @Nullable RequestBody requestBody)
+    static Optional<String> getHeader() throws IOException, InterruptedException
     {
-        Request.Builder builder = new Request.Builder()
-                .url(TIXTE_API_PREFIX + route.getCompiledRoute())
-                .addHeader("Authorization", sessionTokenNeeded ? getClient().getSessionToken().orElse(null) : getClient().getAPIKey())
-                .addHeader("User-Agent", "Tixte4J-Request (" + GITHUB + ", " + VERSION + ")");
+        final Call call = tixteClient.getHttpClient().newCall(tixteClient.getRequest().orElse(null));
 
-        CompletableFuture<InputStream> future = new CompletableFuture<>();
-
-        try
+        try (Response response = call.execute(); var scope = new StructuredTaskScope<String>())
         {
-            Field field = TixteClientBuilder.class.getDeclaredField("request");
-            field.setAccessible(true);
+            Future<String> responseStream = scope.fork(response.body()::string);
+            scope.join();
 
-            Request request = (Request) field.get(Request.class);
+            IOUtil.silentClose(response);
 
-            switch (route.getMethod())
-            {
-            case GET:
-                request = builder.build();
-                break;
-            case DELETE:
-                request = requestBody == null ? builder.delete().build() : builder.delete(requestBody).build();
-                break;
-            case PATCH:
-                request = builder.patch(requestBody).build();
-                break;
-            case POST:
-                request = builder.post(requestBody).build();
-                break;
-            }
-
-            getHttpClient().newCall(request).enqueue(FunctionalCallback
-                    .onFailure((call, e) -> future.completeExceptionally(new UncheckedIOException(e)))
-                    .onSuccess((call, response) ->
-                    {
-                        if (response.isSuccessful())
-                        {
-                            logger.info("Request successful: " + route.getMethod() + "/" + route.getCompiledRoute());
-
-                            InputStream body = IOUtil.getBody(response);
-
-                            if (!future.complete(body))
-                            {
-                                IOUtil.silentClose(response);
-                            }
-                        }
-                        else
-                        {
-                            IOUtil.silentClose(response);
-                        }
-                    }).build()
-            );
-            return future;
-        }
-        catch (NoSuchFieldException | IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
+            return Optional.ofNullable(responseStream.resultNow());
         }
     }
 
     @Nullable
     @NonBlocking
     @CheckReturnValue
-    private static CompletableFuture<InputStream> postFile(@Nullable String domain, @NotNull MultipartBody multipartBody, boolean privateFile)
+    private static Future<String> request(@NotNull Route.CompiledRoute route, boolean sessionTokenNeeded, @Nullable RequestBody requestBody) throws IOException, InterruptedException
     {
-        Request request = new Request.Builder()
+        final Request.Builder builder = new Request.Builder()
+                .url(TIXTE_API_PREFIX + route.getCompiledRoute())
+                .addHeader("Authorization", sessionTokenNeeded ? tixteClient.getSessionToken().orElse(null) : tixteClient.getAPIKey())
+                .addHeader("User-Agent", "Tixte4J-Request (" + GITHUB + ", " + VERSION + ")");
+
+        final Request request = switch (route.getMethod())
+                {
+                    case GET -> builder.build();
+                    case DELETE -> requestBody == null ? builder.delete().build() : builder.delete(requestBody).build();
+                    case PUT -> builder.put(requestBody).build();
+                    case PATCH -> builder.patch(requestBody).build();
+                    case POST -> builder.post(requestBody).build();
+                };
+
+        final Call call = tixteClient.getHttpClient().newCall(request);
+
+        try (Response response = call.execute(); var scope = new StructuredTaskScope<String>())
+        {
+            Future<String> responseString = scope.fork(response.body()::string);
+            scope.join();
+
+            IOUtil.silentClose(response);
+            logger.info("Request successful: " + route.getMethod() + "/" + route.getCompiledRoute());
+
+            return responseString;
+        }
+    }
+
+    @Nullable
+    @NonBlocking
+    @CheckReturnValue
+    private static Future<String> postFile(@Nullable String domain, @NotNull MultipartBody multipartBody, boolean privateFile) throws IOException, InterruptedException
+    {
+        final Request request = new Request.Builder()
                 .url(TIXTE_API_PREFIX + Route.File.UPLOAD_FILE.getRoute())
-                .addHeader("Authorization", getClient().getAPIKey())
+                .addHeader("Authorization", tixteClient.getAPIKey())
                 .addHeader("User-Agent", "Tixte4J-Request (" + GITHUB + ", " + VERSION + ")")
-                .addHeader("domain", domain == null ? getClient().getDefaultDomain().orElse(null) : domain)
+                .addHeader("domain", domain == null ? tixteClient.getDefaultDomain().orElse(null) : domain)
                 .addHeader("type", privateFile ? "2" : "1")
                 .post(multipartBody)
                 .build();
 
-        CompletableFuture<InputStream> future = new CompletableFuture<>();
+        final Call call = tixteClient.getHttpClient().newCall(request);
 
-        getHttpClient().newCall(request).enqueue(FunctionalCallback
-                .onFailure((call, e) -> future.completeExceptionally(new UncheckedIOException(e)))
-                .onSuccess((call, response) ->
-                {
-                    if (response.isSuccessful())
-                    {
-                        logger.info("Request successful: " + Route.File.UPLOAD_FILE);
-
-                        InputStream body = IOUtil.getBody(response);
-
-                        if (!future.complete(body))
-                        {
-                            IOUtil.silentClose(response);
-                        }
-                    }
-                    else
-                    {
-                        IOUtil.silentClose(response);
-                    }
-                }).build()
-        );
-        return future;
-    }
-
-    @NotNull
-    @NonBlocking
-    @CheckReturnValue
-    private static TixteClient getClient()
-    {
-        try
+        try (Response response = call.execute(); var scope = new StructuredTaskScope<String>())
         {
-            Constructor<?> constructor = TixteClient.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return (TixteClient) constructor.newInstance();
-        }
-        catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
+            Future<String> responseString = scope.fork(response.body()::string);
+            scope.join();
 
-    @Nullable
-    @NonBlocking
-    @CheckReturnValue
-    private static OkHttpClient getHttpClient()
-    {
-        try
-        {
-            Field field = TixteClientBuilder.class.getDeclaredField("client");
-            field.setAccessible(true);
-            return (OkHttpClient) field.get(OkHttpClient.class);
-        }
-        catch (NoSuchFieldException | IllegalAccessException e)
-        {
-            throw new RuntimeException(e);
+            IOUtil.silentClose(response);
+            logger.info("Request successful: " + Route.File.UPLOAD_FILE);
+
+            return responseString;
         }
     }
 }
