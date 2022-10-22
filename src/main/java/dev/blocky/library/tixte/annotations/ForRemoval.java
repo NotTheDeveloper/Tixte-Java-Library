@@ -34,6 +34,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ForRemoval
 {
     /**
+     * Specifies the version, in which the deprecated method or class should be removed.
+     *
      * @return The version, in which the deprecated method or class should be removed.
      */
     String deadline();

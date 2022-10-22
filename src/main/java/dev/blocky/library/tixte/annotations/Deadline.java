@@ -34,6 +34,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Deadline
 {
     /**
+     * Specifies the version, in which the <b>new</b> method or class should be finished.
+     *
      * @return The version, in which the <b>new</b> method or class should be finished.
      */
     String version();

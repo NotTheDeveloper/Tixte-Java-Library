@@ -34,6 +34,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface DeprecatedSince
 {
     /**
+     * Specifies the version, since when the method or class is deprecated.
+     *
      * @return The version, since when the method or class is deprecated.
      */
     String version();
