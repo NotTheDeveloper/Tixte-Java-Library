@@ -16,11 +16,11 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.Helpers;
-import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 public class EmbedEditor implements RawResponseData
 {
     private final Pattern URL_PATTERN = Pattern.compile("^ht{2}ps?://[a-zA-Z\\d]+.[a-zA-Z\\d]+(.[a-zA-Z._/-]+)?([a-zA-Z\\d._/-]+)?", Pattern.CASE_INSENSITIVE);
-    private final Logger logger = TixteLogger.getLog(EmbedEditor.class);
+    private final Logger logger = FallbackLogger.getLog(EmbedEditor.class);
     private final StringBuilder description = new StringBuilder();
     private String providerName, providerUrl, color;
     private String authorName, authorUrl, title;
@@ -94,7 +94,7 @@ public class EmbedEditor implements RawResponseData
                     " characters!");
         }
 
-        String description = this.description.length() < 1 ? null : this.description.toString();
+        final String description = this.description.length() < 1 ? null : this.description.toString();
 
         return new Embed(authorName, authorUrl, title, description, color, providerName, providerUrl);
     }
@@ -460,7 +460,7 @@ public class EmbedEditor implements RawResponseData
      */
     public boolean onlyImageEnabled() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getBoolean(json, "data.only_image");
     }
 
@@ -480,7 +480,7 @@ public class EmbedEditor implements RawResponseData
     @NotNull
     public String getEmbedTitle() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.title");
     }
 
@@ -501,7 +501,7 @@ public class EmbedEditor implements RawResponseData
     @NotNull
     public String getEmbedDescription() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.description");
     }
 
@@ -521,7 +521,7 @@ public class EmbedEditor implements RawResponseData
     @NotNull
     public String getEmbedAuthorName() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.author_name");
     }
 
@@ -541,7 +541,7 @@ public class EmbedEditor implements RawResponseData
     @NotNull
     public String getEmbedAuthorUrl() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.author_url");
     }
 
@@ -561,7 +561,7 @@ public class EmbedEditor implements RawResponseData
     @NotNull
     public String getEmbedProviderName() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.provider_name");
     }
 
@@ -581,7 +581,7 @@ public class EmbedEditor implements RawResponseData
     @NotNull
     public String getEmbedProviderUrl() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.author_url");
     }
 
@@ -601,7 +601,7 @@ public class EmbedEditor implements RawResponseData
     @NotNull
     public String getEmbedThemeColor() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.embed.theme_color");
     }
 
@@ -618,7 +618,7 @@ public class EmbedEditor implements RawResponseData
             return false;
         }
 
-        EmbedEditor editor = (EmbedEditor) o;
+        final EmbedEditor editor = (EmbedEditor) o;
 
         return URL_PATTERN.equals(editor.URL_PATTERN) && logger.equals(editor.logger) &&
                 Objects.equals(description.toString(), editor.description.toString()) && Objects.equals(providerName, editor.providerName) &&

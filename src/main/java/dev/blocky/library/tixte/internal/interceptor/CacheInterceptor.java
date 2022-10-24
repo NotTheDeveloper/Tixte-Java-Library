@@ -38,10 +38,10 @@ public class CacheInterceptor implements Interceptor
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException
     {
-        Request request = chain.request();
-        Response response = chain.proceed(request);
+        final Request request = chain.request();
+        final Response response = chain.proceed(request);
 
-        CacheControl cacheControl = new CacheControl.Builder()
+        final CacheControl cacheControl = new CacheControl.Builder()
                 .maxAge(604800, TimeUnit.MILLISECONDS)
                 .build();
 

@@ -51,14 +51,14 @@ public record Network(@NotNull String hostName, int port)
 
         try
         {
-            Socket socket = new Socket();
-            SocketAddress socketAddress = new InetSocketAddress(hostName, port);
+            final Socket socket = new Socket();
+            final SocketAddress socketAddress = new InetSocketAddress(hostName, port);
 
             socket.connect(socketAddress, 1500);
             socket.close();
             return true;
         }
-        catch (IOException e)
+        catch (@NotNull IOException e)
         {
             return false;
         }

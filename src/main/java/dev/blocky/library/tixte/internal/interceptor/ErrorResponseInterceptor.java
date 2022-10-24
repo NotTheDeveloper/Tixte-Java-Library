@@ -38,14 +38,18 @@ public class ErrorResponseInterceptor implements Interceptor
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException
     {
-        Request request = chain.request();
-        Response response = chain.proceed(request);
+        final Request request = chain.request();
+        final Response response = chain.proceed(request);
 
-        DataObject json = DataObject.fromJson(response.peekBody(1000000).string());
+        final DataObject json = DataObject.fromJson(response.peekBody(1000000).string());
 
         if (!response.isSuccessful())
         {
-            DataObject error = json.getDataObject("error");
+            final DataObject error = json.getDataObject("error");
+
+            final String prettyString = json.toPrettyString();
+
+            System.err.println(prettyString);
 
             switch (response.code())
             {

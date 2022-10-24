@@ -43,13 +43,13 @@ public class DateFormatExample
     @NotNull
     public static Date formatDateTime() throws InterruptedException, IOException
     {
-        SelfUser self = new SelfUser();
+        final SelfUser self = new SelfUser();
 
         // Fully parses the text producing a temporal object.
         // This parses the entire text producing a temporal object.
         // The result of this method is TemporalAccessor which has been resolved, applying basic validation checks to help ensure a valid date-time.
-        TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT.parse(self.getLastLogin());
-        Instant instant = Instant.from(temporalAccessor);
+        final TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT.parse(self.getLastLogin());
+        final Instant instant = Instant.from(temporalAccessor);
 
         // Returns a valid datetime
         return Date.from(instant);

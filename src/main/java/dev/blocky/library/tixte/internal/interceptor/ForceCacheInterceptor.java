@@ -38,8 +38,8 @@ public class ForceCacheInterceptor implements Interceptor
     @Override
     public Response intercept(@NotNull Interceptor.Chain chain) throws IOException
     {
-        Request.Builder builder = chain.request().newBuilder();
-        Network network = new Network("8.8.8.8", 53);
+        final Request.Builder builder = chain.request().newBuilder();
+        final Network network = new Network("8.8.8.8", 53);
 
         if (!network.isInternetAvailable())
         {

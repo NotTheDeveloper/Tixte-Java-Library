@@ -17,6 +17,7 @@ package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.utils.Helpers;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -104,7 +105,7 @@ public record Embed(@Nullable String authorName, @Nullable String authorUrl, @Nu
                  @Nullable String description, @Nullable String color, @Nullable String providerName,
                  @Nullable String providerUrl)
     {
-        EmbedEditor editor = new EmbedEditor();
+        final EmbedEditor editor = new EmbedEditor();
 
         this.description = description;
         this.title = title;
@@ -116,17 +117,17 @@ public record Embed(@Nullable String authorName, @Nullable String authorUrl, @Nu
 
         try
         {
-            String embedDescription = description == null ? editor.getEmbedDescription() : description;
-            String embedTitle = title == null ? editor.getEmbedTitle() : title;
-            String embedColor = color == null ? editor.getEmbedThemeColor() : color;
-            String embedAuthorName = authorName == null ? editor.getEmbedAuthorName() : authorName;
-            String embedAuthorUrl = authorUrl == null ? editor.getEmbedAuthorUrl() : authorUrl;
-            String embedProviderName = providerName == null ? editor.getEmbedProviderName() : providerName;
-            String embedProviderUrl = providerUrl == null ? editor.getEmbedProviderUrl() : providerUrl;
+            final String embedDescription = description == null ? editor.getEmbedDescription() : description;
+            final String embedTitle = title == null ? editor.getEmbedTitle() : title;
+            final String embedColor = color == null ? editor.getEmbedThemeColor() : color;
+            final String embedAuthorName = authorName == null ? editor.getEmbedAuthorName() : authorName;
+            final String embedAuthorUrl = authorUrl == null ? editor.getEmbedAuthorUrl() : authorUrl;
+            final String embedProviderName = providerName == null ? editor.getEmbedProviderName() : providerName;
+            final String embedProviderUrl = providerUrl == null ? editor.getEmbedProviderUrl() : providerUrl;
 
             RawResponseData.setEmbedRaw(embedDescription, embedTitle, embedColor, embedAuthorName, embedAuthorUrl, embedProviderName, embedProviderUrl);
         }
-        catch (InterruptedException | IOException e)
+        catch (@NotNull InterruptedException | @NotNull IOException e)
         {
             e.printStackTrace();
         }

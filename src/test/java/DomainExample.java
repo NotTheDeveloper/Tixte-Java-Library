@@ -40,7 +40,7 @@ public class DomainExample
     @NotNull
     public static Domains createDomain() throws InterruptedException, IOException
     {
-        Domains domains = new Domains();
+        final Domains domains = new Domains();
 
         // Adds a *new* domain to the dashboard.
         // You cannot use domain endings, you don't own.
@@ -60,7 +60,7 @@ public class DomainExample
     @NotNull
     public static Domains createRandomDomain() throws InterruptedException, IOException
     {
-        Domains domains = new Domains();
+        final Domains domains = new Domains();
 
         // You should note everything I said above.
         // This will only create the beginning of the domain, because otherwise it could create a domain, you don*t own.
@@ -78,7 +78,7 @@ public class DomainExample
     @Nullable
     public static Domains deleteDomain() throws InterruptedException, IOException
     {
-        Domains domains = new Domains();
+        final Domains domains = new Domains();
 
         // This will delete the domain.
         // Of course, you cannot delete a domain, that doesn't exist

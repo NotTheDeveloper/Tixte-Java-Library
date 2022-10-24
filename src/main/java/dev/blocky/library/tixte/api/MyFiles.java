@@ -58,7 +58,7 @@ public record MyFiles() implements RawResponseData
      */
     public long getUsedSize() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getSizeRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getSizeRaw().resultNow());
         return DataPath.getInt(json, "data.used");
     }
 
@@ -78,7 +78,7 @@ public record MyFiles() implements RawResponseData
      */
     public long getLimit() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getSizeRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getSizeRaw().resultNow());
         return DataPath.getInt(json, "data.limit");
     }
 
@@ -120,7 +120,7 @@ public record MyFiles() implements RawResponseData
      */
     public int getPremiumTier() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getSizeRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getSizeRaw().resultNow());
         return DataPath.getInt(json, "data.premium_tier");
     }
 
@@ -136,7 +136,7 @@ public record MyFiles() implements RawResponseData
      */
     public int getTotalUploadCount() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         return DataPath.getInt(json, "data.total");
     }
 
@@ -152,7 +152,7 @@ public record MyFiles() implements RawResponseData
      */
     public int getResults() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         return DataPath.getInt(json, "data.results");
     }
 
@@ -170,10 +170,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<Integer> getPermissionLevels() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<Integer> list = new ArrayList<>();
+        final List<Integer> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -199,10 +199,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<String> getExtensions() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -225,10 +225,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<Integer> getSizes() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<Integer> list = new ArrayList<>();
+        final List<Integer> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -255,10 +255,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<String> getUploadDates() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -281,10 +281,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<String> getDomains() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -307,10 +307,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<String> getNames() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -338,10 +338,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<String> getMimeTypes() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -368,10 +368,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<Object> getExpirationTimes() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<Object> list = new ArrayList<>();
+        final List<Object> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -394,10 +394,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<String> getAssetIds() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -423,10 +423,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<Integer> getTypes() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<Integer> list = new ArrayList<>();
+        final List<Integer> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -452,10 +452,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<Boolean> isPublic() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<Boolean> list = new ArrayList<>();
+        final List<Boolean> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -481,10 +481,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<Boolean> isPrivate() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<Boolean> list = new ArrayList<>();
+        final List<Boolean> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -514,10 +514,10 @@ public record MyFiles() implements RawResponseData
     @CheckReturnValue
     public List<String> getFileNames() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
-        DataArray uploads = DataPath.getDataArray(json, "data.uploads");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
+        final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
@@ -539,7 +539,7 @@ public record MyFiles() implements RawResponseData
     @NotNull
     public String getUploadRegion() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getString(json, "data.upload_region");
     }
 
@@ -615,7 +615,7 @@ public record MyFiles() implements RawResponseData
     @NotNull
     public MyFiles uploadFile(@NotNull File file) throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(file).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(file).resultNow());
 
         url = DataPath.getString(json, "data.url");
         directURL = DataPath.getString(json, "data.direct_url");
@@ -653,7 +653,7 @@ public record MyFiles() implements RawResponseData
     @NotNull
     public MyFiles uploadPrivateFile(@NotNull File file) throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(file).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(file).resultNow());
 
         url = DataPath.getString(json, "data.url");
         directURL = DataPath.getString(json, "data.direct_url");
@@ -693,7 +693,7 @@ public record MyFiles() implements RawResponseData
     {
         domainCheck(domain);
 
-        DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(file, domain).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(file, domain).resultNow());
 
         url = DataPath.getString(json, "data.url");
         directURL = DataPath.getString(json, "data.direct_url");
@@ -733,7 +733,7 @@ public record MyFiles() implements RawResponseData
     {
         domainCheck(domain);
 
-        DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(file, domain).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(file, domain).resultNow());
 
         url = DataPath.getString(json, "data.url");
         directURL = DataPath.getString(json, "data.direct_url");
@@ -771,7 +771,7 @@ public record MyFiles() implements RawResponseData
     @NotNull
     public MyFiles uploadFile(@NotNull String filePath) throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(filePath).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(filePath).resultNow());
 
         url = DataPath.getString(json, "data.url");
         directURL = DataPath.getString(json, "data.direct_url");
@@ -809,7 +809,7 @@ public record MyFiles() implements RawResponseData
     @NotNull
     public MyFiles uploadPrivateFile(@NotNull String filePath) throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(filePath).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(filePath).resultNow());
 
         url = DataPath.getString(json, "data.url");
         directURL = DataPath.getString(json, "data.direct_url");
@@ -849,7 +849,7 @@ public record MyFiles() implements RawResponseData
     {
         domainCheck(domain);
 
-        DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(filePath, domain).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.uploadFileRaw(filePath, domain).resultNow());
 
         url = DataPath.getString(json, "data.url");
         directURL = DataPath.getString(json, "data.direct_url");
@@ -889,7 +889,7 @@ public record MyFiles() implements RawResponseData
     {
         domainCheck(domain);
 
-        DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(filePath, domain).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.uploadPrivateFileRaw(filePath, domain).resultNow());
 
         url = DataPath.getString(json, "data.url");
         directURL = DataPath.getString(json, "data.direct_url");

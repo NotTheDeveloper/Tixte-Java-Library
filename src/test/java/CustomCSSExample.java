@@ -41,12 +41,12 @@ public class CustomCSSExample
     @NotNull
     public static PageDesign setCustomCSS() throws InterruptedException, IOException
     {
-        PageDesign pageDesign = new PageDesign();
+        final PageDesign pageDesign = new PageDesign();
 
         // Creates a new File object for the CSS file. (You don't have to do this, but it's a good idea to do so.)
         // You can do this much simpler, by just using a string instead of a File object.
         // There are some pretty sweet themes that you can use. (some themes are in the resource folder of the test directory)
-        File file = new File("YOUR_VALID_FILE_PATH");
+        final File file = new File("YOUR_VALID_FILE_PATH");
 
         return pageDesign
                 // This will throw an exception if the CSS is invalid.

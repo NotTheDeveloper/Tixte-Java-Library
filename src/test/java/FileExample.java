@@ -42,11 +42,11 @@ public class FileExample
     @NotNull
     public static MyFiles uploadFile() throws InterruptedException, IOException
     {
-        MyFiles myFiles = new MyFiles();
+        final MyFiles myFiles = new MyFiles();
 
         // Creates a *new* File object.
         // If you initialize a file, which doesn't exist, this will throw an FileNotFoundException, an NoSuchFileException and an IOException.
-        File file = new File("YOUR_VALID_FILE_PATH");
+        final File file = new File("YOUR_VALID_FILE_PATH");
 
         // This uses the default domain, which you can initialize with TixteClientBuilder#setDefaultDomain(@Nullable String).
         // If you haven't initialized the default domain, this will throw an exception.
@@ -66,13 +66,13 @@ public class FileExample
      */
     public static MyFiles uploadFileFromURL() throws InterruptedException, IOException
     {
-        MyFiles myFiles = new MyFiles();
+        final MyFiles myFiles = new MyFiles();
 
         // Creates a *new* File object.
         // Here you set the path, where the file should be created, but also the name of the file.
-        File file = new File("YOUR_VALID_FILE_PATH");
+        final File file = new File("YOUR_VALID_FILE_PATH");
         // This is the url, from where the file will get downloaded.
-        URL url = new URL("YOUR_VALID_URL");
+        final URL url = new URL("YOUR_VALID_URL");
 
         // Starts the downloading process.
         FileUtils.copyURLToFile(url, file);
@@ -97,7 +97,7 @@ public class FileExample
     @NotNull
     public static MyFiles deleteFile() throws InterruptedException, IOException
     {
-        MyFiles myFiles = new MyFiles();
+        final MyFiles myFiles = new MyFiles();
 
         // This could throw an HTTPException if there is no file to purge, but I am not sure about that.
         // Also note that this could throw an exception if the file takes too long to delete or if the of the fileId is invalid.
@@ -116,7 +116,7 @@ public class FileExample
     @NotNull
     public static MyFiles deleteAllFiles() throws InterruptedException, IOException
     {
-        MyFiles myFiles = new MyFiles();
+        final MyFiles myFiles = new MyFiles();
 
         // You must set a password (for some reason) to execute this request, because otherwise it won't work.
         // This could throw an HTTPException if there is no file to purge, but I am not sure about that.

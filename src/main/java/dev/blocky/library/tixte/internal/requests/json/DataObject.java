@@ -23,9 +23,9 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.MapType;
+import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.api.exceptions.ParsingException;
 import dev.blocky.library.tixte.internal.utils.Helpers;
-import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +49,7 @@ import java.util.function.UnaryOperator;
  */
 public record DataObject(@NotNull Map<String, Object> data) implements SerializableData
 {
-    private static final Logger log = TixteLogger.getLog(DataObject.class);
+    private static final Logger log = FallbackLogger.getLog(DataObject.class);
     private static final ObjectMapper mapper;
     private static final SimpleModule module;
     private static final MapType mapType;
@@ -91,10 +91,10 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     {
         try
         {
-            Map<String, Object> map = mapper.readValue(data, mapType);
+            final Map<String, Object> map = mapper.readValue(data, mapType);
             return new DataObject(map);
         }
-        catch (IOException ex)
+        catch (@NotNull IOException ex)
         {
             throw new ParsingException(ex);
         }
@@ -114,10 +114,10 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     {
         try
         {
-            Map<String, Object> map = mapper.readValue(json, mapType);
+            final Map<String, Object> map = mapper.readValue(json, mapType);
             return new DataObject(map);
         }
-        catch (IOException ex)
+        catch (@NotNull IOException ex)
         {
             throw new ParsingException(ex);
         }
@@ -137,10 +137,10 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     {
         try
         {
-            Map<String, Object> map = mapper.readValue(stream, mapType);
+            final Map<String, Object> map = mapper.readValue(stream, mapType);
             return new DataObject(map);
         }
-        catch (IOException ex)
+        catch (@NotNull IOException ex)
         {
             throw new ParsingException(ex);
         }
@@ -160,10 +160,10 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     {
         try
         {
-            Map<String, Object> map = mapper.readValue(stream, mapType);
+            final Map<String, Object> map = mapper.readValue(stream, mapType);
             return new DataObject(map);
         }
-        catch (IOException ex)
+        catch (@NotNull IOException ex)
         {
             throw new ParsingException(ex);
         }
@@ -244,7 +244,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
         {
             child = (Map<String, Object>) get(Map.class, key);
         }
-        catch (ClassCastException ex)
+        catch (@NotNull ClassCastException ex)
         {
             log.error("Unable to extract child data", ex);
         }
@@ -284,7 +284,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
         {
             child = (List<Object>) get(List.class, key);
         }
-        catch (ClassCastException ex)
+        catch (@NotNull ClassCastException ex)
         {
             log.error("Unable to extract child data", ex);
         }
@@ -319,7 +319,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     @NotNull
     public Object get(@NotNull String key)
     {
-        Object value = data.get(key);
+        final Object value = data.get(key);
 
         if (value == null)
         {
@@ -341,7 +341,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     @NotNull
     public String getString(@NotNull String key)
     {
-        String value = getString(key, null);
+        final String value = getString(key, null);
 
         if (value == null)
         {
@@ -362,7 +362,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     @Contract("_, !null -> !null")
     public String getString(@NotNull String key, @Nullable String defaultValue)
     {
-        String value = get(String.class, key, UnaryOperator.identity(), String::valueOf);
+        final String value = get(String.class, key, UnaryOperator.identity(), String::valueOf);
         return value == null ? defaultValue : value;
     }
 
@@ -395,7 +395,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      */
     public boolean getBoolean(@NotNull String key, boolean defaultValue)
     {
-        Boolean value = get(Boolean.class, key, Boolean::parseBoolean, null);
+        final Boolean value = get(Boolean.class, key, Boolean::parseBoolean, null);
         return value == null ? defaultValue : value;
     }
 
@@ -410,7 +410,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      */
     public long getLong(@NotNull String key)
     {
-        Long value = get(Long.class, key, Helpers::parseLong, Number::longValue);
+        final Long value = get(Long.class, key, Helpers::parseLong, Number::longValue);
 
         if (value == null)
         {
@@ -432,7 +432,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      */
     public long getLong(@NotNull String key, long defaultValue)
     {
-        Long value = get(Long.class, key, Long::parseLong, Number::longValue);
+        final Long value = get(Long.class, key, Long::parseLong, Number::longValue);
         return value == null ? defaultValue : value;
     }
 
@@ -447,7 +447,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      */
     public long getUnsignedLong(@NotNull String key)
     {
-        Long value = get(Long.class, key, Long::parseUnsignedLong, Number::longValue);
+        final Long value = get(Long.class, key, Long::parseUnsignedLong, Number::longValue);
 
         if (value == null)
         {
@@ -469,7 +469,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      */
     public long getUnsignedLong(@NotNull String key, long defaultValue)
     {
-        Long value = get(Long.class, key, Long::parseUnsignedLong, Number::longValue);
+        final Long value = get(Long.class, key, Long::parseUnsignedLong, Number::longValue);
         return value == null ? defaultValue : value;
     }
 
@@ -484,7 +484,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      */
     public int getInt(@NotNull String key)
     {
-        Integer value = get(Integer.class, key, Integer::parseInt, Number::intValue);
+        final Integer value = get(Integer.class, key, Integer::parseInt, Number::intValue);
 
         if (value == null)
         {
@@ -506,7 +506,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      */
     public int getInt(@NotNull String key, int defaultValue)
     {
-        Integer value = get(Integer.class, key, Integer::parseInt, Number::intValue);
+        final Integer value = get(Integer.class, key, Integer::parseInt, Number::intValue);
         return value == null ? defaultValue : value;
     }
 
@@ -521,7 +521,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      */
     public int getUnsignedInt(@NotNull String key)
     {
-        Integer value = get(Integer.class, key, Integer::parseUnsignedInt, Number::intValue);
+        final Integer value = get(Integer.class, key, Integer::parseUnsignedInt, Number::intValue);
 
         if (value == null)
         {
@@ -543,7 +543,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      */
     public int getUnsignedInt(@NotNull String key, int defaultValue)
     {
-        Integer value = get(Integer.class, key, Integer::parseUnsignedInt, Number::intValue);
+        final Integer value = get(Integer.class, key, Integer::parseUnsignedInt, Number::intValue);
         return value == null ? defaultValue : value;
     }
 
@@ -558,7 +558,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      */
     public double getDouble(@NotNull String key)
     {
-        Double value = get(Double.class, key, Double::parseDouble, Number::doubleValue);
+        final Double value = get(Double.class, key, Double::parseDouble, Number::doubleValue);
 
         if (value == null)
         {
@@ -580,7 +580,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      */
     public double getDouble(@NotNull String key, double defaultValue)
     {
-        Double value = get(Double.class, key, Double::parseDouble, Number::doubleValue);
+        final Double value = get(Double.class, key, Double::parseDouble, Number::doubleValue);
         return value == null ? defaultValue : value;
     }
 
@@ -670,11 +670,11 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     {
         try
         {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             mapper.writeValue(outputStream, data);
             return outputStream.toByteArray();
         }
-        catch (IOException e)
+        catch (@NotNull IOException e)
         {
             throw new UncheckedIOException(e);
         }
@@ -688,15 +688,15 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     @NotNull
     public String toPrettyString()
     {
-        DefaultPrettyPrinter.Indenter indent = new DefaultIndenter("    ", DefaultIndenter.SYS_LF);
-        DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
+        final DefaultPrettyPrinter.Indenter indent = new DefaultIndenter("    ", DefaultIndenter.SYS_LF);
+        final DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
         printer.withObjectIndenter(indent).withArrayIndenter(indent);
 
         try
         {
             return mapper.writer(printer).writeValueAsString(data);
         }
-        catch (JsonProcessingException e)
+        catch (@NotNull JsonProcessingException e)
         {
             throw new ParsingException(e);
         }
@@ -728,7 +728,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     @Nullable
     private <T> T get(@NotNull Class<T> type, @NotNull String key, @Nullable Function<String, T> stringParse, @Nullable Function<Number, T> numberParse)
     {
-        Object value = data.get(key);
+        final Object value = data.get(key);
 
         if (value == null)
         {
@@ -773,7 +773,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
         {
             return mapper.writeValueAsString(data);
         }
-        catch (JsonProcessingException e)
+        catch (@NotNull JsonProcessingException e)
         {
             throw new ParsingException(e);
         }

@@ -48,7 +48,7 @@ public record PageDesign() implements RawResponseData
     @NotNull
     public String getCustomCSS() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getString(json, "data.custom_css");
     }
 
@@ -112,7 +112,7 @@ public record PageDesign() implements RawResponseData
      */
     public boolean hidesBranding() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
         return DataPath.getBoolean(json, "data.hide_branding");
     }
 }

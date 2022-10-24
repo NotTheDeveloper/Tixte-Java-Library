@@ -194,8 +194,8 @@ public class TixteClient implements RawResponseData
     @CheckReturnValue
     public Object baseRedirect() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
-        DataObject data = json.getDataObject("data");
+        final DataObject json = DataObject.fromJson(RawResponseData.getConfigRaw().resultNow());
+        final DataObject data = json.getDataObject("data");
 
         return data.get("base_redirect");
     }

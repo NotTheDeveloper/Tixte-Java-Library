@@ -23,6 +23,16 @@ publishing {
 
 repositories {
     mavenCentral()
+
+    repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/BlockyDotJar/SLF4J-Fallback-Logger")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
 
 dependencies {
@@ -31,6 +41,7 @@ dependencies {
     api("com.squareup.okhttp3:okhttp:4.10.0")
     api("com.squareup.okio:okio-jvm:3.2.0")
     api("org.slf4j:slf4j-api:2.0.3")
+    api("dev.blocky.library:slf4j-fbl:1.0.1")
     api("org.apache.commons:commons-collections4:4.4")
     api("commons-io:commons-io:2.11.0")
 
@@ -39,7 +50,7 @@ dependencies {
 }
 
 group = "dev.blocky.library"
-version = "1.1.0"
+version = "1.1.1"
 description = "A wrapper for the Tixte API in Java."
 
 java {

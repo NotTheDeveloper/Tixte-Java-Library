@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
+import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.api.TixteClient;
 import dev.blocky.library.tixte.api.TixteClientBuilder;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
-import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import secrets.DONOTOPEN;
@@ -33,13 +33,12 @@ import java.io.IOException;
  */
 public class BasicTixteClientExample
 {
-    private static final Logger logger = TixteLogger.getLog(BasicTixteClientExample.class);
-    private static TixteClient client;
+    private static final Logger logger = FallbackLogger.getLog(BasicTixteClientExample.class);
 
     public static void main(@NotNull String[] args) throws IOException
     {
         // Creates a *new* TixteClientBuilder instance.
-        TixteClientBuilder builder = new TixteClientBuilder()
+        final TixteClientBuilder builder = new TixteClientBuilder()
                 // Sets the API-key, which is required for most of the methods.
                 // This method also sets the cache policy. I really recommend to set this to ALL.
                 // If this is equal to null or not set, this will be automatically set to NONE.
@@ -51,19 +50,8 @@ public class BasicTixteClientExample
                 .setDefaultDomain(DONOTOPEN.getDefaultDomain());
 
         // Builds a *new* TixteClient instance and uses the provided API-key and session-token to start the login process.
-        client = builder.build();
+        builder.build();
 
         logger.info("Successfully logged in!");
-    }
-
-    /**
-     * Returns the {@link TixteClient} instance from the {@link BasicTixteClientExample} class.
-     *
-     * @return {@link BasicTixteClientExample#client}.
-     */
-    @NotNull
-    public static TixteClient getTixteClient()
-    {
-        return client;
     }
 }

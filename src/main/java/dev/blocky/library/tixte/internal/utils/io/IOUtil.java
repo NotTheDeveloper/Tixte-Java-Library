@@ -46,7 +46,7 @@ public class IOUtil
         {
             closeable.close();
         }
-        catch (IOException ignored)
+        catch (@NotNull IOException ignored)
         {
             // Ignored.
         }

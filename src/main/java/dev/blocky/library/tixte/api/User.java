@@ -46,7 +46,7 @@ public record User(@Nullable String userData) implements RawResponseData
      */
     public int getFlagCount() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw(userData).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw(userData).resultNow());
         return DataPath.getInt(json, "data.flags");
     }
 
@@ -64,7 +64,7 @@ public record User(@Nullable String userData) implements RawResponseData
     @CheckReturnValue
     public String getId() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw(userData).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw(userData).resultNow());
         return DataPath.getString(json, "data.id");
     }
 
@@ -83,7 +83,7 @@ public record User(@Nullable String userData) implements RawResponseData
     @CheckReturnValue
     public String getAvatarId() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw(userData).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw(userData).resultNow());
         return DataPath.getString(json, "data.avatar?");
     }
 
@@ -101,7 +101,7 @@ public record User(@Nullable String userData) implements RawResponseData
     @CheckReturnValue
     public String getUsername() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw(userData).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw(userData).resultNow());
         return DataPath.getString(json, "data.username");
     }
 }

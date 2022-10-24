@@ -43,7 +43,7 @@ public class RateLimitInterceptor implements Interceptor
             {
                 Thread.sleep(5000);
             }
-            catch (InterruptedException e)
+            catch (@NotNull InterruptedException e)
             {
                 e.printStackTrace();
             }

@@ -33,7 +33,7 @@ public class EmbedEditorExample
     @NotNull
     public static Embed buildEmbed()
     {
-        EmbedEditor editor = new EmbedEditor();
+        final EmbedEditor editor = new EmbedEditor();
 
         // Sets the author name and url of the embed. If you only want to set the author name, you can use setAuthorName(@Nullable String).
         // You can not only set the author url, because that doesn't make much sense.

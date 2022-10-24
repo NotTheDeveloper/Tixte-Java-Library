@@ -23,9 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.api.exceptions.ParsingException;
 import dev.blocky.library.tixte.internal.utils.Helpers;
-import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +52,7 @@ import java.util.stream.Stream;
  */
 public record DataArray(@NotNull List<Object> data) implements Iterable<Object>, SerializableArray
 {
-    private static final Logger log = TixteLogger.getLog(DataArray.class);
+    private static final Logger log = FallbackLogger.getLog(DataArray.class);
     private static final ObjectMapper mapper;
     private static final SimpleModule module;
     private static final CollectionType listType;
@@ -109,7 +109,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             return new DataArray(mapper.readValue(json, listType));
         }
-        catch (IOException e)
+        catch (@NotNull IOException e)
         {
             throw new ParsingException(e);
         }
@@ -131,7 +131,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             return new DataArray(mapper.readValue(json, listType));
         }
-        catch (IOException e)
+        catch (@NotNull IOException e)
         {
             throw new ParsingException(e);
         }
@@ -153,7 +153,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             return new DataArray(mapper.readValue(json, listType));
         }
-        catch (IOException e)
+        catch (@NotNull IOException e)
         {
             throw new ParsingException(e);
         }
@@ -227,7 +227,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             child = (Map<String, Object>) get(Map.class, index);
         }
-        catch (ClassCastException ex)
+        catch (@NotNull ClassCastException ex)
         {
             log.error("Unable to extract child data", ex);
         }
@@ -258,7 +258,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             child = (List<Object>) get(List.class, index);
         }
-        catch (ClassCastException ex)
+        catch (@NotNull ClassCastException ex)
         {
             log.error("Unable to extract child data", ex);
         }
@@ -282,7 +282,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
     @NotNull
     public String getString(int index)
     {
-        String value = get(String.class, index, UnaryOperator.identity(), String::valueOf);
+        final String value = get(String.class, index, UnaryOperator.identity(), String::valueOf);
 
         if (value == null)
         {
@@ -304,7 +304,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
     @Contract("_, !null -> !null")
     public String getString(int index, @Nullable String defaultValue)
     {
-        String value = get(String.class, index, UnaryOperator.identity(), String::valueOf);
+        final String value = get(String.class, index, UnaryOperator.identity(), String::valueOf);
         return value == null ? defaultValue : value;
     }
 
@@ -337,7 +337,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
      */
     public boolean getBoolean(int index, boolean defaultValue)
     {
-        Boolean value = get(Boolean.class, index, Boolean::parseBoolean, null);
+        final Boolean value = get(Boolean.class, index, Boolean::parseBoolean, null);
         return value == null ? defaultValue : value;
     }
 
@@ -352,7 +352,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
      */
     public int getInt(int index)
     {
-        Integer value = get(Integer.class, index, Integer::parseInt, Number::intValue);
+        final Integer value = get(Integer.class, index, Integer::parseInt, Number::intValue);
 
         if (value == null)
         {
@@ -373,7 +373,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
      */
     public int getInt(int index, int defaultValue)
     {
-        Integer value = get(Integer.class, index, Integer::parseInt, Number::intValue);
+        final Integer value = get(Integer.class, index, Integer::parseInt, Number::intValue);
         return value == null ? defaultValue : value;
     }
 
@@ -388,7 +388,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
      */
     public int getUnsignedInt(int index)
     {
-        Integer value = get(Integer.class, index, Integer::parseUnsignedInt, Number::intValue);
+        final Integer value = get(Integer.class, index, Integer::parseUnsignedInt, Number::intValue);
 
         if (value == null)
         {
@@ -409,7 +409,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
      */
     public int getUnsignedInt(int index, int defaultValue)
     {
-        Integer value = get(Integer.class, index, Integer::parseUnsignedInt, Number::intValue);
+        final Integer value = get(Integer.class, index, Integer::parseUnsignedInt, Number::intValue);
         return value == null ? defaultValue : value;
     }
 
@@ -424,7 +424,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
      */
     public long getLong(int index)
     {
-        Long value = get(Long.class, index, Long::parseLong, Number::longValue);
+        final Long value = get(Long.class, index, Long::parseLong, Number::longValue);
 
         if (value == null)
         {
@@ -445,7 +445,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
      */
     public long getLong(int index, long defaultValue)
     {
-        Long value = get(Long.class, index, Long::parseLong, Number::longValue);
+        final Long value = get(Long.class, index, Long::parseLong, Number::longValue);
         return value == null ? defaultValue : value;
     }
 
@@ -460,7 +460,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
      */
     public long getUnsignedLong(int index)
     {
-        Long value = get(Long.class, index, Long::parseUnsignedLong, Number::longValue);
+        final Long value = get(Long.class, index, Long::parseUnsignedLong, Number::longValue);
 
         if (value == null)
         {
@@ -481,7 +481,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
      */
     public long getUnsignedLong(int index, long defaultValue)
     {
-        Long value = get(Long.class, index, Long::parseUnsignedLong, Number::longValue);
+        final Long value = get(Long.class, index, Long::parseUnsignedLong, Number::longValue);
         return value == null ? defaultValue : value;
     }
 
@@ -496,7 +496,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
      */
     public double getDouble(int index)
     {
-        Double value = get(Double.class, index, Double::parseDouble, Number::doubleValue);
+        final Double value = get(Double.class, index, Double::parseDouble, Number::doubleValue);
 
         if (value == null)
         {
@@ -517,7 +517,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
      */
     public double getDouble(int index, double defaultValue)
     {
-        Double value = get(Double.class, index, Double::parseDouble, Number::doubleValue);
+        final Double value = get(Double.class, index, Double::parseDouble, Number::doubleValue);
         return value == null ? defaultValue : value;
     }
 
@@ -641,7 +641,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
             mapper.writeValue(outputStream, data);
             return outputStream.toByteArray();
         }
-        catch (IOException e)
+        catch (@NotNull IOException e)
         {
             throw new UncheckedIOException(e);
         }
@@ -655,15 +655,15 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
     @NotNull
     public String toPrettyString()
     {
-        DefaultPrettyPrinter.Indenter indent = new DefaultIndenter("    ", DefaultIndenter.SYS_LF);
-        DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
+        final DefaultPrettyPrinter.Indenter indent = new DefaultIndenter("    ", DefaultIndenter.SYS_LF);
+        final DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
         printer.withObjectIndenter(indent).withArrayIndenter(indent);
 
         try
         {
             return mapper.writer(printer).writeValueAsString(data);
         }
-        catch (JsonProcessingException e)
+        catch (@NotNull JsonProcessingException e)
         {
             throw new ParsingException(e);
         }
@@ -695,7 +695,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
     @Nullable
     private <T> T get(@NotNull Class<T> type, int index, @Nullable Function<String, T> stringMapper, @Nullable Function<Number, T> numberMapper)
     {
-        Object value = data.get(index);
+        final Object value = data.get(index);
 
         if (value == null)
         {
@@ -754,7 +754,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             return mapper.writeValueAsString(data);
         }
-        catch (JsonProcessingException e)
+        catch (@NotNull JsonProcessingException e)
         {
             throw new ParsingException(e);
         }

@@ -106,13 +106,15 @@ public record DataPath()
     private static <T> T getUnchecked(@NotNull DataObject root, @NotNull String path, @NotNull BiFunction<DataObject, String, ? extends T> fromObject,
                                       @NotNull BiFunction<DataArray, Integer, ? extends T> fromArray)
     {
-        String[] parts = path.split("\\.", 2);
+        final String[] parts = path.split("\\.", 2);
+        final String child = parts.length > 1 ? parts[1] : null;
+
         String current = parts[0];
-        String child = parts.length > 1 ? parts[1] : null;
 
         if (current.indexOf('[') > -1)
         {
-            int arrayIndex = current.indexOf('[');
+            final int arrayIndex = current.indexOf('[');
+
             String key = current.substring(0, arrayIndex);
             path = path.substring(arrayIndex);
 
@@ -188,18 +190,19 @@ public record DataPath()
     private static <T> T getUnchecked(@NotNull DataArray root, String path, @NotNull BiFunction<DataObject, String, ? extends T> fromObject,
                                       @NotNull BiFunction<DataArray, Integer, ? extends T> fromArray)
     {
-        byte[] chars = path.getBytes(StandardCharsets.UTF_8);
+        final byte[] chars = path.getBytes(StandardCharsets.UTF_8);
+
         int offset = 0;
 
         for (int i = 0; i < chars.length; i++)
         {
-            int end = indexOf(chars, offset + 1, ']');
-            int index = Integer.parseInt(path.substring(offset + 1, end));
+            final int end = indexOf(chars, offset + 1, ']');
+            final int index = Integer.parseInt(path.substring(offset + 1, end));
 
             offset = Math.min(chars.length, end + 1);
-            boolean optional = offset != chars.length && chars[offset] == '?';
+            final boolean optional = offset != chars.length && chars[offset] == '?';
 
-            boolean isMissing = root.length() <= index || root.isNull(index);
+            final boolean isMissing = root.length() <= index || root.isNull(index);
             if (optional)
             {
                 offset++;
@@ -229,7 +232,7 @@ public record DataPath()
 
     private static int indexOf(byte[] chars, int offset, char c)
     {
-        byte b = (byte) c;
+        final byte b = (byte) c;
         for (int i = offset; i < chars.length; i++)
         {
             if (chars[i] == b)
@@ -256,7 +259,7 @@ public record DataPath()
      */
     public static boolean getBoolean(@NotNull DataObject root, @NotNull String path)
     {
-        Boolean bool = get(root, path, DataObject::getBoolean, DataArray::getBoolean);
+        final Boolean bool = get(root, path, DataObject::getBoolean, DataArray::getBoolean);
         return bool != null && bool;
     }
 
@@ -277,7 +280,7 @@ public record DataPath()
      */
     public static boolean getBoolean(@NotNull DataObject root, @NotNull String path, boolean fallback)
     {
-        Boolean bool = get(root, path, (obj, key) -> obj.getBoolean(key, fallback), (arr, index) -> arr.getBoolean(index, fallback));
+        final Boolean bool = get(root, path, (obj, key) -> obj.getBoolean(key, fallback), (arr, index) -> arr.getBoolean(index, fallback));
         return bool != null ? bool : fallback;
     }
 
@@ -297,7 +300,7 @@ public record DataPath()
      */
     public static boolean getBoolean(@NotNull DataArray root, @NotNull String path)
     {
-        Boolean bool = get(root, path, DataObject::getBoolean, DataArray::getBoolean);
+        final Boolean bool = get(root, path, DataObject::getBoolean, DataArray::getBoolean);
         return bool != null && bool;
     }
 
@@ -318,7 +321,7 @@ public record DataPath()
      */
     public static boolean getBoolean(@NotNull DataArray root, @NotNull String path, boolean fallback)
     {
-        Boolean bool = get(root, path, (obj, key) -> obj.getBoolean(key, fallback), (arr, index) -> arr.getBoolean(index, fallback));
+        final Boolean bool = get(root, path, (obj, key) -> obj.getBoolean(key, fallback), (arr, index) -> arr.getBoolean(index, fallback));
         return bool != null ? bool : fallback;
     }
 
@@ -339,7 +342,7 @@ public record DataPath()
      */
     public static int getInt(@NotNull DataObject root, @NotNull String path)
     {
-        Integer integer = get(root, path, DataObject::getInt, DataArray::getInt);
+        final Integer integer = get(root, path, DataObject::getInt, DataArray::getInt);
 
         if (integer == null)
         {
@@ -366,7 +369,7 @@ public record DataPath()
      */
     public static int getInt(@NotNull DataObject root, @NotNull String path, int fallback)
     {
-        Integer integer = get(root, path, (obj, key) -> obj.getInt(key, fallback), (arr, index) -> arr.getInt(index, fallback));
+        final Integer integer = get(root, path, (obj, key) -> obj.getInt(key, fallback), (arr, index) -> arr.getInt(index, fallback));
         return integer == null ? fallback : integer;
     }
 
@@ -387,7 +390,7 @@ public record DataPath()
      */
     public static int getInt(@NotNull DataArray root, @NotNull String path)
     {
-        Integer integer = get(root, path, DataObject::getInt, DataArray::getInt);
+        final Integer integer = get(root, path, DataObject::getInt, DataArray::getInt);
 
         if (integer == null)
         {
@@ -414,7 +417,7 @@ public record DataPath()
      */
     public static int getInt(@NotNull DataArray root, @NotNull String path, int fallback)
     {
-        Integer integer = get(root, path, (obj, key) -> obj.getInt(key, fallback), (arr, index) -> arr.getInt(index, fallback));
+        final Integer integer = get(root, path, (obj, key) -> obj.getInt(key, fallback), (arr, index) -> arr.getInt(index, fallback));
         return integer == null ? fallback : integer;
     }
 
@@ -435,7 +438,7 @@ public record DataPath()
      */
     public static int getUnsignedInt(@NotNull DataObject root, @NotNull String path)
     {
-        Integer integer = get(root, path, DataObject::getUnsignedInt, DataArray::getUnsignedInt);
+        final Integer integer = get(root, path, DataObject::getUnsignedInt, DataArray::getUnsignedInt);
 
         if (integer == null)
         {
@@ -462,7 +465,7 @@ public record DataPath()
      */
     public static int getUnsignedInt(@NotNull DataObject root, @NotNull String path, int fallback)
     {
-        Integer integer = get(root, path, (obj, key) -> obj.getUnsignedInt(key, fallback), (arr, index) -> arr.getUnsignedInt(index, fallback));
+        final Integer integer = get(root, path, (obj, key) -> obj.getUnsignedInt(key, fallback), (arr, index) -> arr.getUnsignedInt(index, fallback));
         return integer == null ? fallback : integer;
     }
 
@@ -483,7 +486,7 @@ public record DataPath()
      */
     public static int getUnsignedInt(@NotNull DataArray root, @NotNull String path)
     {
-        Integer integer = get(root, path, DataObject::getUnsignedInt, DataArray::getUnsignedInt);
+        final Integer integer = get(root, path, DataObject::getUnsignedInt, DataArray::getUnsignedInt);
 
         if (integer == null)
         {
@@ -510,7 +513,7 @@ public record DataPath()
      */
     public static int getUnsignedInt(@NotNull DataArray root, @NotNull String path, int fallback)
     {
-        Integer integer = get(root, path, (obj, key) -> obj.getUnsignedInt(key, fallback), (arr, index) -> arr.getUnsignedInt(index, fallback));
+        final Integer integer = get(root, path, (obj, key) -> obj.getUnsignedInt(key, fallback), (arr, index) -> arr.getUnsignedInt(index, fallback));
         return integer == null ? fallback : integer;
     }
 
@@ -531,7 +534,7 @@ public record DataPath()
      */
     public static long getLong(@NotNull DataObject root, @NotNull String path)
     {
-        Long longValue = get(root, path, DataObject::getLong, DataArray::getLong);
+        final Long longValue = get(root, path, DataObject::getLong, DataArray::getLong);
 
         if (longValue == null)
         {
@@ -558,7 +561,7 @@ public record DataPath()
      */
     public static long getLong(@NotNull DataObject root, @NotNull String path, long fallback)
     {
-        Long longValue = get(root, path, (obj, key) -> obj.getLong(key, fallback), (arr, index) -> arr.getLong(index, fallback));
+        final Long longValue = get(root, path, (obj, key) -> obj.getLong(key, fallback), (arr, index) -> arr.getLong(index, fallback));
         return longValue == null ? fallback : longValue;
     }
 
@@ -579,7 +582,7 @@ public record DataPath()
      */
     public static long getLong(@NotNull DataArray root, @NotNull String path)
     {
-        Long longValue = get(root, path, DataObject::getLong, DataArray::getLong);
+        final Long longValue = get(root, path, DataObject::getLong, DataArray::getLong);
 
         if (longValue == null)
         {
@@ -606,7 +609,7 @@ public record DataPath()
      */
     public static long getLong(@NotNull DataArray root, @NotNull String path, long fallback)
     {
-        Long longValue = get(root, path, (obj, key) -> obj.getLong(key, fallback), (arr, index) -> arr.getLong(index, fallback));
+        final Long longValue = get(root, path, (obj, key) -> obj.getLong(key, fallback), (arr, index) -> arr.getLong(index, fallback));
         return longValue == null ? fallback : longValue;
     }
 
@@ -627,7 +630,7 @@ public record DataPath()
      */
     public static long getUnsignedLong(@NotNull DataObject root, @NotNull String path)
     {
-        Long longValue = get(root, path, DataObject::getUnsignedLong, DataArray::getUnsignedLong);
+        final Long longValue = get(root, path, DataObject::getUnsignedLong, DataArray::getUnsignedLong);
 
         if (longValue == null)
         {
@@ -654,7 +657,7 @@ public record DataPath()
      */
     public static long getUnsignedLong(@NotNull DataObject root, @NotNull String path, long fallback)
     {
-        Long longValue = get(root, path, (obj, key) -> obj.getUnsignedLong(key, fallback), (arr, index) -> arr.getUnsignedLong(index, fallback));
+        final Long longValue = get(root, path, (obj, key) -> obj.getUnsignedLong(key, fallback), (arr, index) -> arr.getUnsignedLong(index, fallback));
         return longValue == null ? fallback : longValue;
     }
 
@@ -675,7 +678,7 @@ public record DataPath()
      */
     public static long getUnsignedLong(@NotNull DataArray root, @NotNull String path)
     {
-        Long longValue = get(root, path, DataObject::getUnsignedLong, DataArray::getUnsignedLong);
+        final Long longValue = get(root, path, DataObject::getUnsignedLong, DataArray::getUnsignedLong);
 
         if (longValue == null)
         {
@@ -702,7 +705,7 @@ public record DataPath()
      */
     public static long getUnsignedLong(@NotNull DataArray root, @NotNull String path, long fallback)
     {
-        Long longValue = get(root, path, (obj, key) -> obj.getUnsignedLong(key, fallback), (arr, index) -> arr.getUnsignedLong(index, fallback));
+        final Long longValue = get(root, path, (obj, key) -> obj.getUnsignedLong(key, fallback), (arr, index) -> arr.getUnsignedLong(index, fallback));
         return longValue == null ? fallback : longValue;
     }
 
@@ -723,7 +726,7 @@ public record DataPath()
      */
     public static double getDouble(@NotNull DataObject root, @NotNull String path)
     {
-        Double doubleValue = get(root, path, DataObject::getDouble, DataArray::getDouble);
+        final Double doubleValue = get(root, path, DataObject::getDouble, DataArray::getDouble);
 
         if (doubleValue == null)
         {
@@ -750,7 +753,7 @@ public record DataPath()
      */
     public static double getDouble(@NotNull DataObject root, @NotNull String path, double fallback)
     {
-        Double doubleValue = get(root, path, (obj, key) -> obj.getDouble(key, fallback), (arr, index) -> arr.getDouble(index, fallback));
+        final Double doubleValue = get(root, path, (obj, key) -> obj.getDouble(key, fallback), (arr, index) -> arr.getDouble(index, fallback));
         return doubleValue == null ? fallback : doubleValue;
     }
 
@@ -771,7 +774,7 @@ public record DataPath()
      */
     public static double getDouble(@NotNull DataArray root, @NotNull String path)
     {
-        Double doubleValue = get(root, path, DataObject::getDouble, DataArray::getDouble);
+        final Double doubleValue = get(root, path, DataObject::getDouble, DataArray::getDouble);
 
         if (doubleValue == null)
         {
@@ -798,7 +801,7 @@ public record DataPath()
      */
     public static double getDouble(@NotNull DataArray root, @NotNull String path, double fallback)
     {
-        Double doubleValue = get(root, path, (obj, key) -> obj.getDouble(key, fallback), (arr, index) -> arr.getDouble(index, fallback));
+        final Double doubleValue = get(root, path, (obj, key) -> obj.getDouble(key, fallback), (arr, index) -> arr.getDouble(index, fallback));
         return doubleValue == null ? fallback : doubleValue;
     }
 
@@ -819,7 +822,7 @@ public record DataPath()
     @NotNull
     public static String getString(@NotNull DataObject root, @NotNull String path)
     {
-        String string = get(root, path, DataObject::getString, DataArray::getString);
+        final String string = get(root, path, DataObject::getString, DataArray::getString);
 
         if (string == null)
         {
@@ -846,7 +849,7 @@ public record DataPath()
     @Contract("_, _, !null -> !null")
     public static String getString(@NotNull DataObject root, @NotNull String path, @Nullable String fallback)
     {
-        String string = get(root, path, (obj, key) -> obj.getString(key, fallback), (arr, index) -> arr.getString(index, fallback));
+        final String string = get(root, path, (obj, key) -> obj.getString(key, fallback), (arr, index) -> arr.getString(index, fallback));
         return string == null ? fallback : string;
     }
 
@@ -867,7 +870,7 @@ public record DataPath()
     @NotNull
     public static String getString(@NotNull DataArray root, @NotNull String path)
     {
-        String string = get(root, path, DataObject::getString, DataArray::getString);
+        final String string = get(root, path, DataObject::getString, DataArray::getString);
 
         if (string == null)
         {
@@ -894,7 +897,7 @@ public record DataPath()
     @Contract("_, _, !null -> !null")
     public static String getString(@NotNull DataArray root, @NotNull String path, @Nullable String fallback)
     {
-        String string = get(root, path, (obj, key) -> obj.getString(key, fallback), (arr, index) -> arr.getString(index, fallback));
+        final String string = get(root, path, (obj, key) -> obj.getString(key, fallback), (arr, index) -> arr.getString(index, fallback));
         return string == null ? fallback : string;
     }
 
@@ -915,7 +918,7 @@ public record DataPath()
     @NotNull
     public static DataObject getDataObject(@NotNull DataObject root, @NotNull String path)
     {
-        DataObject obj = optObject(root, path);
+        final DataObject obj = optObject(root, path);
 
         if (obj == null)
         {
@@ -965,7 +968,7 @@ public record DataPath()
     @NotNull
     public static DataObject getDataObject(@NotNull DataArray root, @NotNull String path)
     {
-        DataObject obj = optObject(root, path);
+        final DataObject obj = optObject(root, path);
 
         if (obj == null)
         {
@@ -1015,7 +1018,7 @@ public record DataPath()
     @NotNull
     public static DataArray getDataArray(@NotNull DataObject root, @NotNull String path)
     {
-        DataArray array = optArray(root, path);
+        final DataArray array = optArray(root, path);
 
         if (array == null)
         {
@@ -1065,7 +1068,7 @@ public record DataPath()
     @NotNull
     public static DataArray getDataArray(@NotNull DataArray root, @NotNull String path)
     {
-        DataArray array = optArray(root, path);
+        final DataArray array = optArray(root, path);
 
         if (array == null)
         {
@@ -1092,7 +1095,9 @@ public record DataPath()
     public static DataArray optArray(@NotNull DataArray root, @NotNull String path)
     {
         if (!path.endsWith("?"))
+        {
             path += "?";
+        }
         return get(root, path, DataObject::getDataArray, DataArray::getDataArray);
     }
 

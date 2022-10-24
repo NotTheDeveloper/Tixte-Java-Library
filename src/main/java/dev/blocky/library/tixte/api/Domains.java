@@ -35,7 +35,7 @@ import java.util.Optional;
  * @version v1.4.0
  * @since v1.0.0-alpha.1
  */
-public record Domains() implements RawResponseData
+public record  Domains() implements RawResponseData
 {
     private static String lastDeletedDomain;
 
@@ -51,7 +51,7 @@ public record Domains() implements RawResponseData
      */
     public int getUsableDomainCount() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
         return DataPath.getInt(json, "data.count");
     }
 
@@ -69,10 +69,10 @@ public record Domains() implements RawResponseData
     @CheckReturnValue
     public List<String> getUsableDomainNames() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
-        DataArray domains = DataPath.getDataArray(json, "data.domains");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
+        final DataArray domains = DataPath.getDataArray(json, "data.domains");
 
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
 
         for (int i = 0; i < domains.toList().size(); i++)
         {
@@ -95,10 +95,10 @@ public record Domains() implements RawResponseData
     @CheckReturnValue
     public List<Boolean> isActive() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
-        DataArray domains = DataPath.getDataArray(json, "data.domains");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
+        final DataArray domains = DataPath.getDataArray(json, "data.domains");
 
-        List<Boolean> list = new ArrayList<>();
+        final List<Boolean> list = new ArrayList<>();
 
         for (int i = 0; i < domains.toList().size(); i++)
         {
@@ -119,7 +119,7 @@ public record Domains() implements RawResponseData
      */
     public int getDomainCount() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
         return DataPath.getInt(json, "data.total");
     }
 
@@ -137,10 +137,10 @@ public record Domains() implements RawResponseData
     @CheckReturnValue
     public List<String> getOwnerIds() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
-        DataArray domains = DataPath.getDataArray(json, "data.domains");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
+        final DataArray domains = DataPath.getDataArray(json, "data.domains");
 
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
 
         for (int i = 0; i < domains.toList().size(); i++)
         {
@@ -163,10 +163,10 @@ public record Domains() implements RawResponseData
     @CheckReturnValue
     public List<String> getDomainNames() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
-        DataArray domains = DataPath.getDataArray(json, "data.domains");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
+        final DataArray domains = DataPath.getDataArray(json, "data.domains");
 
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
 
         for (int i = 0; i < domains.toList().size(); i++)
         {
@@ -189,10 +189,10 @@ public record Domains() implements RawResponseData
     @CheckReturnValue
     public List<Integer> getUploadCounts() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
-        DataArray domains = DataPath.getDataArray(json, "data.domains");
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
+        final DataArray domains = DataPath.getDataArray(json, "data.domains");
 
-        List<Integer> list = new ArrayList<>();
+        final List<Integer> list = new ArrayList<>();
 
         for (int i = 0; i < domains.toList().size(); i++)
         {
@@ -214,7 +214,7 @@ public record Domains() implements RawResponseData
     @NotNull
     public String generateDomain() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.generateDomainRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.generateDomainRaw().resultNow());
         return DataPath.getString(json, "data.name");
     }
 
@@ -298,7 +298,7 @@ public record Domains() implements RawResponseData
     @CheckReturnValue
     public Domains deleteDomain(@NotNull String domainName) throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.deleteDomainRaw(domainName).resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.deleteDomainRaw(domainName).resultNow());
 
         lastDeletedDomain = DataPath.getString(json, "data.domain");
         return this;

@@ -60,7 +60,7 @@ The `TixteClientBuilder` allows a set of configurations to improve the experienc
         .setDefaultDomain(getDefaultDomain());
 
         // Builds a *new* TixteClient instance and uses the provided API-key and session-token to start the login process.
-        TixteClient client = builder.build();
+        builder.build();
     }
 ```
 
@@ -266,8 +266,9 @@ There is a guide for logback-classic available at the Tixte4J wiki: [Logging-Set
 
 ## Documentation
 
-Docs can be found [directly here](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Documentation).
-<br>A simple wiki can also be found in this repository's [wiki section](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki).
+JavaDocs are available in both jar format and web format.
+
+The jar format is available on the [promoted downloads](https://github.com/BlockyDotJar/Tixte-Java-Library/packages/1520119) page or on any of the build pages of the [downloads](https://BlockyDotJar.github.io/Tixte-Java-Library).
 
 ## Getting help
 
@@ -303,7 +304,7 @@ We highly recommend discontinuing usage of deprecated functionality and update b
 - Update to `1.0.0-rc.2` and check for deprecation
 
 The `RR` in version `1.0.RR` should be replaced by the latest version that was published for `1.0`, you can find out which the latest
-version was by looking at the [release page](https://github.com/BlockyDotJar/Tixte-java-Library/releases)
+version was by looking at the [release page](https://github.com/BlockyDotJar/Tixte-Java-Library/releases).
 
 
 ## Dependencies:
@@ -323,6 +324,9 @@ This project requires **Java 19+**
 * slf4j-api
     * Version: **v2.0.3**
     * [Github](https://github.com/qos-ch/slf4j)
+* slf4j-fbl
+    * Version: **v1.0.1**
+    * [Github](https://github.com/BlockyDotJar/SLF4J-Fallback-Logger)
 * jetbrains-annotations
     * Version: **v23.0.0**
     * [Github](https://github.com/JetBrains/java-annotations)

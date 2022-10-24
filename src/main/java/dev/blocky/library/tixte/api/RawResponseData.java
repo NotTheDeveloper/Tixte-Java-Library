@@ -17,10 +17,11 @@ package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.CheckReturnValue;
+import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.internal.requests.Route;
+import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.io.IOUtil;
-import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import jdk.incubator.concurrent.StructuredTaskScope;
 import okhttp3.*;
 import org.jetbrains.annotations.ApiStatus.Experimental;
@@ -30,7 +31,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -49,7 +52,7 @@ import static dev.blocky.library.tixte.internal.requests.Route.TIXTE_API_PREFIX;
 @Internal
 public interface RawResponseData
 {
-    Logger logger = TixteLogger.getLog(RawResponseData.class);
+    Logger logger = FallbackLogger.getLog(RawResponseData.class);
     TixteClient tixteClient = new TixteClient();
 
     /**
@@ -64,7 +67,7 @@ public interface RawResponseData
     @NotNull
     static Future<String> getSizeRaw() throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.GET_UPLOAD_SIZE.compile();
+        final Route.CompiledRoute route = Route.Self.GET_UPLOAD_SIZE.compile();
         return request(route, false, null);
     }
 
@@ -87,7 +90,7 @@ public interface RawResponseData
     @NotNull
     static Future<String> getUploadsRaw() throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.GET_UPLOADS.compile();
+        final Route.CompiledRoute route = Route.Self.GET_UPLOADS.compile();
         return request(route, false, null);
     }
 
@@ -108,9 +111,9 @@ public interface RawResponseData
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
 
-        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+        final RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
 
-        MultipartBody multipartBody = new MultipartBody.Builder()
+        final MultipartBody multipartBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", file.getName(), requestBody)
                 .build();
@@ -135,9 +138,9 @@ public interface RawResponseData
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
 
-        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+        final RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
 
-        MultipartBody multipartBody = new MultipartBody.Builder()
+        final MultipartBody multipartBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", file.getName(), requestBody)
                 .build();
@@ -166,9 +169,9 @@ public interface RawResponseData
         Checks.notEmpty(domain, "domain");
         Checks.noWhitespace(domain, "domain");
 
-        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+        final RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
 
-        MultipartBody multipartBody = new MultipartBody.Builder()
+        final MultipartBody multipartBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", file.getName(), requestBody)
                 .build();
@@ -197,9 +200,9 @@ public interface RawResponseData
         Checks.notEmpty(domain, "domain");
         Checks.noWhitespace(domain, "domain");
 
-        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+        final RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
 
-        MultipartBody multipartBody = new MultipartBody.Builder()
+        final MultipartBody multipartBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", file.getName(), requestBody)
                 .build();
@@ -221,16 +224,16 @@ public interface RawResponseData
     {
         Checks.notEmpty(filePath, "filePath");
 
-        File file = new File(filePath);
+        final File file = new File(filePath);
 
         if (!file.exists())
         {
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
 
-        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+        final RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
 
-        MultipartBody multipartBody = new MultipartBody.Builder()
+        final MultipartBody multipartBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", file.getName(), requestBody)
                 .build();
@@ -252,16 +255,16 @@ public interface RawResponseData
     {
         Checks.notEmpty(filePath, "filePath");
 
-        File file = new File(filePath);
+        final File file = new File(filePath);
 
         if (!file.exists())
         {
             throw new FileNotFoundException("File " + file.getName() + " was not found.");
         }
 
-        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+        final RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
 
-        MultipartBody multipartBody = new MultipartBody.Builder()
+        final MultipartBody multipartBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", file.getName(), requestBody)
                 .build();
@@ -284,7 +287,7 @@ public interface RawResponseData
     {
         Checks.notEmpty(filePath, "filePath");
 
-        File file = new File(filePath);
+        final File file = new File(filePath);
 
         if (!file.exists())
         {
@@ -294,9 +297,9 @@ public interface RawResponseData
         Checks.notEmpty(domain, "domain");
         Checks.noWhitespace(domain, "domain");
 
-        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+        final RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
 
-        MultipartBody multipartBody = new MultipartBody.Builder()
+        final MultipartBody multipartBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", file.getName(), requestBody)
                 .build();
@@ -319,7 +322,7 @@ public interface RawResponseData
     {
         Checks.notEmpty(filePath, "filePath");
 
-        File file = new File(filePath);
+        final File file = new File(filePath);
 
         if (!file.exists())
         {
@@ -329,9 +332,9 @@ public interface RawResponseData
         Checks.notEmpty(domain, "domain");
         Checks.noWhitespace(domain, "domain");
 
-        RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
+        final RequestBody requestBody = RequestBody.create(file, MediaType.get("multipart/form-data"));
 
-        MultipartBody multipartBody = new MultipartBody.Builder()
+        final MultipartBody multipartBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file", file.getName(), requestBody)
                 .build();
@@ -353,7 +356,7 @@ public interface RawResponseData
         Checks.notEmpty(fileId, "fileId");
         Checks.noWhitespace(fileId, "fileId");
 
-        Route.CompiledRoute route = Route.Self.DELETE_FILE.compile(fileId);
+        final Route.CompiledRoute route = Route.Self.DELETE_FILE.compile(fileId);
 
         return request(route, false, null);
     }
@@ -372,9 +375,9 @@ public interface RawResponseData
         Checks.notEmpty(password, "password");
         Checks.noWhitespace(password, "password");
 
-        Route.CompiledRoute route = Route.Self.DELETE_FILE.compile();
+        final Route.CompiledRoute route = Route.Self.DELETE_FILE.compile();
 
-        RequestBody requestBody = RequestBody.create("{ \"password\": \"" + password + "\", \"purge\": true }",
+        final RequestBody requestBody = RequestBody.create("{ \"password\": \"" + password + "\", \"purge\": true }",
                 MediaType.parse("application/json; charset=utf-8"));
 
         return request(route, true, requestBody);
@@ -399,7 +402,7 @@ public interface RawResponseData
     @NotNull
     static Future<String> getUserInfoRaw() throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.GET_SELF.compile();
+        final Route.CompiledRoute route = Route.Self.GET_SELF.compile();
         return request(route, false, null);
     }
 
@@ -419,7 +422,7 @@ public interface RawResponseData
         Checks.notEmpty(userData, "userData");
         Checks.noWhitespace(userData, "userData");
 
-        Route.CompiledRoute route = Route.Users.GET_USER.compile(userData);
+        final Route.CompiledRoute route = Route.Users.GET_USER.compile(userData);
 
         return request(route, true, null);
     }
@@ -435,7 +438,7 @@ public interface RawResponseData
     @NotNull
     static Future<String> getUserDomainsRaw() throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.GET_DOMAINS.compile();
+        final Route.CompiledRoute route = Route.Self.GET_DOMAINS.compile();
         return request(route, true, null);
     }
 
@@ -449,7 +452,7 @@ public interface RawResponseData
     @NotNull
     static Future<String> getUsableDomainsRaw() throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Domain.GET_DOMAINS.compile();
+        final Route.CompiledRoute route = Route.Domain.GET_DOMAINS.compile();
         return request(route, false, null);
     }
 
@@ -461,7 +464,7 @@ public interface RawResponseData
     @NotNull
     static Future<String> generateDomainRaw() throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Resources.GET_GENERATED_DOMAIN.compile();
+        final Route.CompiledRoute route = Route.Resources.GET_GENERATED_DOMAIN.compile();
         return request(route, false, null);
     }
 
@@ -479,9 +482,9 @@ public interface RawResponseData
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
 
-        Route.CompiledRoute route = Route.Self.ADD_DOMAIN.compile(domainName);
+        final Route.CompiledRoute route = Route.Self.ADD_DOMAIN.compile(domainName);
 
-        RequestBody requestBody = RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": false }",
+        final RequestBody requestBody = RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": false }",
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, true, requestBody);
@@ -506,9 +509,9 @@ public interface RawResponseData
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
 
-        Route.CompiledRoute route = Route.Self.ADD_DOMAIN.compile(domainName);
+        final Route.CompiledRoute route = Route.Self.ADD_DOMAIN.compile(domainName);
 
-        RequestBody requestBody = RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": true }",
+        final RequestBody requestBody = RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": true }",
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, true, requestBody);
@@ -532,7 +535,7 @@ public interface RawResponseData
         Checks.notEmpty(domainName, "domainName");
         Checks.noWhitespace(domainName, "domainName");
 
-        Route.CompiledRoute route = Route.Self.DELETE_DOMAIN.compile(domainName);
+        final Route.CompiledRoute route = Route.Self.DELETE_DOMAIN.compile(domainName);
 
         return request(route, true, null);
     }
@@ -545,7 +548,7 @@ public interface RawResponseData
     @NotNull
     static Future<String> getAPIKeyBySessionTokenRaw() throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.GET_KEYS.compile();
+        final Route.CompiledRoute route = Route.Self.GET_KEYS.compile();
         return request(route, true, null);
     }
 
@@ -572,7 +575,7 @@ public interface RawResponseData
     @NotNull
     static Future<String> getConfigRaw() throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.GET_CONFIG.compile();
+        final Route.CompiledRoute route = Route.Self.GET_CONFIG.compile();
         return request(route, false, null);
     }
 
@@ -592,9 +595,9 @@ public interface RawResponseData
     @CanIgnoreReturnValue
     static Future<String> setCustomCSSRaw(@NotNull String customCSS) throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
+        final Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
-        RequestBody requestBody = RequestBody.create("{ \"custom_css\": \"" + customCSS + "\" }",
+        final RequestBody requestBody = RequestBody.create("{ \"custom_css\": \"" + customCSS + "\" }",
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, false, requestBody);
@@ -624,9 +627,9 @@ public interface RawResponseData
                                       @Nullable String authorName, @Nullable String authorURL, @Nullable String providerName,
                                       @Nullable String providerURL) throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
+        final Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
-        RequestBody requestBody = RequestBody.create(
+        final RequestBody requestBody = RequestBody.create(
                 "{ \"embed\": { \"description\": \"" + description + "\", " +
                         "\"title\": \"" + title + "\", " +
                         "\"theme_color\": \"" + color + "\", " +
@@ -656,9 +659,9 @@ public interface RawResponseData
     @CanIgnoreReturnValue
     static Future<String> setHideBrandingRaw(boolean hideBranding) throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
+        final Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
-        RequestBody requestBody = RequestBody.create("{ \"hide_branding\": " + hideBranding + " }",
+        final RequestBody requestBody = RequestBody.create("{ \"hide_branding\": " + hideBranding + " }",
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, false, requestBody);
@@ -680,9 +683,9 @@ public interface RawResponseData
     @CanIgnoreReturnValue
     static Future<String> setOnlyImageEnabledRaw(boolean onlyImagedEnabled) throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
+        final Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
-        RequestBody requestBody = RequestBody.create("{ \"only_image\": " + onlyImagedEnabled + " }",
+        final RequestBody requestBody = RequestBody.create("{ \"only_image\": " + onlyImagedEnabled + " }",
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, false, requestBody);
@@ -707,9 +710,9 @@ public interface RawResponseData
         Checks.notEmpty(redirectUrl, "redirectUrl");
         Checks.noWhitespace(redirectUrl, "redirectUrl");
 
-        Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
+        final Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
-        RequestBody requestBody = RequestBody.create("{ \"base_redirect\": " + redirectUrl + " }",
+        final RequestBody requestBody = RequestBody.create("{ \"base_redirect\": " + redirectUrl + " }",
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, false, requestBody);
@@ -729,7 +732,7 @@ public interface RawResponseData
     @CheckReturnValue
     static Future<String> getExperimentsRaw() throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.GET_EXPERIMENTS.compile();
+        final Route.CompiledRoute route = Route.Self.GET_EXPERIMENTS.compile();
         return request(route, true, null);
     }
 
@@ -746,7 +749,7 @@ public interface RawResponseData
     @CheckReturnValue
     static Future<String> getFoldersRaw() throws IOException, InterruptedException
     {
-        Route.CompiledRoute route = Route.Self.GET_FOLDERS.compile();
+        final Route.CompiledRoute route = Route.Self.GET_FOLDERS.compile();
         return request(route, false, null);
     }
 
@@ -775,9 +778,9 @@ public interface RawResponseData
         Checks.notNegative((int) minSize, "minSize");
         Checks.notNegative((int) maxSize, "maxSize");
 
-        Route.CompiledRoute route = Route.Self.SEARCH_FILE.compile();
+        final Route.CompiledRoute route = Route.Self.SEARCH_FILE.compile();
 
-        RequestBody requestBody = RequestBody.create("{ \"query\": \"" + query + "\", " +
+        final RequestBody requestBody = RequestBody.create("{ \"query\": \"" + query + "\", " +
                         "\"extensions\": " + Arrays.toString(extensions) + ", \"domains\": " + Arrays.toString(domains) + ", " +
                         "\"sort_by\": \"" + sortBy + "\", \"size\": { \"min\": " + minSize + ", \"max\": " + maxSize + " } }",
                 MediaType.get("application/json; charset=utf-8"));
@@ -802,9 +805,9 @@ public interface RawResponseData
     {
         final Call call = tixteClient.getHttpClient().newCall(tixteClient.getRequest().orElse(null));
 
-        try (Response response = call.execute(); var scope = new StructuredTaskScope<String>())
+        try (final Response response = call.execute(); final var scope = new StructuredTaskScope<String>())
         {
-            Future<String> responseStream = scope.fork(response.body()::string);
+            final Future<String> responseStream = scope.fork(response.body()::string);
             scope.join();
 
             IOUtil.silentClose(response);
@@ -834,13 +837,21 @@ public interface RawResponseData
 
         final Call call = tixteClient.getHttpClient().newCall(request);
 
-        try (Response response = call.execute(); var scope = new StructuredTaskScope<String>())
+        try (final Response response = call.execute(); final var scope = new StructuredTaskScope<String>())
         {
-            Future<String> responseString = scope.fork(response.body()::string);
+            final Future<String> responseString = scope.fork(response.body()::string);
             scope.join();
 
             IOUtil.silentClose(response);
-            logger.info("Request successful: " + route.getMethod() + "/" + route.getCompiledRoute());
+
+            if (!TixteClientBuilder.prettyResponsePrinting)
+            {
+                logger.info("Request successful: " + route.getMethod() + "/" + route.getCompiledRoute());
+            }
+            else
+            {
+                System.out.println(prettyString(responseString, route));
+            }
 
             return responseString;
         }
@@ -862,15 +873,36 @@ public interface RawResponseData
 
         final Call call = tixteClient.getHttpClient().newCall(request);
 
-        try (Response response = call.execute(); var scope = new StructuredTaskScope<String>())
+        try (final Response response = call.execute(); final var scope = new StructuredTaskScope<String>())
         {
-            Future<String> responseString = scope.fork(response.body()::string);
+            final Future<String> responseString = scope.fork(response.body()::string);
             scope.join();
 
             IOUtil.silentClose(response);
-            logger.info("Request successful: " + Route.File.UPLOAD_FILE);
+
+            final Route.CompiledRoute route = Route.File.UPLOAD_FILE.compile();
+
+            if (!TixteClientBuilder.prettyResponsePrinting)
+            {
+                logger.info("Request successful: " + route.getMethod() + "/" + route.getCompiledRoute());
+            }
+            else
+            {
+                System.out.println(prettyString(responseString, route));
+            }
 
             return responseString;
         }
+    }
+
+    @NotNull
+    @CheckReturnValue
+    private static String prettyString(@NotNull Future<String> body, @NotNull Route.CompiledRoute route)
+    {
+        final DataObject object = DataObject.fromJson(body.resultNow());
+
+        logger.info("'---->>>> Incoming Request: " + route.getMethod() + "/" + route.getCompiledRoute() + "<<<<----'");
+
+        return object.toPrettyString();
     }
 }

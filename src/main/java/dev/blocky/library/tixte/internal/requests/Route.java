@@ -272,14 +272,15 @@ public class Route
                     "Expected: " + paramCount + ", Provided: " + params.length);
         }
 
-        Set<String> major = new HashSet<>();
-        StringBuilder compiledRoute = new StringBuilder(route);
+        final Set<String> major = new HashSet<>();
+        final StringBuilder compiledRoute = new StringBuilder(route);
 
         for (int i = 0; i < paramCount; i++)
         {
-            int paramStart = compiledRoute.indexOf("{");
-            int paramEnd = compiledRoute.indexOf("}");
-            String paramName = compiledRoute.substring(paramStart + 1, paramEnd);
+            final int paramStart = compiledRoute.indexOf("{");
+            final int paramEnd = compiledRoute.indexOf("}");
+
+            final String paramName = compiledRoute.substring(paramStart + 1, paramEnd);
 
             if (majorParameters.contains(paramName))
             {
@@ -363,7 +364,7 @@ public class Route
             Checks.check(params.length >= 2, "params length must be at least 2");
             Checks.check(params.length % 2 == 0, "params length must be a multiple of 2");
 
-            StringBuilder newRoute = new StringBuilder(compiledRoute);
+            final StringBuilder newRoute = new StringBuilder(compiledRoute);
 
             for (int i = 0; i < params.length; i++)
             {

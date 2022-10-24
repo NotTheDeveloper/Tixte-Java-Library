@@ -1,3 +1,6 @@
+/**
+ * A wrapper for the Tixte API in Java.
+ */
 module tixte4j {
     requires java.datatransfer;
     requires java.desktop;
@@ -8,7 +11,11 @@ module tixte4j {
     requires com.fasterxml.jackson.databind;
 
     requires okhttp3;
+    requires okio;
     requires org.slf4j;
+    requires slf4jfbl;
+    requires org.apache.commons.collections4;
+    requires org.apache.commons.io;
 
     requires org.jetbrains.annotations;
     requires com.google.errorprone.annotations;
@@ -24,5 +31,4 @@ module tixte4j {
     exports dev.blocky.library.tixte.internal.requests.json;
     exports dev.blocky.library.tixte.internal.utils;
     exports dev.blocky.library.tixte.internal.utils.io;
-    exports dev.blocky.library.tixte.internal.utils.logging;
 }

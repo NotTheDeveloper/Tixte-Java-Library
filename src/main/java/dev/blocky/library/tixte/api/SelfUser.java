@@ -46,7 +46,7 @@ public record SelfUser() implements RawResponseData
      */
     public boolean isEmailVerified() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getBoolean(json, "data.email_verified");
     }
 
@@ -65,7 +65,7 @@ public record SelfUser() implements RawResponseData
     @CheckReturnValue
     public String getPhoneNumber() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getString(json, "data.phone?");
     }
 
@@ -85,7 +85,7 @@ public record SelfUser() implements RawResponseData
     @NotNull
     public String getLastLogin() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getString(json, "data.last_login");
     }
 
@@ -101,7 +101,7 @@ public record SelfUser() implements RawResponseData
      */
     public int getFlagCount() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getInt(json, "data.flags");
     }
 
@@ -117,7 +117,7 @@ public record SelfUser() implements RawResponseData
      */
     public int getPremiumTier() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getInt(json, "data.premium_tier");
     }
 
@@ -134,7 +134,7 @@ public record SelfUser() implements RawResponseData
      */
     public boolean hasMFAEnabled() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getBoolean(json, "data.mfa_enabled");
     }
 
@@ -151,7 +151,7 @@ public record SelfUser() implements RawResponseData
     @NotNull
     public String getId() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getString(json, "data.id");
     }
 
@@ -170,7 +170,7 @@ public record SelfUser() implements RawResponseData
     @CheckReturnValue
     public String getAvatarId() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getString(json, "data.avatar?");
     }
 
@@ -187,7 +187,7 @@ public record SelfUser() implements RawResponseData
     @NotNull
     public String getUploadRegion() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getString(json, "data.upload_region");
     }
 
@@ -206,7 +206,7 @@ public record SelfUser() implements RawResponseData
     @CheckReturnValue
     public String getEmail() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getString(json, "data.email?");
     }
 
@@ -223,7 +223,7 @@ public record SelfUser() implements RawResponseData
     @NotNull
     public String getUsername() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
         return DataPath.getString(json, "data.username");
     }
 
@@ -241,7 +241,7 @@ public record SelfUser() implements RawResponseData
     @CheckReturnValue
     public String getAPIKeyBySessionToken() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getAPIKeyBySessionTokenRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getAPIKeyBySessionTokenRaw().resultNow());
         return DataPath.getString(json, "data.api_key");
     }
 
@@ -308,7 +308,7 @@ public record SelfUser() implements RawResponseData
      */
     public int getExperimentCount() throws InterruptedException, IOException
     {
-        DataObject json = DataObject.fromJson(RawResponseData.getExperimentsRaw().resultNow());
+        final DataObject json = DataObject.fromJson(RawResponseData.getExperimentsRaw().resultNow());
         return json.getInt("data");
     }
 }

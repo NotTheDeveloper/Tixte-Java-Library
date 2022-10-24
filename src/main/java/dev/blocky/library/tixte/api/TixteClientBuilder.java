@@ -15,13 +15,13 @@
  */
 package dev.blocky.library.tixte.api;
 
+import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
 import dev.blocky.library.tixte.internal.interceptor.CacheInterceptor;
 import dev.blocky.library.tixte.internal.interceptor.ErrorResponseInterceptor;
 import dev.blocky.library.tixte.internal.interceptor.ForceCacheInterceptor;
 import dev.blocky.library.tixte.internal.interceptor.RateLimitInterceptor;
 import dev.blocky.library.tixte.internal.utils.Checks;
-import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
@@ -49,12 +49,13 @@ public record TixteClientBuilder()
     private static final Pattern SESSION_TOKEN_PATTERN = Pattern.compile("^tx.(mfa.)?([a-zA-Z\\d]){16}.([a-zA-Z\\d]){16}.([a-zA-Z\\d]){16}.([a-zA-Z\\d]){4}$", Pattern.CASE_INSENSITIVE);
     private static final Pattern API_KEY_PATTERN = Pattern.compile("^([a-z\\d]){8}-([a-z\\d]){4}-([a-z\\d]){4}-([a-z\\d]){4}-([a-z\\d]){12}$", Pattern.CASE_INSENSITIVE);
     private static final Pattern DEFAULT_DOMAIN_PATTERN = Pattern.compile("^(?!.*https?://)([a-zA-Z\\d_-])+.([a-zA-Z-])+.([a-zA-Z])+$", Pattern.CASE_INSENSITIVE);
-    private static final Logger logger = TixteLogger.getLog(TixteClientBuilder.class);
+    private static final Logger logger = FallbackLogger.getLog(TixteClientBuilder.class);
     private static final TixteClient tixteClient = new TixteClient();
 
     static final Dispatcher dispatcher = new Dispatcher();
 
     static String apiKey, sessionToken, defaultDomain;
+    static boolean prettyResponsePrinting = false;
     static CachePolicy policy;
     static OkHttpClient client;
     static Request request;
@@ -71,7 +72,7 @@ public record TixteClientBuilder()
      * @param apiKey The API-key to use.
      * @param policy The cache-policy, which should be used.
      *
-     * @return Instantiates a <b>new</b> Tixte-Client-Builder.
+     * @return Instantiates a <b>new</b> {@link TixteClientBuilder}.
      */
     @NotNull
     public TixteClientBuilder create(@NotNull String apiKey, @Nullable CachePolicy policy)
@@ -91,7 +92,7 @@ public record TixteClientBuilder()
      *
      * @param apiKey The API-key to use.
      *
-     * @return Instantiates a <b>new</b> Tixte-Client-Builder.
+     * @return Instantiates a <b>new</b> {@link TixteClientBuilder}.
      */
     @NotNull
     public TixteClientBuilder create(@NotNull String apiKey)
@@ -104,7 +105,7 @@ public record TixteClientBuilder()
      *
      * @param sessionToken The session-token to use.
      *
-     * @return Instantiates a <b>new</b> Tixte-Client-Builder.
+     * @return Instantiates a <b>new</b> {@link TixteClientBuilder}r.
      */
     @NotNull
     public TixteClientBuilder setSessionToken(@NotNull String sessionToken)
@@ -123,7 +124,7 @@ public record TixteClientBuilder()
      *
      * @param defaultDomain The default domain to use.
      *
-     * @return Instantiates a <b>new</b> Tixte-Client-Builder.
+     * @return Instantiates a <b>new</b> {@link TixteClientBuilder}.
      */
     @NotNull
     public TixteClientBuilder setDefaultDomain(@NotNull String defaultDomain)
@@ -147,12 +148,43 @@ public record TixteClientBuilder()
      *
      * @param policy The cache-policy, which should be used.
      *
-     * @return Instantiates a <b>new</b> Tixte-Client-Builder.
+     * @return Instantiates a <b>new</b> {@link TixteClientBuilder}.
      */
     @NotNull
     public TixteClientBuilder setCachePolicy(@Nullable CachePolicy policy)
     {
         TixteClientBuilder.policy = policy;
+        return this;
+    }
+
+    /**
+     * If there should be printed out a pretty string or not.
+     *
+     * <p><b>Example:</b>
+     * <pre>
+     * <code>
+     * {
+     *      "data" : {
+     *       "limit" : 15000000000,
+     *       "premium_tier" : 0,
+     *        "used" : 156108016
+     *      },
+     *       "success" : true
+     *    }
+     * </code>
+     * </pre>
+     *
+     * This is used for every type of response. (Normal responses and error responses)
+     * <br>Note, that this could slow the process.
+     *
+     * @param prettyResponsePrinting Whether there shall be printed a pretty string of the response or not.
+     *
+     * @return Instantiates a <b>new</b>{@link TixteClientBuilder}.
+     */
+    @NotNull
+    public TixteClientBuilder setPrettyResponsePrinting(boolean prettyResponsePrinting)
+    {
+        TixteClientBuilder.prettyResponsePrinting = prettyResponsePrinting;
         return this;
     }
 
@@ -188,19 +220,17 @@ public record TixteClientBuilder()
         switch (policy)
         {
         case NONE -> client = builder.build();
-        case ONLY_FORCE_CACHE ->
-                client = builder
+        case ONLY_FORCE_CACHE -> client = builder
                 .addInterceptor(new ForceCacheInterceptor())
                 .build();
-        case ONLY_NETWORK_CACHE ->
-                client = builder
+        case ONLY_NETWORK_CACHE -> client = builder
                 .addNetworkInterceptor(new CacheInterceptor())
                 .build();
         case ALL -> client =
                 builder
-                .addInterceptor(new ForceCacheInterceptor())
-                .addNetworkInterceptor(new CacheInterceptor())
-                .build();
+                        .addInterceptor(new ForceCacheInterceptor())
+                        .addNetworkInterceptor(new CacheInterceptor())
+                        .build();
         }
         return tixteClient;
     }
