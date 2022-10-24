@@ -15,8 +15,8 @@
  */
 package secrets;
 
-import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
+import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ import java.nio.file.Paths;
  */
 public class DONOTOPEN
 {
-    private static final Logger logger = FallbackLogger.getLog(DONOTOPEN.class);
+    private static final Logger logger = TixteLogger.getLog(DONOTOPEN.class);
     private static final File file = new File("FILE_PATH");
 
     /**

@@ -41,7 +41,6 @@ dependencies {
     api("com.squareup.okhttp3:okhttp:4.10.0")
     api("com.squareup.okio:okio-jvm:3.2.0")
     api("org.slf4j:slf4j-api:2.0.3")
-    api("dev.blocky.library:slf4j-fbl:1.0.1")
     api("org.apache.commons:commons-collections4:4.4")
     api("commons-io:commons-io:2.11.0")
 

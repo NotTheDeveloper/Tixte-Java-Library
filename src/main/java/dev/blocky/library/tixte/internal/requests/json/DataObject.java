@@ -23,9 +23,9 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.MapType;
-import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.api.exceptions.ParsingException;
 import dev.blocky.library.tixte.internal.utils.Helpers;
+import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +49,7 @@ import java.util.function.UnaryOperator;
  */
 public record DataObject(@NotNull Map<String, Object> data) implements SerializableData
 {
-    private static final Logger log = FallbackLogger.getLog(DataObject.class);
+    private static final Logger log = TixteLogger.getLog(DataObject.class);
     private static final ObjectMapper mapper;
     private static final SimpleModule module;
     private static final MapType mapType;

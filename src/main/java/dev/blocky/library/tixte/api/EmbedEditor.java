@@ -16,11 +16,11 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.Helpers;
+import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 public class EmbedEditor implements RawResponseData
 {
     private final Pattern URL_PATTERN = Pattern.compile("^ht{2}ps?://[a-zA-Z\\d]+.[a-zA-Z\\d]+(.[a-zA-Z._/-]+)?([a-zA-Z\\d._/-]+)?", Pattern.CASE_INSENSITIVE);
-    private final Logger logger = FallbackLogger.getLog(EmbedEditor.class);
+    private final Logger logger = TixteLogger.getLog(EmbedEditor.class);
     private final StringBuilder description = new StringBuilder();
     private String providerName, providerUrl, color;
     private String authorName, authorUrl, title;

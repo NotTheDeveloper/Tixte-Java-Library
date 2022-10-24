@@ -2,6 +2,8 @@
  * A wrapper for the Tixte API in Java.
  */
 module tixte4j {
+    uses org.slf4j.spi.SLF4JServiceProvider;
+
     requires java.datatransfer;
     requires java.desktop;
 
@@ -13,7 +15,6 @@ module tixte4j {
     requires okhttp3;
     requires okio;
     requires org.slf4j;
-    requires slf4jfbl;
     requires org.apache.commons.collections4;
     requires org.apache.commons.io;
 

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.api.TixteClient;
 import dev.blocky.library.tixte.api.TixteClientBuilder;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
+import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import secrets.DONOTOPEN;
@@ -33,7 +33,7 @@ import java.io.IOException;
  */
 public class BasicTixteClientExample
 {
-    private static final Logger logger = FallbackLogger.getLog(BasicTixteClientExample.class);
+    private static final Logger logger = TixteLogger.getLog(BasicTixteClientExample.class);
 
     public static void main(@NotNull String[] args) throws IOException
     {

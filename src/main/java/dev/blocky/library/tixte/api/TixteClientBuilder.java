@@ -15,13 +15,13 @@
  */
 package dev.blocky.library.tixte.api;
 
-import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
 import dev.blocky.library.tixte.internal.interceptor.CacheInterceptor;
 import dev.blocky.library.tixte.internal.interceptor.ErrorResponseInterceptor;
 import dev.blocky.library.tixte.internal.interceptor.ForceCacheInterceptor;
 import dev.blocky.library.tixte.internal.interceptor.RateLimitInterceptor;
 import dev.blocky.library.tixte.internal.utils.Checks;
+import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
@@ -49,7 +49,7 @@ public record TixteClientBuilder()
     private static final Pattern SESSION_TOKEN_PATTERN = Pattern.compile("^tx.(mfa.)?([a-zA-Z\\d]){16}.([a-zA-Z\\d]){16}.([a-zA-Z\\d]){16}.([a-zA-Z\\d]){4}$", Pattern.CASE_INSENSITIVE);
     private static final Pattern API_KEY_PATTERN = Pattern.compile("^([a-z\\d]){8}-([a-z\\d]){4}-([a-z\\d]){4}-([a-z\\d]){4}-([a-z\\d]){12}$", Pattern.CASE_INSENSITIVE);
     private static final Pattern DEFAULT_DOMAIN_PATTERN = Pattern.compile("^(?!.*https?://)([a-zA-Z\\d_-])+.([a-zA-Z-])+.([a-zA-Z])+$", Pattern.CASE_INSENSITIVE);
-    private static final Logger logger = FallbackLogger.getLog(TixteClientBuilder.class);
+    private static final Logger logger = TixteLogger.getLog(TixteClientBuilder.class);
     private static final TixteClient tixteClient = new TixteClient();
 
     static final Dispatcher dispatcher = new Dispatcher();

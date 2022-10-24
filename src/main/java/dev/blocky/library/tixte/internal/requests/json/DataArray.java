@@ -23,9 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.api.exceptions.ParsingException;
 import dev.blocky.library.tixte.internal.utils.Helpers;
+import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +52,7 @@ import java.util.stream.Stream;
  */
 public record DataArray(@NotNull List<Object> data) implements Iterable<Object>, SerializableArray
 {
-    private static final Logger log = FallbackLogger.getLog(DataArray.class);
+    private static final Logger log = TixteLogger.getLog(DataArray.class);
     private static final ObjectMapper mapper;
     private static final SimpleModule module;
     private static final CollectionType listType;

@@ -17,11 +17,11 @@ package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.CheckReturnValue;
-import dev.blocky.library.logging.FallbackLogger;
 import dev.blocky.library.tixte.internal.requests.Route;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.io.IOUtil;
+import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import jdk.incubator.concurrent.StructuredTaskScope;
 import okhttp3.*;
 import org.jetbrains.annotations.ApiStatus.Experimental;
@@ -52,7 +52,7 @@ import static dev.blocky.library.tixte.internal.requests.Route.TIXTE_API_PREFIX;
 @Internal
 public interface RawResponseData
 {
-    Logger logger = FallbackLogger.getLog(RawResponseData.class);
+    Logger logger = TixteLogger.getLog(RawResponseData.class);
     TixteClient tixteClient = new TixteClient();
 
     /**
