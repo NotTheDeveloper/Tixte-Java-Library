@@ -25,6 +25,6 @@ package dev.blocky.library.tixte.api;
 public record TixteInfo()
 {
     public static final int TIXTE_API_VERSION = 1;
-    public static final String VERSION = "v1.1.2";
+    public static final String VERSION = "v1.1.3";
     public static final String GITHUB = "https://github.com/BlockyDotJar/Tixte-Java-Library";
 }
