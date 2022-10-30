@@ -528,8 +528,8 @@ public class EmbedEditor implements RawResponseData
     /**
      * The url to a website from the creator of the embedded content.
      * <br>This is typically used to represent the account on the providing site.
-     * <br>The only difference between this and {@link Embed#getAuthorUrl()} ()}is that this method gets the current author url
-     * of the Tixte 'Embed Editor' page, while {@link Embed#getAuthorUrl()} ()} only gets the current value of the variable.
+     * <br>The only difference between this and {@link Embed#getAuthorUrl()} is that this method gets the current author url
+     * of the Tixte 'Embed Editor' page, while {@link Embed#getAuthorUrl()} only gets the current value of the variable.
      *
      * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
      *                     Because networks can fail during an exchange, it is possible that the remote server accepted 

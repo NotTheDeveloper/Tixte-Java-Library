@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
+import java.time.OffsetDateTime;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
@@ -60,7 +61,7 @@ import java.util.regex.Pattern;
  * This will result in {@code foo == "default"}, since the array element 1 is marked as optional, and missing in the actual object.
  *
  * @author MinnDevelopment and BlockyDotJar
- * @version v1.0.0
+ * @version v1.1.0
  * @since v1.0.0
  */
 public record DataPath()
@@ -899,6 +900,102 @@ public record DataPath()
     {
         final String string = get(root, path, (obj, key) -> obj.getString(key, fallback), (arr, index) -> arr.getString(index, fallback));
         return string == null ? fallback : string;
+    }
+
+    /**
+     * Parses the given {@code path} and finds the appropriate value within this {@link DataObject}.
+     *
+     * @param root The root data object, which is the top level accessor.
+     *             <br>The very first element in the path corresponds to a field of that name within this root object.
+     * @param path The path of the value, in accordance with the described grammar by {@link DataPath}.
+     *             <br>This must start with a name element, such as {@code "foo"}.
+     *
+     * @throws ParsingException If the path is invalid or resolving fails due to missing elements.
+     * @throws IndexOutOfBoundsException If any of the elements in the path refer to an array index that is out of bounds.
+     * @throws IllegalArgumentException If null is provided or the path is empty.
+     *
+     * @return The {@link OffsetDateTime} value at the given path.
+     */
+    @NotNull
+    public static OffsetDateTime getOffsetDateTime(@NotNull DataObject root, @NotNull String path)
+    {
+        final OffsetDateTime offsetDateTime = get(root, path, DataObject::getOffsetDateTime, DataArray::getOffsetDateTime);
+
+        if (offsetDateTime == null)
+        {
+            pathError(path, "OffsetDateTime");
+        }
+        return offsetDateTime;
+    }
+
+    /**
+     * Parses the given {@code path} and finds the appropriate value within this {@link DataObject}.
+     *
+     * @param root The root data object, which is the top level accessor.
+     *             <br>The very first element in the path corresponds to a field of that name within this root object.
+     * @param path The path of the value, in accordance with the described grammar by {@link DataPath}.
+     *             <br>This must start with a name element, such as {@code "foo"}.
+     * @param fallback The {@link OffsetDateTime}, which should be used for the case of a fallback.
+     *
+     * @throws ParsingException If the path is invalid or resolving fails due to missing elements.
+     * @throws IndexOutOfBoundsException If any of the elements in the path refer to an array index that is out of bounds.
+     * @throws IllegalArgumentException If null is provided or the path is empty.
+     *
+     * @return The {@link OffsetDateTime} value at the given path, returning the fallback if the path resolves to an optional value that is missing.
+     */
+    @Contract("_, _, !null -> !null")
+    public static OffsetDateTime getOffsetDateTime(@NotNull DataObject root, @NotNull String path, @Nullable OffsetDateTime fallback)
+    {
+        final OffsetDateTime offsetDateTime = get(root, path, (obj, key) -> obj.getOffsetDateTime(key, fallback), (arr, index) -> arr.getOffsetDateTime(index, fallback));
+        return offsetDateTime == null ? fallback : offsetDateTime;
+    }
+
+    /**
+     * Parses the given {@code path} and finds the appropriate value within this {@link DataArray}.
+     *
+     * @param root The root data array, which is the top level accessor.
+     *             <br>The very first element in the path corresponds to a field of that name within this root object.
+     * @param path The path of the value, in accordance with the described grammar by {@link DataPath}.
+     *             <br>This must start with an index element, such as {@code "[0]"}.
+     *
+     * @throws ParsingException If the path is invalid or resolving fails due to missing elements.
+     * @throws IndexOutOfBoundsException If any of the elements in the path refer to an array index that is out of bounds.
+     * @throws IllegalArgumentException If null is provided or the path is empty.
+     *
+     * @return The {@link OffsetDateTime} value at the given path.
+     */
+    @NotNull
+    public static OffsetDateTime getOffsetDateTime(@NotNull DataArray root, @NotNull String path)
+    {
+        final OffsetDateTime offsetDateTime = get(root, path, DataObject::getOffsetDateTime, DataArray::getOffsetDateTime);
+
+        if (offsetDateTime == null)
+        {
+            pathError(path, "OffsetDateTime");
+        }
+        return offsetDateTime;
+    }
+
+    /**
+     * Parses the given {@code path} and finds the appropriate value within this {@link DataArray}.
+     *
+     * @param root The root data array, which is the top level accessor.
+     *             <br>The very first element in the path corresponds to a field of that name within this root object.
+     * @param path The path of the value, in accordance with the described grammar by {@link DataPath}.
+     *             <br>This must start with an index element, such as {@code "[0]"}.
+     * @param fallback The {@link OffsetDateTime}, which should be used for the case of a fallback.
+     *
+     * @throws ParsingException If the path is invalid or resolving fails due to missing elements.
+     * @throws IndexOutOfBoundsException If any of the elements in the path refer to an array index that is out of bounds.
+     * @throws IllegalArgumentException If null is provided or the path is empty.
+     *
+     * @return The {@link OffsetDateTime} value at the given path, returning the fallback if the path resolves to an optional value that is missing.
+     */
+    @Contract("_, _, !null -> !null")
+    public static OffsetDateTime getOffsetDateTime(@NotNull DataArray root, @NotNull String path, @Nullable OffsetDateTime fallback)
+    {
+        final OffsetDateTime offsetDateTime = get(root, path, (obj, key) -> obj.getOffsetDateTime(key, fallback), (arr, index) -> arr.getOffsetDateTime(index, fallback));
+        return offsetDateTime == null ? fallback : offsetDateTime;
     }
 
     /**

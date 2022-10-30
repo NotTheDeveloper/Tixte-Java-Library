@@ -16,17 +16,14 @@
  */
 package dev.blocky.library.tixte.internal.requests;
 
-import org.jetbrains.annotations.ApiStatus.Internal;
-
 /**
- * Represents HTTP-methods.
+ * Enum used to specify the HTTP method to use for a request.
  *
  * @author BlockyDotJar
- * @version v1.0.1
+ * @version v2.0.0
  * @since v1.0.0-beta.3
  */
-@Internal
-public enum Method
+public enum HTTPMethods
 {
 
     /**

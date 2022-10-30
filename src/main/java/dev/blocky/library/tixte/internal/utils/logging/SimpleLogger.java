@@ -39,7 +39,7 @@ import static dev.blocky.library.tixte.internal.utils.logging.SimpleLogger.Simpl
  * A custom {@link SimpleLogger}. (from <a href="https://www.slf4j.org/api/org/slf4j/simple/SimpleLogger.html">slf4j-simple</a>).
  *
  * @author QOS.ch and BlockyDotJar
- * @version v1.2.1
+ * @version v1.2.2
  * @since v1.0.0-alpha.3
  */
 public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogger
@@ -133,7 +133,7 @@ public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogge
 
     private synchronized void write(@NotNull StringBuilder buf, @Nullable Throwable t)
     {
-        PrintStream targetStream = OUTPUT_CHOICE.getTargetPrintStream();
+        final PrintStream targetStream = OUTPUT_CHOICE.getTargetPrintStream();
 
         targetStream.println(buf);
         writeThrowable(t, targetStream);
@@ -151,14 +151,14 @@ public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogge
     @NotNull
     private synchronized String getFormattedDate()
     {
-        Date now = new Date();
+        final Date now = new Date();
         return DATE_FORMATTER.format(now);
     }
 
     private void innerHandleNormalizedLoggingCall(@NotNull Level level, @NotNull List<Marker> markers, @NotNull String messagePattern,
                                                   @NotNull Object[] arguments, @Nullable Throwable t)
     {
-        StringBuilder buf = new StringBuilder(32);
+        final StringBuilder buf = new StringBuilder(32);
 
         if (SHOW_DATE_TIME)
         {
@@ -193,7 +193,7 @@ public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogge
             buf.append('[');
         }
 
-        String levelStr = level.name();
+        final String levelStr = level.name();
         buf.append(levelStr);
 
         if (LEVEL_IN_BRACKETS)
@@ -226,7 +226,7 @@ public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogge
             }
         }
 
-        String formattedMessage = MessageFormatter.basicArrayFormat(messagePattern, arguments);
+        final String formattedMessage = MessageFormatter.basicArrayFormat(messagePattern, arguments);
 
         buf.append(formattedMessage);
 
@@ -385,9 +385,9 @@ public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogge
 
         private static synchronized void loadProperties()
         {
-            ClassLoader threadCL = Thread.currentThread().getContextClassLoader();
+            final ClassLoader threadCL = Thread.currentThread().getContextClassLoader();
 
-            try (InputStream in = threadCL.getResourceAsStream(CONFIGURATION_FILE))
+            try (final InputStream in = threadCL.getResourceAsStream(CONFIGURATION_FILE))
             {
                 if (null != in)
                 {
@@ -416,7 +416,7 @@ public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogge
             INITIALIZED = true;
             loadProperties();
 
-            String defaultLogLevelString = getStringProperty(DEFAULT_LOG_LEVEL_KEY, null);
+            final String defaultLogLevelString = getStringProperty(DEFAULT_LOG_LEVEL_KEY, null);
 
             if (defaultLogLevelString != null)
             {
@@ -456,13 +456,13 @@ public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogge
         @CheckReturnValue
         static String getStringProperty(@NotNull String name, @Nullable String defaultValue)
         {
-            String prop = getStringProperty(name);
+            final String prop = getStringProperty(name);
             return (prop == null) ? defaultValue : prop;
         }
 
         static boolean getBooleanProperty(@NotNull String name, boolean defaultValue)
         {
-            String prop = getStringProperty(name);
+            final String prop = getStringProperty(name);
             return (prop == null) ? defaultValue : "true".equalsIgnoreCase(prop);
         }
 
@@ -543,8 +543,8 @@ public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogge
             {
                 try
                 {
-                    FileOutputStream fos = new FileOutputStream(logFile);
-                    PrintStream printStream = new PrintStream(fos);
+                    final FileOutputStream fos = new FileOutputStream(logFile);
+                    final PrintStream printStream = new PrintStream(fos);
                     return new OutputChoice(printStream);
                 }
                 catch (FileNotFoundException e)
@@ -604,7 +604,11 @@ public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogge
                     {
                         case SYS_OUT -> System.out;
                         case SYS_ERR -> System.err;
-                        case CACHED_SYS_ERR, CACHED_SYS_OUT, FILE -> TARGET_PRINT_STREAM;
+                        case CACHED_SYS_ERR, CACHED_SYS_OUT, FILE ->
+                        {
+                            assert TARGET_PRINT_STREAM != null;
+                            yield TARGET_PRINT_STREAM;
+                        }
                     };
         }
 

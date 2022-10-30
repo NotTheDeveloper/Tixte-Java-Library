@@ -21,24 +21,26 @@ import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.Helpers;
 import okhttp3.Request;
 import org.jetbrains.annotations.ApiStatus.Experimental;
-import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static dev.blocky.library.tixte.api.TixteInfo.TIXTE_API_VERSION;
-import static dev.blocky.library.tixte.internal.requests.Method.*;
+import static dev.blocky.library.tixte.internal.requests.HTTPMethods.*;
 
 /**
  * Utility class for creating {@link Request requests}.
  *
  * @author MinnDevelopment and BlockyDotJar
- * @version v2.1.2
+ * @version v2.2.0
  * @since v1.0.0-alpha.3
  */
-@Internal
 public class Route
 {
     public static final String TIXTE_API_PREFIX = Helpers.format("https://api.tixte.com/v%d/", TIXTE_API_VERSION);
@@ -63,6 +65,7 @@ public class Route
         public static final Route GET_UPLOADS = new Route(GET, "users/@me/uploads");
         public static final Route GET_UPLOAD_SIZE = new Route(GET, "users/@me/uploads/size");
         public static final Route DELETE_FILE = new Route(DELETE, "users/@me/uploads/{asset_id}");
+
 
         //  Can't be used yet by everyone, so I am not able to implement it already.
 
@@ -122,16 +125,35 @@ public class Route
     }
 
     /**
-     * Represents a custom HTTP-method to specific route.
+     * Create a route template for the given HTTP method.
      *
-     * @param method The {@link Method} of the request.
-     * @param route The route of the request.
+     * <p>Route syntax should include valid argument placeholders of the format: {@code '{' argument_name '}'}
+     * <br>These are the correct names of major parameters:
+     * <ul>
+     *     <li>{@code user_data} for user routes</li>
+     *     <li>{@code asset_id} for upload routes</li>
+     *     <li>{@code domain} for domain routes</li>
+     * </ul>
      *
-     * @return A custom HTTP-method to specific route.
+     * For example, to compose the route to create a message in a channel:
+     * <pre>{@code
+     * Route route = Route.custom(HTTPMethods.DELETE, "users/@me/uploads/{asset_id}");
+     * }</pre>
+     *
+     * <p>To compile the route, use {@link #compile(String...)} with the positional arguments.
+     * <pre>{@code
+     * Route.CompiledRoute compiled = route.compile(assetId);
+     * }</pre>
+     *
+     * @param method The HTTP method.
+     * @param route The route template with valid argument placeholders.
+     *
+     * @throws IllegalArgumentException If null is provided or the route is invalid (containing spaces or empty)
+     *
+     * @return The custom route template.
      */
     @NotNull
-    @CheckReturnValue
-    public static Route custom(@NotNull Method method, @NotNull String route)
+    public static Route custom(@NotNull HTTPMethods method, @NotNull String route)
     {
         Checks.notNull(method, "Method");
         Checks.notEmpty(route, "Route");
@@ -141,11 +163,31 @@ public class Route
     }
 
     /**
-     * Represents a {@code delete}-request to a specific route.
+     * Create a route template for the with the {@link HTTPMethods#DELETE DELETE} method.
      *
-     * @param route The route of the request.
+     * <p>Route syntax should include valid argument placeholders of the format: {@code '{' argument_name '}'}
+     * <br>These are the correct names of major parameters:
+     * <ul>
+     *     <li>{@code user_data} for user routes</li>
+     *     <li>{@code asset_id} for upload routes</li>
+     *     <li>{@code domain} for domain routes</li>
+     * </ul>
      *
-     * @return A {@code delete}-request to a specific route.
+     * For example, to compose the route to delete a message in a channel:
+     * <pre>{@code
+     * Route route = Route.custom(HTTPMethods.DELETE, "channels/{channel_id}/messages/{message_id}");
+     * }</pre>
+     *
+     * <p>To compile the route, use {@link #compile(String...)} with the positional arguments.
+     * <pre>{@code
+     * Route.CompiledRoute compiled = route.compile(assetId);
+     * }</pre>
+     *
+     * @param route The route template with valid argument placeholders
+     *
+     * @throws IllegalArgumentException If null is provided or the route is invalid (containing spaces or empty)
+     *
+     * @return The custom route template
      */
     @NotNull
     public static Route delete(@NotNull String route)
@@ -154,11 +196,31 @@ public class Route
     }
 
     /**
-     * Represents a {@code post}-request to a specific route.
+     * Create a route template for the with the {@link HTTPMethods#POST POST} method.
      *
-     * @param route The route of the request.
+     * <p>Route syntax should include valid argument placeholders of the format: {@code '{' argument_name '}'}
+     * <br>These are the correct names of major parameters:
+     * <ul>
+     *     <li>{@code user_data} for user routes</li>
+     *     <li>{@code asset_id} for upload routes</li>
+     *     <li>{@code domain} for domain routes</li>
+     * </ul>
      *
-     * @return A {@code post}-request to a specific route.
+     * For example, to compose the route to create a message in a channel:
+     * <pre>{@code
+     * Route route = Route.custom(HTTPMethods.POST, "upload");
+     * }</pre>
+     *
+     * <p>To compile the route, use {@link #compile(String...)} with the positional arguments.
+     * <pre>{@code
+     * Route.CompiledRoute compiled = route.compile();
+     * }</pre>
+     *
+     * @param route The route template with valid argument placeholders
+     *
+     * @throws IllegalArgumentException If null is provided or the route is invalid (containing spaces or empty)
+     *
+     * @return The custom route template
      */
     @NotNull
     public static Route post(@NotNull String route)
@@ -167,11 +229,31 @@ public class Route
     }
 
     /**
-     * Represents a {@code put}-request to a specific route.
+     * Create a route template for the with the {@link HTTPMethods#PUT PUT} method.
      *
-     * @param route The route of the request.
+     * <p>Route syntax should include valid argument placeholders of the format: {@code '{' argument_name '}'}
+     * <br>These are the correct names of major parameters:
+     * <ul>
+     *     <li>{@code user_data} for user routes</li>
+     *     <li>{@code asset_id} for upload routes</li>
+     *     <li>{@code domain} for domain routes</li>
+     * </ul>
      *
-     * @return A {@code put}-request to a specific route.
+     * For example, to compose the route to ban a user in a guild:
+     * <pre>{@code
+     * Route route = Route.custom(HTTPMethods.PUT, "users/@me/domains/{domain}");
+     * }</pre>
+     *
+     * <p>To compile the route, use {@link #compile(String...)} with the positional arguments.
+     * <pre>{@code
+     * Route.CompiledRoute compiled = route.compile(domain);
+     * }</pre>
+     *
+     * @param route The route template with valid argument placeholders
+     *
+     * @throws IllegalArgumentException If null is provided or the route is invalid (containing spaces or empty)
+     *
+     * @return The custom route template
      */
     @NotNull
     public static Route put(@NotNull String route)
@@ -180,11 +262,31 @@ public class Route
     }
 
     /**
-     * Represents a {@code patch}-request to a specific route.
+     * Create a route template for the with the {@link HTTPMethods#PATCH PATCH} method.
      *
-     * @param route The route of the request.
+     * <p>Route syntax should include valid argument placeholders of the format: {@code '{' argument_name '}'}
+     * <br>These are the correct names of major parameters:
+     * <ul>
+     *     <li>{@code user_data} for user routes</li>
+     *     <li>{@code asset_id} for upload routes</li>
+     *     <li>{@code domain} for domain routes</li>
+     * </ul>
      *
-     * @return A {@code patch}-request to a specific route.
+     * For example, to compose the route to edit a message in a channel:
+     * <pre>{@code
+     * Route route = Route.custom(HTTPMethods.PATCH, "users/@me/domains/{domain}");
+     * }</pre>
+     *
+     * <p>To compile the route, use {@link #compile(String...)} with the positional arguments.
+     * <pre>{@code
+     * Route.CompiledRoute compiled = route.compile(domain);
+     * }</pre>
+     *
+     * @param route The route template with valid argument placeholders
+     *
+     * @throws IllegalArgumentException If null is provided or the route is invalid (containing spaces or empty)
+     *
+     * @return The custom route template
      */
     @NotNull
     public static Route patch(@NotNull String route)
@@ -193,11 +295,31 @@ public class Route
     }
 
     /**
-     * Represents a {@code get}-request to a specific route.
+     * Create a route template for the with the {@link HTTPMethods#GET GET} method.
      *
-     * @param route The route of the request.
+     * <p>Route syntax should include valid argument placeholders of the format: {@code '{' argument_name '}'}
+     * <br>These are the correct names of major parameters:
+     * <ul>
+     *     <li>{@code user_data} for user routes</li>
+     *     <li>{@code asset_id} for upload routes</li>
+     *     <li>{@code domain} for domain routes</li>
+     * </ul>
      *
-     * @return A {@code get}-request to a specific route.
+     * For example, to compose the route to get a message in a channel:
+     * <pre>{@code
+     * Route route = Route.custom(HTTPMethods.GET, "users/{user_data}");
+     * }</pre>
+     *
+     * <p>To compile the route, use {@link #compile(String...)} with the positional arguments.
+     * <pre>{@code
+     * Route.CompiledRoute compiled = route.compile(userData);
+     * }</pre>
+     *
+     * @param route The route template with valid argument placeholders
+     *
+     * @throws IllegalArgumentException If null is provided or the route is invalid (containing spaces or empty)
+     *
+     * @return The custom route template
      */
     @NotNull
     public static Route get(@NotNull String route)
@@ -205,12 +327,17 @@ public class Route
         return custom(GET, route);
     }
 
-    private static final String majorParameters = "user_data:asset_id:domain";
-    private final int paramCount;
-    private final Method method;
+    /**
+     * The known major parameters.
+     */
+    public static final List<String> MAJOR_PARAMETER_NAMES = Helpers.listOf(
+            "user_data", "asset_id", "domain"
+    );
     private final String route;
+    private final HTTPMethods method;
+    private final int paramCount;
 
-    private Route(@NotNull Method method, @NotNull String route)
+    private Route(@NotNull HTTPMethods method, @NotNull String route)
     {
         this.method = method;
         this.route = route;
@@ -223,33 +350,32 @@ public class Route
     }
 
     /**
-     * Gets the current used HTTP-method.
+     * The {@link HTTPMethods} of this route template.
+     * <br>Multiple routes with different HTTP methods can share a rate-limit.
      *
-     * @return The current used HTTP-method.
+     * @return The HTTP method.
      */
-    @Nullable
-    @CheckReturnValue
-    public Method getMethod()
+    @NotNull
+    public HTTPMethods getHTTPMethod()
     {
         return method;
     }
 
     /**
-     * Gets the current used route.
+     * The route template with argument placeholders.
      *
-     * @return The current used route.
+     * @return The route template.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public String getRoute()
     {
         return route;
     }
 
     /**
-     * Gets the amount of parameters in the current route.
+     * The number of parameters for this route, not including query parameters.
      *
-     * @return The amount of parameters in the current route.
+     * @return The parameter count.
      */
     public int getParamCount()
     {
@@ -257,11 +383,17 @@ public class Route
     }
 
     /**
-     * Gets the current route with all parameters replaced with the given values.
+     * Compile the route with provided parameters.
+     * <br>The number of parameters must match the number of placeholders in the route template.
+     * The provided arguments are positional and will replace the placeholders of the template in order of appearance.
+     *
+     * <p>Use {@link CompiledRoute#withQueryParams(String...)} to add query parameters to the route.
      *
      * @param params The parameters to compile the route with.
      *
-     * @return The current {@link CompiledRoute} with all parameters replaced with the given values.
+     * @throws IllegalArgumentException If the number of parameters does not match the number of placeholders, or null is provided.
+     *
+     * @return The compiled route, ready to use for rate-limit handling.
      */
     @NotNull
     public CompiledRoute compile(@NotNull String... params)
@@ -282,7 +414,7 @@ public class Route
 
             final String paramName = compiledRoute.substring(paramStart + 1, paramEnd);
 
-            if (majorParameters.contains(paramName))
+            if (MAJOR_PARAMETER_NAMES.contains(paramName))
             {
                 if (params[i].length() > 30)
                 {
@@ -293,7 +425,7 @@ public class Route
                     major.add(paramName + "=" + params[i]);
                 }
             }
-            compiledRoute.replace(paramStart, paramEnd + 1, params[i]);
+            compiledRoute.replace(paramStart, paramEnd + 1, URLEncoder.encode(params[i], StandardCharsets.UTF_8));
         }
         return new CompiledRoute(this, compiledRoute.toString(), major.isEmpty() ? "N/A" : String.join(":", major));
     }
@@ -323,61 +455,101 @@ public class Route
     }
 
     /**
-     * Represents the current compiled route.
+     * Represents a route compiled with arguments.
+     *
+     * @see Route#compile(String...)
      *
      * @author BlockyDotJar
-     * @version v1.3.1
+     * @version v1.4.0
      * @since v1.0.0-beta.3
      */
     public class CompiledRoute
     {
-        private final boolean hasQueryParams;
         private final Route baseRoute;
         private final String major;
         private final String compiledRoute;
+        private final List<String> query;
 
-        private CompiledRoute(@NotNull Route baseRoute, @NotNull String compiledRoute, @NotNull String major, boolean hasQueryParams)
+        private CompiledRoute(@NotNull Route baseRoute, @NotNull String compiledRoute, @NotNull String major)
         {
             this.baseRoute = baseRoute;
             this.compiledRoute = compiledRoute;
             this.major = major;
-            this.hasQueryParams = hasQueryParams;
+            this.query = null;
         }
 
-        private CompiledRoute(@NotNull Route baseRoute, @NotNull String compiledRoute, @NotNull String major)
+        private CompiledRoute(@NotNull CompiledRoute original, @NotNull List<String> query)
         {
-            this(baseRoute, compiledRoute, major, false);
+            this.baseRoute = original.baseRoute;
+            this.compiledRoute = original.compiledRoute;
+            this.major = original.major;
+            this.query = query;
         }
 
         /**
-         * Gets the current route with all parameters replaced with the given values.
-         * <br>Query parameter are for example: {@code ?param1=value1&param2=value2}
+         * Returns a copy of this {@link CompiledRoute} with the provided parameters added as query.
+         * <br>This will use <a href="https://en.wikipedia.org/wiki/Percent-encoding" target="_blank">percent-encoding</a>
+         * for all provided <em>values</em> but not for the keys.
          *
-         * @param params The parameters to compile the route with.
+         * <p><b>Example Usage</b><br>
+         * <pre>{@code
+         * Route.CompiledRoute uploads = Route.GET_UPLOADS.compile();
          *
-         * @return The current {@link CompiledRoute} with all parameters replaced with the given values.
+         * // Returns a *new* route.
+         * route = uploads.withQueryParams(
+         *   "page", 1
+         * );
+         * // Adds another parameter on top of page.
+         * route = route.withQueryParams(
+         *   "amount", 5
+         * );
+         *
+         * // Now the route has both page and amount, you can also do this in one call:
+         * route = uploads.withQueryParams(
+         *   "page", 1,
+         *   "amount", 5
+         * );
+         * }</pre>
+         *
+         * @param params The parameters to add as query, alternating key and value (see example)
+         *
+         * @throws IllegalArgumentException If the number of arguments is not even or null is provided.
+         *
+         * @return A copy of this CompiledRoute with the provided parameters added as query.
          */
         @NotNull
         @CheckReturnValue
         public CompiledRoute withQueryParams(@NotNull String... params)
         {
-            Checks.check(params.length >= 2, "params length must be at least 2");
-            Checks.check(params.length % 2 == 0, "params length must be a multiple of 2");
+            Checks.notNull(params, "params");
+            Checks.check(params.length >= 2, "Params length must be at least 2");
+            Checks.check((params.length & 1) == 0, "Params length must be a multiple of 2");
 
-            final StringBuilder newRoute = new StringBuilder(compiledRoute);
+            List<String> newQuery;
 
-            for (int i = 0; i < params.length; i++)
+            if (query == null)
             {
-                newRoute.append(!hasQueryParams && i == 0 ? '?' : '&').append(params[i]).append('=').append(params[++i]);
+                newQuery = new ArrayList<>(params.length / 2);
+            }
+            else
+            {
+                newQuery = new ArrayList<>(query.size() + params.length / 2);
+                newQuery.addAll(query);
             }
 
-            return new CompiledRoute(baseRoute, newRoute.toString(), major, true);
+            for (int i = 0; i < params.length; i += 2)
+            {
+                newQuery.add(params[i] + '=' + URLEncoder.encode(params[i + 1], StandardCharsets.UTF_8));
+            }
+
+            return new CompiledRoute(this, newQuery);
         }
 
         /**
-         * Gets every major parameter of the route.
+         * The string of major parameters used by this route.
+         * <br>This is important for rate-limit handling.
          *
-         * @return Every major parameter of the route.
+         * @return The string of major parameters used by this route.
          */
         @NotNull
         public String getMajorParameters()
@@ -386,20 +558,26 @@ public class Route
         }
 
         /**
-         * Gets the current compiled route.
+         * The compiled route string of the endpoint,
+         * including all arguments and query parameters.
          *
-         * @return The current compiled route.
+         * @return The compiled route string of the endpoint.
          */
         @NotNull
         public String getCompiledRoute()
         {
-            return compiledRoute;
+            if (query == null)
+            {
+                return compiledRoute;
+            }
+
+            return compiledRoute + '?' + String.join("&", query);
         }
 
         /**
-         * Gets the current base route.
+         * The route template with the original placeholders.
          *
-         * @return The current base route.
+         * @return The route template with the original placeholders.
          */
         @NotNull
         public Route getBaseRoute()
@@ -408,12 +586,12 @@ public class Route
         }
 
         /**
-         * Gets the current used HTTP-method.
+         * The HTTP method.
          *
-         * @return The current used HTTP-method.
+         * @return The HTTP method.
          */
         @NotNull
-        public Method getMethod()
+        public HTTPMethods getHTTPMethod()
         {
             return baseRoute.method;
         }
@@ -439,7 +617,7 @@ public class Route
         @Override
         public String toString()
         {
-            return "CompiledRoute(" + method + ": " + compiledRoute + ")";
+            return method + "/" + route;
         }
     }
 }

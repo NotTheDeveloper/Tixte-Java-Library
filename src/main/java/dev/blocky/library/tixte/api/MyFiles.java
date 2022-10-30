@@ -19,6 +19,7 @@ import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.requests.json.DataArray;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.requests.json.DataPath;
+import dev.blocky.library.tixte.internal.requests.json.DataType;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +38,7 @@ import java.util.regex.Pattern;
  * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
  *
  * @author BlockyDotJar
- * @version v1.5.0
+ * @version v1.5.1
  * @since v1.0.0-alpha.1
  */
 public record MyFiles() implements RawResponseData
@@ -157,14 +159,14 @@ public record MyFiles() implements RawResponseData
     }
 
     /**
-     * Gets a {@link List} of permission level, which the files are containing.
+     * Gets a {@link List} of permission level, which the file contains.
      *
      * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
      *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
      *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return A {@link List} of permission level, which the files are containing.
+     * @return A {@link List} of permission level, which the file contains.
      */
     @Nullable
     @CheckReturnValue
@@ -238,31 +240,31 @@ public record MyFiles() implements RawResponseData
     }
 
     /**
-     * Gets a {@link List} of upload dates from the files as a ISO string.
+     * Gets a {@link List} of upload dates from the files as a {@link OffsetDateTime} in ISO8601 format.
      *
-     * <p>Example for ISO string: <b>2022-07-08T11:32:51.913Z</b>.
+     * <p>Example for ISO8601 format: <b>2022-07-08T11:32:51.913Z</b>.
      * <br>There is an <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/java/DateFormatExample.java">example</a>
-     * for formatting the ISO string.
+     * for formatting the ISO8601 {@link OffsetDateTime}.
      *
      * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
      *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
      *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return A {@link List} of upload dates from the files as a ISO string.
+     * @return A {@link List} of upload dates from the files as a {@link OffsetDateTime} in ISO8601 format.
      */
     @Nullable
     @CheckReturnValue
-    public List<String> getUploadDates() throws InterruptedException, IOException
+    public List<OffsetDateTime> getUploadDates() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
 
-        final List<String> list = new ArrayList<>();
+        final List<OffsetDateTime> list = new ArrayList<>();
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
-            list.add(DataPath.getString(json, "data.uploads[" + i + "]?.uploaded_at"));
+            list.add(DataPath.getOffsetDateTime(json, "data.uploads[" + i + "]?.uploaded_at"));
         }
         return list;
     }
@@ -351,18 +353,20 @@ public record MyFiles() implements RawResponseData
     }
 
     /**
-     * Gets a {@link List} of expiration times from the file as a ISO string.
+     * Gets a {@link List} of expiration times from the file as a {@link OffsetDateTime} in ISO8601 format or an int,
+     * if the remaining time is lower than or equal to 60 minutes.
      *
-     * <p>Example for ISO string: <b>2022-07-08T11:32:51.913Z</b>
+     * <p>Example for ISO8601 format: <b>2022-07-08T11:32:51.913Z</b>
      * <br>There is an <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/java/DateFormatExample.java">example</a>
-     * for formatting the ISO string.
+     * for formatting the ISO8601 {@link OffsetDateTime}.
      *
      * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
      *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
      *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return A {@link List} of expiration times from the files as a ISO string.
+     * @return A {@link List} of expiration times from the files as a {@link OffsetDateTime} in ISO8601 format or an int,
+     * if the remaining time is lower than or equal to 60 minutes.
      */
     @Nullable
     @CheckReturnValue
@@ -375,7 +379,14 @@ public record MyFiles() implements RawResponseData
 
         for (int i = 0; i < uploads.toList().size(); i++)
         {
-            list.add(DataPath.getString(json, "data.uploads[" + i + "]?.expiration?"));
+            if (uploads.isType(i, DataType.STRING))
+            {
+                list.add(DataPath.getOffsetDateTime(json, "data.uploads[" + i + "]?.expiration?"));
+            }
+            else
+            {
+                list.add(DataPath.getInt(json, "data.uploads[" + i + "]?.expiration?"));
+            }
         }
         return list;
     }

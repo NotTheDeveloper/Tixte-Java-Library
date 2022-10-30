@@ -19,12 +19,12 @@ package dev.blocky.library.tixte.api;
  * Contains information to this specific build of Tixte4J.
  *
  * @author BlockyDotJar
- * @version v1.2.0
+ * @version v1.1.2
  * @since v1.0.0-beta.5
  */
 public record TixteInfo()
 {
     public static final int TIXTE_API_VERSION = 1;
-    public static final String VERSION = "v1.1.1";
+    public static final String VERSION = "v1.1.2";
     public static final String GITHUB = "https://github.com/BlockyDotJar/Tixte-Java-Library";
 }

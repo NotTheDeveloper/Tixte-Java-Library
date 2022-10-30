@@ -1,6 +1,6 @@
 /**
  * Copyright 2022 Dominic R. (aka. BlockyDotJar), Florian Spieß (aka. MinnDevelopment),
- * Austin Keener (aka. DV8FromTheWorld), Austin Shapiro (aka. Scarsz) and Dennis Neufeld (aka. napstr)
+ * Austin Keener (aka. DV8FromTheWorld), Austin Shapiro (aka. Scarsz), Dennis Neufeld (aka. napstr) and Mitmocc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -46,8 +48,8 @@ import java.util.stream.Stream;
  *
  * @param data A {@link List} of objects.
  *
- * @author MinnDevelopment, napstr and BlockyDotJar
- * @version v1.1.1
+ * @author MinnDevelopment, napstr, Mitmocc and BlockyDotJar
+ * @version v1.2.0
  * @since v1.0.0-beta.3
  */
 public record DataArray(@NotNull List<Object> data) implements Iterable<Object>, SerializableArray
@@ -109,7 +111,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             return new DataArray(mapper.readValue(json, listType));
         }
-        catch (@NotNull IOException e)
+        catch (IOException e)
         {
             throw new ParsingException(e);
         }
@@ -131,7 +133,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             return new DataArray(mapper.readValue(json, listType));
         }
-        catch (@NotNull IOException e)
+        catch (IOException e)
         {
             throw new ParsingException(e);
         }
@@ -153,7 +155,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             return new DataArray(mapper.readValue(json, listType));
         }
-        catch (@NotNull IOException e)
+        catch (IOException e)
         {
             throw new ParsingException(e);
         }
@@ -227,7 +229,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             child = (Map<String, Object>) get(Map.class, index);
         }
-        catch (@NotNull ClassCastException ex)
+        catch (ClassCastException ex)
         {
             log.error("Unable to extract child data", ex);
         }
@@ -258,7 +260,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             child = (List<Object>) get(List.class, index);
         }
-        catch (@NotNull ClassCastException ex)
+        catch (ClassCastException ex)
         {
             log.error("Unable to extract child data", ex);
         }
@@ -522,6 +524,55 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
     }
 
     /**
+     * Resolves the value at the specified index to an {@link OffsetDateTime}.
+     * <br><b>Note:</b> This method should be used on ISO8601 timestamps.
+     *
+     * @param index The index to resolve.
+     *
+     * @throws ParsingException If the value is missing, null, or not a valid ISO8601 timestamp.
+     *
+     * @return Possibly-null {@link OffsetDateTime} object representing the timestamp.
+     */
+    @NotNull
+    public OffsetDateTime getOffsetDateTime(int index)
+    {
+        OffsetDateTime value = getOffsetDateTime(index, null);
+
+        if(value == null)
+        {
+            throw valueError(index, "OffsetDateTime");
+        }
+        return value;
+    }
+    /**
+     * Resolves the value at the specified index to an {@link OffsetDateTime}.
+     * <br><b>Note:</b> This method should only be used on ISO8601 timestamps.
+     *
+     * @param index The index to resolve.
+     * @param defaultValue Alternative value to use when no value or null value is associated with the key.
+     *
+     * @throws ParsingException If the value is not a valid ISO8601 timestamp.
+     *
+     * @return Possibly-null {@link OffsetDateTime} object representing the timestamp.
+     */
+    @Contract("_, !null -> !null")
+    public OffsetDateTime getOffsetDateTime(int index, @Nullable OffsetDateTime defaultValue)
+    {
+        OffsetDateTime value;
+
+        try
+        {
+            value = get(OffsetDateTime.class, index, OffsetDateTime::parse, null);
+        }
+        catch (DateTimeParseException e)
+        {
+            String reason = "Cannot parse value for %s into an OffsetDateTime object. Try double checking that %s is a valid ISO8601 timestamp.";
+            throw new ParsingException(String.format(reason, e.getParsedString()));
+        }
+        return value == null ? defaultValue : value;
+    }
+
+    /**
      * Appends the provided value to the end of the array.
      *
      * @param value The value to append.
@@ -641,7 +692,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
             mapper.writeValue(outputStream, data);
             return outputStream.toByteArray();
         }
-        catch (@NotNull IOException e)
+        catch (IOException e)
         {
             throw new UncheckedIOException(e);
         }
@@ -663,7 +714,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             return mapper.writer(printer).writeValueAsString(data);
         }
-        catch (@NotNull JsonProcessingException e)
+        catch (JsonProcessingException e)
         {
             throw new ParsingException(e);
         }
@@ -754,7 +805,7 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
         {
             return mapper.writeValueAsString(data);
         }
-        catch (@NotNull JsonProcessingException e)
+        catch (JsonProcessingException e)
         {
             throw new ParsingException(e);
         }

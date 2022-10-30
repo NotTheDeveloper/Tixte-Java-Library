@@ -25,7 +25,6 @@ import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import jdk.incubator.concurrent.StructuredTaskScope;
 import okhttp3.*;
 import org.jetbrains.annotations.ApiStatus.Experimental;
-import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NonBlocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,10 +45,9 @@ import static dev.blocky.library.tixte.internal.requests.Route.TIXTE_API_PREFIX;
  * Represents the raw response data from Tixte API-requests.
  *
  * @author BlockyDotJar
- * @version v3.0.2
+ * @version v3.0.3
  * @since v1.0.0-beta.1
  */
-@Internal
 public interface RawResponseData
 {
     Logger logger = TixteLogger.getLog(RawResponseData.class);
@@ -826,7 +824,7 @@ public interface RawResponseData
                 .addHeader("Authorization", sessionTokenNeeded ? tixteClient.getSessionToken().orElse(null) : tixteClient.getAPIKey())
                 .addHeader("User-Agent", "Tixte4J-Request (" + GITHUB + ", " + VERSION + ")");
 
-        final Request request = switch (route.getMethod())
+        final Request request = switch (route.getHTTPMethod())
                 {
                     case GET -> builder.build();
                     case DELETE -> requestBody == null ? builder.delete().build() : builder.delete(requestBody).build();
@@ -846,7 +844,7 @@ public interface RawResponseData
 
             if (!TixteClientBuilder.prettyResponsePrinting)
             {
-                logger.info("Request successful: " + route.getMethod() + "/" + route.getCompiledRoute());
+                logger.info("Request successful: " + route.getHTTPMethod() + "/" + route.getCompiledRoute());
             }
             else
             {
@@ -884,7 +882,7 @@ public interface RawResponseData
 
             if (!TixteClientBuilder.prettyResponsePrinting)
             {
-                logger.info("Request successful: " + route.getMethod() + "/" + route.getCompiledRoute());
+                logger.info("Request successful: " + route.getHTTPMethod() + "/" + route.getCompiledRoute());
             }
             else
             {
@@ -901,7 +899,7 @@ public interface RawResponseData
     {
         final DataObject object = DataObject.fromJson(body.resultNow());
 
-        logger.info("'---->>>> Incoming Request: " + route.getMethod() + "/" + route.getCompiledRoute() + "<<<<----'");
+        logger.info("'---->>>> Incoming Request: " + route.getHTTPMethod() + "/" + route.getCompiledRoute() + "<<<<----'");
 
         return object.toPrettyString();
     }

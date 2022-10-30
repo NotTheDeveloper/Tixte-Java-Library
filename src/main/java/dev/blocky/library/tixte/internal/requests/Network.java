@@ -30,7 +30,7 @@ import java.net.SocketAddress;
  * @param port The port number.
  *
  * @author BlockyDotJar
- * @version v1.1.3
+ * @version v1.1.4
  * @since v1.0.0-alpha.3
  */
 public record Network(@NotNull String hostName, int port)
@@ -58,7 +58,7 @@ public record Network(@NotNull String hostName, int port)
             socket.close();
             return true;
         }
-        catch (@NotNull IOException e)
+        catch (IOException e)
         {
             return false;
         }

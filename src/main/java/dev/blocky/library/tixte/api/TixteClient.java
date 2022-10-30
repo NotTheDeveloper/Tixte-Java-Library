@@ -238,7 +238,7 @@ public class TixteClient implements RawResponseData
             return false;
         }
 
-        TixteClient that = (TixteClient) o;
+        final TixteClient that = (TixteClient) o;
 
         return Objects.equals(self, that.self);
     }

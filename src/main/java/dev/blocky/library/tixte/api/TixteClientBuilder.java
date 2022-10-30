@@ -15,6 +15,7 @@
  */
 package dev.blocky.library.tixte.api;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
 import dev.blocky.library.tixte.internal.interceptor.CacheInterceptor;
 import dev.blocky.library.tixte.internal.interceptor.ErrorResponseInterceptor;
@@ -41,7 +42,7 @@ import java.util.regex.Pattern;
  * <br>Each call to {@link #build()} creates a <b>new</b> {@link TixteClient} instance using the same information.
  *
  * @author BlockyDotJar
- * @version v1.3.0
+ * @version v1.3.1
  * @since v1.0.0-alpha.1
  */
 public record TixteClientBuilder()
@@ -190,14 +191,19 @@ public record TixteClientBuilder()
 
     /**
      * Builds a <b>new</b> {@link TixteClient} instance and uses the provided API-key and session-token to start the login process.
-     * <br>In this method there will be set a rate-limit for max. 100 requests per host.
+     * <br>In this method there will be set a rate-limit for max. 25 requests per host.
      * <br>Here also will be built a {@link OkHttpClient} instance, in which every interceptor will be set.
      * <br>You can also set the {@link CachePolicy} by calling {@link #setCachePolicy(CachePolicy)}, which will be used here.
+     *
+     * <p>If the connection - for some reason - fails, the client will retry to open the connection.
+     * <br>If there is not occurring a failure, there will be created a connection which lasts 5 seconds.
+     * <br>There also is a limit for idle connections, which is set to 5.
      *
      * @return A {@link TixteClient} instance that has started the login process.
      */
     @NotNull
     @NonBlocking
+    @CanIgnoreReturnValue
     public TixteClient build()
     {
         dispatcher.setMaxRequestsPerHost(25);

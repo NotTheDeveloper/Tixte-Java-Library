@@ -22,12 +22,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 
 /**
  * Represents your Tixte user-account.
  *
  * @author BlockyDotJar
- * @version v1.4.0
+ * @version v1.4.1
  * @since v1.0.0-beta.1
  */
 public record SelfUser() implements RawResponseData
@@ -70,23 +71,23 @@ public record SelfUser() implements RawResponseData
     }
 
     /**
-     * Gets your last login date as a ISO string.
-     * <br>Example for ISO string: <b>2022-07-08T11:32:51.913Z</b>
+     * Gets your last login date as a {@link OffsetDateTime} in ISO8601 format.
+     * <br>Example for ISO8601 format: <b>2022-07-08T11:32:51.913Z</b>
      * <br>There is an <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/test/java/DateFormatExample.java">example</a>
-     * for formatting the ISO string.
+     * for formatting the ISO8601 {@link OffsetDateTime}.
      *
      * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
      *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
      *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @return Your last login date as a ISO string.
+     * @return Your last login date as a {@link OffsetDateTime} in ISO8601 format.
      */
     @NotNull
-    public String getLastLogin() throws InterruptedException, IOException
+    public OffsetDateTime getLastLogin() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
-        return DataPath.getString(json, "data.last_login");
+        return DataPath.getOffsetDateTime(json, "data.last_login");
     }
 
     /**

@@ -16,8 +16,13 @@
  */
 package dev.blocky.library.tixte.internal.utils;
 
+import com.google.errorprone.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -26,7 +31,7 @@ import java.util.Locale;
  * <br>Specifically {@code StringUtils.java} and {@code ExceptionUtils.java}
  *
  * @author MinnDevelopment and BlockyDotJar
- * @version v1.0.3
+ * @version v1.0.4
  * @since v1.0.0-beta.2
  */
 public class Helpers
@@ -151,5 +156,23 @@ public class Helpers
         }
 
         return count;
+    }
+
+    /**
+     * Returns an unmodifiable view of the specified list.
+     * <br>Query operations on the returned list "read through" to the specified list, and attempts to modify the returned list,
+     * whether direct or via its iterator, result in an {@link UnsupportedOperationException}.
+     *
+     * @param elements The elements for the unmodifiable {@link List}.
+     * @param <T> The type of the first argument to the operation.
+     *
+     * @return An unmodifiable view of the specified {@link List}.
+     */
+    @NotNull
+    @SafeVarargs
+    @CheckReturnValue
+    public static <T> List<T> listOf(@Nullable T... elements)
+    {
+        return Collections.unmodifiableList(Arrays.asList(elements));
     }
 }

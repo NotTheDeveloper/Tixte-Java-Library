@@ -25,7 +25,7 @@ import java.io.IOException;
  * Utility class for I/O operations.
  *
  * @author MinnDevelopment and BlockyDotJar
- * @version v1.1.1
+ * @version v1.1.2
  * @since v1.0.0-beta.5
  */
 public class IOUtil
@@ -46,7 +46,7 @@ public class IOUtil
         {
             closeable.close();
         }
-        catch (@NotNull IOException ignored)
+        catch (IOException ignored)
         {
             // Ignored.
         }

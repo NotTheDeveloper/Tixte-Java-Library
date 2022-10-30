@@ -19,15 +19,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
 /**
- * Some basic examples, how to format an ISO string to a {@link Date}.
+ * Some basic examples, how to format an ISO8601 string to a {@link Date}.
  *
  * @author BlockyDotJar
- * @version v1.1.2
+ * @version v1.1.3
  * @since v1.0.0-beta.3
  */
 public class DateFormatExample
@@ -48,10 +47,10 @@ public class DateFormatExample
         // Fully parses the text producing a temporal object.
         // This parses the entire text producing a temporal object.
         // The result of this method is TemporalAccessor which has been resolved, applying basic validation checks to help ensure a valid date-time.
-        final TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT.parse(self.getLastLogin());
+        final TemporalAccessor temporalAccessor = self.getLastLogin();
         final Instant instant = Instant.from(temporalAccessor);
 
-        // Returns a valid datetime
+        // Returns a valid datetime.
         return Date.from(instant);
     }
 }

@@ -139,7 +139,7 @@ public class Checks
     }
 
     /**
-     * Checks if the following inputs are containing matches.
+     * Checks if the following input contains matches.
      *
      * @param input The input to match.
      * @param pattern A compiled representation of a regex.

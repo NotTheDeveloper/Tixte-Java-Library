@@ -35,7 +35,7 @@ the `TixteClient` object is then created by calling the `build()` method.
 **Example**:
 
 ```java
-TixteClient client = new TixteClientBuilder().create("API_KEY").setSessionToken("SESSION_TOKEN").build();
+final TixteClient client = new TixteClientBuilder().create("API_KEY").setSessionToken("SESSION_TOKEN").build();
 ```
 
 ### Configuration
@@ -45,26 +45,26 @@ The `TixteClientBuilder` allows a set of configurations to improve the experienc
 **Example**:
 
 ```java
-    public static void main(@NotNull String[] args) throws IOException
-    {
-        // Creates a *new* TixteClientBuilder instance.
-        TixteClientBuilder builder = new TixteClientBuilder()
-        // Sets the API-key, which is required for most of the methods.
-        // This method also sets the cache policy. I really recommend to set this to ALL.
-        // If this is equal to null or not set, this will be automatically set to NONE.
-        // If you use this method like here, you don't have to set it via setCachePolicy(@Nullable CachePolicy).
-        .create(getAPIKey(), CachePolicy.ALL)
-        // Sets the session-token. (Optional but recommended)
-        .setSessionToken(getSessionToken())
-        // Sets a default domain. (Optional)
-        .setDefaultDomain(getDefaultDomain());
+public static void main(@NotNull String[] args) throws IOException
+{
+    // Creates a *new* TixteClientBuilder instance.
+    final TixteClientBuilder builder = new TixteClientBuilder()
+            // Sets the API-key, which is required for most of the methods.
+            // This method also sets the cache policy. I really recommend to set this to ALL.
+            // If this is equal to null or not set, this will be automatically set to NONE.
+            // If you use this method like here, you don't have to set it via setCachePolicy(@Nullable CachePolicy).
+            .create(getAPIKey(), CachePolicy.ALL)
+            // Sets the session-token. (Optional but recommended)
+            .setSessionToken(getSessionToken())
+            // Sets a default domain. (Optional)
+            .setDefaultDomain(getDefaultDomain());
 
-        // Builds a *new* TixteClient instance and uses the provided API-key and session-token to start the login process.
-        builder.build();
-    }
+    // Builds a *new* TixteClient instance and uses the provided API-key and session-token to start the login process.
+    builder.build();
+}
 ```
 
-> See [TixteClientBuilder](https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/src/main/java/dev/blocky/library/tixte/api/TixteClientBuilder.java) class
+> See [TixteClientBuilder](https://blockydotjar.github.io/Tixte-Java-Library/tixte4j/dev/blocky/library/tixte/api/TixteClientBuilder.html) class
 
 ### More Examples
 
@@ -77,7 +77,7 @@ If a class or method is marked with the `Experimental` annotation, you should fi
 
 ## Tixte experiments
 
-If you have early access to a feature that i don't have, feel free to implement this into Tixte4J!
+If you have early access to a feature that I don't have, feel free to implement this into Tixte4J!
 
 **Requirements:**
 * Good Java knowledge
@@ -89,7 +89,7 @@ You also should read the [contribution guidelines](https://github.com/BlockyDotJ
 ## Tixte turbo(-charged)
 
 Some features are requiring a Tixte turbo(-charged) subscription, so be careful.
-If you have access to turob(-charged) features that i don't have access to, feel free to implement this into Tixte4J!
+If you have access to turob(-charged) features that I don't have access to, feel free to implement this into Tixte4J!
 
 **Requirements:**
 * Good Java knowledge
@@ -283,7 +283,7 @@ For guides and setup help you can also take a look at the wiki.
 If you want to contribute to Tixte4J, make sure to base your branch off of our **developer** branch
 and create your PR into that **same** branch.
 <br>**We will be rejecting any PRs, which are not based to the developer branch!**
-<br>It is very possible that your change might already be in development or you missed something.
+<br>It is very possible that your change might already be in development, or you missed something.
 
 More information can be found at the [contributing](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Contributing) wiki page.
 

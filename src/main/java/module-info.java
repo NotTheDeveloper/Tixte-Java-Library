@@ -4,7 +4,6 @@
 module tixte4j {
     uses org.slf4j.spi.SLF4JServiceProvider;
 
-    requires java.datatransfer;
     requires java.desktop;
 
     requires jdk.incubator.concurrent;
@@ -13,10 +12,8 @@ module tixte4j {
     requires com.fasterxml.jackson.databind;
 
     requires okhttp3;
-    requires okio;
     requires org.slf4j;
     requires org.apache.commons.collections4;
-    requires org.apache.commons.io;
 
     requires org.jetbrains.annotations;
     requires com.google.errorprone.annotations;

@@ -17,7 +17,6 @@ package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.utils.Helpers;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -35,7 +34,7 @@ import java.io.IOException;
  * @param providerUrl The provider url to be built.
  *
  * @author BlockyDotJar
- * @version v1.2.0
+ * @version v1.2.1
  * @since v1.0.0-beta.1
  */
 public record Embed(@Nullable String authorName, @Nullable String authorUrl, @Nullable String title,
@@ -127,7 +126,7 @@ public record Embed(@Nullable String authorName, @Nullable String authorUrl, @Nu
 
             RawResponseData.setEmbedRaw(embedDescription, embedTitle, embedColor, embedAuthorName, embedAuthorUrl, embedProviderName, embedProviderUrl);
         }
-        catch (@NotNull InterruptedException | @NotNull IOException e)
+        catch (InterruptedException | IOException e)
         {
             e.printStackTrace();
         }

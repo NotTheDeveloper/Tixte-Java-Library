@@ -1,7 +1,7 @@
 /**
  * Copyright 2022 Dominic R. (aka. BlockyDotJar), Florian Spieß (aka. MinnDevelopment),
- * Austin Keener (aka. DV8FromTheWorld), Austin Shapiro (aka. Scarsz), Dennis Neufeld (aka. napstr)
- * and Andre_601 (aka. Andre601)
+ * Austin Keener (aka. DV8FromTheWorld), Austin Shapiro (aka. Scarsz), Dennis Neufeld (aka. napstr),
+ * Andre_601 (aka. Andre601) and Mitmocc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -43,8 +45,8 @@ import java.util.function.UnaryOperator;
  *
  * @param data A {@link List} of objects.
  *
- * @author MinnDevelopment, napstr, Andre601 and BlockyDotJar
- * @version v1.0.3
+ * @author MinnDevelopment, napstr, Andre601, Mitmocc and BlockyDotJar
+ * @version v1.1.0
  * @since v1.0.0-beta.3
  */
 public record DataObject(@NotNull Map<String, Object> data) implements SerializableData
@@ -94,7 +96,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
             final Map<String, Object> map = mapper.readValue(data, mapType);
             return new DataObject(map);
         }
-        catch (@NotNull IOException ex)
+        catch (IOException ex)
         {
             throw new ParsingException(ex);
         }
@@ -117,7 +119,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
             final Map<String, Object> map = mapper.readValue(json, mapType);
             return new DataObject(map);
         }
-        catch (@NotNull IOException ex)
+        catch (IOException ex)
         {
             throw new ParsingException(ex);
         }
@@ -140,7 +142,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
             final Map<String, Object> map = mapper.readValue(stream, mapType);
             return new DataObject(map);
         }
-        catch (@NotNull IOException ex)
+        catch (IOException ex)
         {
             throw new ParsingException(ex);
         }
@@ -163,7 +165,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
             final Map<String, Object> map = mapper.readValue(stream, mapType);
             return new DataObject(map);
         }
-        catch (@NotNull IOException ex)
+        catch (IOException ex)
         {
             throw new ParsingException(ex);
         }
@@ -244,7 +246,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
         {
             child = (Map<String, Object>) get(Map.class, key);
         }
-        catch (@NotNull ClassCastException ex)
+        catch (ClassCastException ex)
         {
             log.error("Unable to extract child data", ex);
         }
@@ -284,7 +286,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
         {
             child = (List<Object>) get(List.class, key);
         }
-        catch (@NotNull ClassCastException ex)
+        catch (ClassCastException ex)
         {
             log.error("Unable to extract child data", ex);
         }
@@ -585,6 +587,58 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     }
 
     /**
+     * Resolves an {@link OffsetDateTime} to a key.
+     * <br><b>Note:</b> This method should be used on ISO8601 timestamps.
+     *
+     * @param key The key to check for a value.
+     *
+     * @throws ParsingException If the value is missing, null, or not a valid ISO8601 timestamp.
+     *
+     * @return Possibly-null {@link OffsetDateTime} object representing the timestamp.
+     */
+    @NotNull
+    public OffsetDateTime getOffsetDateTime(@NotNull String key)
+    {
+        OffsetDateTime value = getOffsetDateTime(key, null);
+
+        if(value == null)
+        {
+            throw valueError(key, "OffsetDateTime");
+        }
+        return value;
+    }
+
+    /**
+     * Resolves an {@link OffsetDateTime} to a key.
+     * <br><b>Note:</b> This method should only be used on ISO8601 timestamps.
+     *
+     * @param key The key to check for a value.
+     * @param defaultValue Alternative value to use when no value or null value is associated with the key.
+     *
+     * @throws ParsingException If the value is not a valid ISO8601 timestamp.
+     *
+     * @return Possibly-null {@link OffsetDateTime} object representing the timestamp.
+     */
+    @Contract("_, !null -> !null")
+    public OffsetDateTime getOffsetDateTime(@NotNull String key, @Nullable OffsetDateTime defaultValue)
+    {
+        OffsetDateTime value;
+
+        try
+        {
+            value = get(OffsetDateTime.class, key, OffsetDateTime::parse, null);
+        }
+        catch (DateTimeParseException e)
+        {
+            String reason = "Cannot parse value for %s into an OffsetDateTime object. Try double checking that %s is a valid ISO8601 timestamp.";
+            throw new ParsingException(String.format(reason, key, e.getParsedString()));
+        }
+        return value == null ? defaultValue : value;
+    }
+
+
+
+    /**
      * Removes the value associated with the specified key.
      * <br>If no value is associated with the key, this does nothing.
      *
@@ -674,7 +728,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
             mapper.writeValue(outputStream, data);
             return outputStream.toByteArray();
         }
-        catch (@NotNull IOException e)
+        catch (IOException e)
         {
             throw new UncheckedIOException(e);
         }
@@ -696,7 +750,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
         {
             return mapper.writer(printer).writeValueAsString(data);
         }
-        catch (@NotNull JsonProcessingException e)
+        catch (JsonProcessingException e)
         {
             throw new ParsingException(e);
         }
@@ -773,7 +827,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
         {
             return mapper.writeValueAsString(data);
         }
-        catch (@NotNull JsonProcessingException e)
+        catch (JsonProcessingException e)
         {
             throw new ParsingException(e);
         }

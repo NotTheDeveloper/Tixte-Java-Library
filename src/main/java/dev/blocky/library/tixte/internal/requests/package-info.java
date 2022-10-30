@@ -3,7 +3,7 @@
  * <br>From here you can navigate to all requests.
  *
  * <ul>
- * <li>{@link dev.blocky.library.tixte.internal.requests.Method}
+ * <li>{@link dev.blocky.library.tixte.internal.requests.HTTPMethods}
  * <br>Represents HTTP-methods.</li>
  *
  * <li>{@link dev.blocky.library.tixte.internal.requests.Network}

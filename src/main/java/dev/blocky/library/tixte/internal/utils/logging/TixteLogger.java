@@ -36,7 +36,7 @@ import java.util.ServiceLoader;
  * <br>It also has the utility method {@link #getLazyString(LazyEvaluation)} which is used to lazily construct strings for logging.
  *
  * @author MinnDevelopment, enveeed and BlockyDotJar
- * @version v1.2.1
+ * @version v1.2.2
  * @since v1.0.0-alpha.3
  */
 public non-sealed class TixteLogger extends SimpleLogger
@@ -69,7 +69,7 @@ public non-sealed class TixteLogger extends SimpleLogger
         {
             try
             {
-                Class<?> serviceProviderInterface = Class.forName("org.slf4j.spi.SLF4JServiceProvider");
+                final Class<?> serviceProviderInterface = Class.forName("org.slf4j.spi.SLF4JServiceProvider");
 
                 SLF4J = ServiceLoader.load(serviceProviderInterface).iterator().hasNext();
             }
@@ -149,7 +149,7 @@ public non-sealed class TixteLogger extends SimpleLogger
                 }
                 catch (Exception ex)
                 {
-                    StringWriter sw = new StringWriter();
+                    final StringWriter sw = new StringWriter();
                     ex.printStackTrace(new PrintWriter(sw));
                     return "Error while evaluating lazy string... " + sw;
                 }

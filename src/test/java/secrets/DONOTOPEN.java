@@ -37,7 +37,7 @@ import java.nio.file.Paths;
 public class DONOTOPEN
 {
     private static final Logger logger = TixteLogger.getLog(DONOTOPEN.class);
-    private static final File file = new File("FILE_PATH");
+    private static final File file = new File("C:\\Users\\hirni\\Desktop\\Applications\\token\\secrets.json");
 
     /**
      * Gets the API-key from the secrets.json file.
