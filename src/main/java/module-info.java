@@ -29,4 +29,5 @@ module tixte4j {
     exports dev.blocky.library.tixte.internal.requests.json;
     exports dev.blocky.library.tixte.internal.utils;
     exports dev.blocky.library.tixte.internal.utils.io;
+    exports dev.blocky.library.tixte.internal.utils.logging;
 }
