@@ -324,9 +324,6 @@ This project requires **Java 19+**
 * slf4j-api
     * Version: **v2.0.3**
     * [Github](https://github.com/qos-ch/slf4j)
-* slf4j-fbl
-    * Version: **v1.0.1**
-    * [Github](https://github.com/BlockyDotJar/SLF4J-Fallback-Logger)
 * jetbrains-annotations
     * Version: **v23.0.0**
     * [Github](https://github.com/JetBrains/java-annotations)
