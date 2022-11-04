@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.Future;
+import java.util.regex.Pattern;
 
 import static dev.blocky.library.tixte.api.TixteInfo.GITHUB;
 import static dev.blocky.library.tixte.api.TixteInfo.VERSION;
@@ -45,11 +46,12 @@ import static dev.blocky.library.tixte.internal.requests.Route.TIXTE_API_PREFIX;
  * Represents the raw response data from Tixte API-requests.
  *
  * @author BlockyDotJar
- * @version v3.0.3
+ * @version v3.1.0
  * @since v1.0.0-beta.1
  */
 public interface RawResponseData
 {
+    Pattern DOMAIN_PATTERN = Pattern.compile("^(https?://)([a-zA-Z\\d_-])+.([a-zA-Z-])+.([a-zA-Z])+$", Pattern.CASE_INSENSITIVE);
     Logger logger = TixteLogger.getLog(RawResponseData.class);
     TixteClient tixteClient = new TixteClient();
 
@@ -373,9 +375,18 @@ public interface RawResponseData
         Checks.notEmpty(password, "password");
         Checks.noWhitespace(password, "password");
 
-        final Route.CompiledRoute route = Route.Self.DELETE_FILE.compile();
+        final Route.CompiledRoute route = Route.Self.PURGE_FILES.compile();
 
-        final RequestBody requestBody = RequestBody.create("{ \"password\": \"" + password + "\", \"purge\": true }",
+        final RequestBody requestBody = RequestBody.create(
+                String.format(
+                        """
+                                {
+                                    "password": "%s",
+                                    "purge": true
+                                }
+                                """
+                        , password
+                ),
                 MediaType.parse("application/json; charset=utf-8"));
 
         return request(route, true, requestBody);
@@ -482,7 +493,16 @@ public interface RawResponseData
 
         final Route.CompiledRoute route = Route.Self.ADD_DOMAIN.compile(domainName);
 
-        final RequestBody requestBody = RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": false }",
+        final RequestBody requestBody = RequestBody.create(
+                String.format(
+                        """
+                                {
+                                    "domain": "%s",
+                                    "custom": false
+                                }
+                                """
+                        , domainName
+                ),
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, true, requestBody);
@@ -509,7 +529,16 @@ public interface RawResponseData
 
         final Route.CompiledRoute route = Route.Self.ADD_DOMAIN.compile(domainName);
 
-        final RequestBody requestBody = RequestBody.create("{ \"domain\": \"" + domainName + "\", \"custom\": true }",
+        final RequestBody requestBody = RequestBody.create(
+                String.format(
+                        """
+                                {
+                                    "domain": "%s",
+                                    "custom": true
+                                }
+                                """
+                        , domainName
+                ),
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, true, requestBody);
@@ -595,7 +624,15 @@ public interface RawResponseData
     {
         final Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
-        final RequestBody requestBody = RequestBody.create("{ \"custom_css\": \"" + customCSS + "\" }",
+        final RequestBody requestBody = RequestBody.create(
+                String.format(
+                        """
+                                {
+                                    "custom_css": "%s"
+                                }
+                                """
+                        , customCSS
+                ),
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, false, requestBody);
@@ -606,7 +643,7 @@ public interface RawResponseData
      * @param authorURL The author url to be built.
      * @param title The title to be built.
      * @param description The description to be built.
-     * @param color The color to be built.
+     * @param themeColor The color to be built.
      * @param providerName The provider name to be built.
      * @param providerURL The provider url to be built.
      *
@@ -621,20 +658,35 @@ public interface RawResponseData
      */
     @NotNull
     @CanIgnoreReturnValue
-    static Future<String> setEmbedRaw(@Nullable String description, @Nullable String title, @Nullable String color,
+    static Future<String> setEmbedRaw(@Nullable String description, @Nullable String title, @Nullable String themeColor,
                                       @Nullable String authorName, @Nullable String authorURL, @Nullable String providerName,
                                       @Nullable String providerURL) throws IOException, InterruptedException
     {
         final Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
         final RequestBody requestBody = RequestBody.create(
-                "{ \"embed\": { \"description\": \"" + description + "\", " +
-                        "\"title\": \"" + title + "\", " +
-                        "\"theme_color\": \"" + color + "\", " +
-                        "\"author_name\": \"" + authorName + "\", " +
-                        "\"author_url\": \"" + authorURL + "\", " +
-                        "\"provider_name\": \"" + providerName + "\", " +
-                        "\"provider_url\": \"" + providerURL + "\" } }",
+                String.format(
+                        """
+                                {
+                                    "embed": {
+                                        "description": "%s",
+                                        "title": "%s",
+                                        "theme_color": "%s",
+                                        "author_name": "%s",
+                                        "author_url": "%s",
+                                        "provider_name": "%s",
+                                        "provider_url": "%s"
+                                    }
+                                }
+                                """
+                        , description
+                        , title
+                        , themeColor
+                        , authorName
+                        , authorURL
+                        , providerName
+                        , providerURL
+                ),
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, false, requestBody);
@@ -659,7 +711,15 @@ public interface RawResponseData
     {
         final Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
-        final RequestBody requestBody = RequestBody.create("{ \"hide_branding\": " + hideBranding + " }",
+        final RequestBody requestBody = RequestBody.create(
+                String.format(
+                        """
+                                {
+                                    "hide_branding": %b
+                                }
+                                """
+                        , hideBranding
+                ),
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, false, requestBody);
@@ -683,35 +743,73 @@ public interface RawResponseData
     {
         final Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
 
-        final RequestBody requestBody = RequestBody.create("{ \"only_image\": " + onlyImagedEnabled + " }",
+        final RequestBody requestBody = RequestBody.create(
+                String.format(
+                        """
+                                {
+                                    "only_image": %b
+                                }
+                                """
+                        , onlyImagedEnabled
+                ),
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, false, requestBody);
     }
 
     /**
-     * @param redirectUrl The redirect url to be built.
+     * @param redirect Either {@code false} or a specified redirect Url as a string.
      *
      * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
      *                     Because networks can fail during an exchange, it is possible that the remote server accepted
      *                     the request before the failure.
      * @throws InterruptedException If the current thread was interrupted.
      *
-     * @see TixteClient#setBaseRedirect(String)
+     * @see TixteClient#setBaseRedirect(Object)
      *
      * @return The raw response of the request.
      */
     @NotNull
     @CanIgnoreReturnValue
-    static Future<String> setBaseRedirectRaw(@NotNull String redirectUrl) throws IOException, InterruptedException
+    static Future<String> setBaseRedirectRaw(@NotNull Object redirect) throws IOException, InterruptedException
     {
-        Checks.notEmpty(redirectUrl, "redirectUrl");
-        Checks.noWhitespace(redirectUrl, "redirectUrl");
+        Checks.notNull(redirect, "redirect");
+
+        RequestBody requestBody;
+
+        if (redirect instanceof String redirectUrl)
+        {
+            Checks.check(DOMAIN_PATTERN.matcher(redirectUrl).matches(), "Regex doesn't match with your domain. Please check if you specified a valid domain.");
+
+            requestBody = RequestBody.create(
+                    String.format(
+                            """
+                                    {
+                                        "base_redirect": "%s"
+                                    }
+                                    """
+                            , redirect
+                    ),
+                    MediaType.get("application/json; charset=utf-8"));
+        }
+        else if (redirect instanceof Boolean isRedirected)
+        {
+            Checks.check(!isRedirected, "'redirect' can either be 'false' or a specified redirect Url as a string.");
+
+            requestBody = RequestBody.create(
+                    """
+                                    {
+                                        "base_redirect": false
+                                    }
+                                    """,
+                    MediaType.get("application/json; charset=utf-8"));
+        }
+        else
+        {
+            throw new IllegalArgumentException("'redirect' can either be 'false' or a specified redirect Url as a string.");
+        }
 
         final Route.CompiledRoute route = Route.Self.PATCH_CONFIG.compile();
-
-        final RequestBody requestBody = RequestBody.create("{ \"base_redirect\": " + redirectUrl + " }",
-                MediaType.get("application/json; charset=utf-8"));
 
         return request(route, false, requestBody);
     }
@@ -778,9 +876,27 @@ public interface RawResponseData
 
         final Route.CompiledRoute route = Route.Self.SEARCH_FILE.compile();
 
-        final RequestBody requestBody = RequestBody.create("{ \"query\": \"" + query + "\", " +
-                        "\"extensions\": " + Arrays.toString(extensions) + ", \"domains\": " + Arrays.toString(domains) + ", " +
-                        "\"sort_by\": \"" + sortBy + "\", \"size\": { \"min\": " + minSize + ", \"max\": " + maxSize + " } }",
+        final RequestBody requestBody = RequestBody.create(
+                String.format(
+                        """
+                                {
+                                    "query": "%s",
+                                    "extensions": %s,
+                                    "domains": %s,
+                                    "sort_by": "%s",
+                                    "size": {
+                                        "min": %d,
+                                        "max": %d
+                                    }
+                                }
+                                """
+                        , query
+                        , Arrays.toString(extensions)
+                        , Arrays.toString(domains)
+                        , sortBy
+                        , minSize
+                        , maxSize
+                ),
                 MediaType.get("application/json; charset=utf-8"));
 
         return request(route, true, requestBody);
@@ -805,12 +921,12 @@ public interface RawResponseData
 
         try (final Response response = call.execute(); final var scope = new StructuredTaskScope<String>())
         {
-            final Future<String> responseStream = scope.fork(response.body()::string);
+            final Future<String> responseString = scope.fork(response.body()::string);
             scope.join();
 
             IOUtil.silentClose(response);
 
-            return Optional.ofNullable(responseStream.resultNow());
+            return Optional.ofNullable(responseString.resultNow());
         }
     }
 

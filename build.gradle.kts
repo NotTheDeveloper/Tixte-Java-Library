@@ -49,7 +49,7 @@ dependencies {
 }
 
 group = "dev.blocky.library"
-version = "1.1.3"
+version = "1.1.4"
 description = "A wrapper for the Tixte API in Java."
 
 java {

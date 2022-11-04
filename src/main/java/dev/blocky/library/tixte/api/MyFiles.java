@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
  *
  * @author BlockyDotJar
- * @version v1.5.1
+ * @version v1.5.2
  * @since v1.0.0-alpha.1
  */
 public record MyFiles() implements RawResponseData
@@ -940,7 +940,7 @@ public record MyFiles() implements RawResponseData
      * <p>You must set a password for this request, because otherwise it won't work.
      *
      * <p>Also note that this could throw an exception if the file takes too long to delete.
-     * <br>if you want to delete a single file in your Tixte dashboard, you can call {@link #deleteFile(String)} instead.
+     * <br>If you want to delete a single file in your Tixte dashboard, you can call {@link #deleteFile(String)} instead.
      *
      * @param password The password of your Tixte account.
      *

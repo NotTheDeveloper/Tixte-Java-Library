@@ -29,16 +29,16 @@ import java.io.IOException;
  * @param authorUrl The author url to be built.
  * @param title The title to be built.
  * @param description The description to be built.
- * @param color The color to be built.
+ * @param themeColor The color to be built.
  * @param providerName The provider name to be built.
  * @param providerUrl The provider url to be built.
  *
  * @author BlockyDotJar
- * @version v1.2.1
+ * @version v1.2.2
  * @since v1.0.0-beta.1
  */
 public record Embed(@Nullable String authorName, @Nullable String authorUrl, @Nullable String title,
-                    @Nullable String description, @Nullable String color, @Nullable String providerName,
+                    @Nullable String description, @Nullable String themeColor, @Nullable String providerName,
                     @Nullable String providerUrl) implements RawResponseData
 {
     /**
@@ -96,19 +96,19 @@ public record Embed(@Nullable String authorName, @Nullable String authorUrl, @Nu
      * @param authorUrl The author url to be built.
      * @param title The title to be built.
      * @param description The description to be built.
-     * @param color The color to be built.
+     * @param themeColor The color to be built.
      * @param providerName The provider name to be built.
      * @param providerUrl The provider url to be built.
      */
     public Embed(@Nullable String authorName, @Nullable String authorUrl, @Nullable String title,
-                 @Nullable String description, @Nullable String color, @Nullable String providerName,
+                 @Nullable String description, @Nullable String themeColor, @Nullable String providerName,
                  @Nullable String providerUrl)
     {
         final EmbedEditor editor = new EmbedEditor();
 
         this.description = description;
         this.title = title;
-        this.color = color;
+        this.themeColor = themeColor;
         this.authorName = authorName;
         this.authorUrl = authorUrl;
         this.providerName = providerName;
@@ -118,7 +118,7 @@ public record Embed(@Nullable String authorName, @Nullable String authorUrl, @Nu
         {
             final String embedDescription = description == null ? editor.getEmbedDescription() : description;
             final String embedTitle = title == null ? editor.getEmbedTitle() : title;
-            final String embedColor = color == null ? editor.getEmbedThemeColor() : color;
+            final String embedColor = themeColor == null ? editor.getEmbedThemeColor() : themeColor;
             final String embedAuthorName = authorName == null ? editor.getEmbedAuthorName() : authorName;
             final String embedAuthorUrl = authorUrl == null ? editor.getEmbedAuthorUrl() : authorUrl;
             final String embedProviderName = providerName == null ? editor.getEmbedProviderName() : providerName;
@@ -221,7 +221,7 @@ public record Embed(@Nullable String authorName, @Nullable String authorUrl, @Nu
     @CheckReturnValue
     public String getColor()
     {
-        return color != null ? color : "#ffffff";
+        return themeColor != null ? themeColor : "#ffffff";
     }
 
     /**

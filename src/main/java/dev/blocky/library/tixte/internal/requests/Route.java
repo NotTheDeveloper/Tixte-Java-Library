@@ -38,7 +38,7 @@ import static dev.blocky.library.tixte.internal.requests.HTTPMethods.*;
  * Utility class for creating {@link Request requests}.
  *
  * @author MinnDevelopment and BlockyDotJar
- * @version v2.2.0
+ * @version v2.2.1
  * @since v1.0.0-alpha.3
  */
 public class Route
@@ -63,6 +63,7 @@ public class Route
         public static final Route ADD_DOMAIN = new Route(PATCH, "users/@me/domains/{domain}");
         public static final Route DELETE_DOMAIN = new Route(DELETE, "users/@me/domains/{domain}");
         public static final Route GET_UPLOADS = new Route(GET, "users/@me/uploads");
+        public static final Route PURGE_FILES = new Route(DELETE, "users/@me/uploads");
         public static final Route GET_UPLOAD_SIZE = new Route(GET, "users/@me/uploads/size");
         public static final Route DELETE_FILE = new Route(DELETE, "users/@me/uploads/{asset_id}");
 

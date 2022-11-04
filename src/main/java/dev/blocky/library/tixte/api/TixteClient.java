@@ -39,7 +39,7 @@ import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
  * <br>All parts of the API can be accessed starting from this class.
  *
  * @author BlockyDotJar
- * @version v1.4.0
+ * @version v1.4.1
  * @since v1.0.0-alpha.1
  */
 public class TixteClient implements RawResponseData
@@ -152,11 +152,12 @@ public class TixteClient implements RawResponseData
     }
 
     /**
-     * Sets the redirect-url.
+     * Sets the redirect-url or disables the redirect.
      * <br>A redirect is a server- or client-side automatic forwarding from one url to another url.
-     * <br>This requires a Tixte turbo/turbo-charged subscription or else there will be thrown a {@link TixteWantsYourMoneyException}.
+     * <br>This {@link Object} can either be {@code false} or a specified redirect url as a string.
+     * <br>This also requires a Tixte turbo/turbo-charged subscription or else there will be thrown a {@link TixteWantsYourMoneyException}.
      *
-     * @param redirectUrl The redirect-url.
+     * @param redirect Either {@code false} or a specified redirect Url as a string.
      *
      * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
      *                     Because networks can fail during an exchange, it is possible that the remote server accepted 
@@ -167,20 +168,20 @@ public class TixteClient implements RawResponseData
      */
     @NotNull
     @CheckReturnValue
-    public TixteClient setBaseRedirect(@NotNull String redirectUrl) throws InterruptedException, IOException
+    public TixteClient setBaseRedirect(@NotNull Object redirect) throws InterruptedException, IOException
     {
         if (!self.hasTixteSubscription())
         {
             throw new TixteWantsYourMoneyException("Payment required: This feature requires a turbo subscription");
         }
 
-        RawResponseData.setBaseRedirectRaw(redirectUrl);
+        RawResponseData.setBaseRedirectRaw(redirect);
         return this;
     }
 
     /**
      * This will return <b>false</b> if you have not set a redirect-url or this will return a string if you have set one.
-     * <br>You can set the redirect-url by using {@link TixteClient#setBaseRedirect(String)}.
+     * <br>You can set the redirect-url by using {@link TixteClient#setBaseRedirect(Object)}.
      *
      * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 
      *                     Because networks can fail during an exchange, it is possible that the remote server accepted 

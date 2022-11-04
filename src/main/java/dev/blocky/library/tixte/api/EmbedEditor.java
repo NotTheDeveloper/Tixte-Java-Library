@@ -42,7 +42,7 @@ public class EmbedEditor implements RawResponseData
     private final Pattern URL_PATTERN = Pattern.compile("^ht{2}ps?://[a-zA-Z\\d]+.[a-zA-Z\\d]+(.[a-zA-Z._/-]+)?([a-zA-Z\\d._/-]+)?", Pattern.CASE_INSENSITIVE);
     private final Logger logger = TixteLogger.getLog(EmbedEditor.class);
     private final StringBuilder description = new StringBuilder();
-    private String providerName, providerUrl, color;
+    private String providerName, providerUrl, themeColor;
     private String authorName, authorUrl, title;
 
     public EmbedEditor()
@@ -96,7 +96,7 @@ public class EmbedEditor implements RawResponseData
 
         final String description = this.description.length() < 1 ? null : this.description.toString();
 
-        return new Embed(authorName, authorUrl, title, description, color, providerName, providerUrl);
+        return new Embed(authorName, authorUrl, title, description, themeColor, providerName, providerUrl);
     }
 
     /**
@@ -112,7 +112,7 @@ public class EmbedEditor implements RawResponseData
         authorUrl = null;
         title = null;
         description.setLength(0);
-        color = null;
+        themeColor = null;
         providerName = null;
         providerUrl = null;
         return this;
@@ -132,7 +132,7 @@ public class EmbedEditor implements RawResponseData
             this.authorName = editor.authorName;
             this.authorUrl = editor.authorUrl;
             this.title = editor.title;
-            this.color = editor.color;
+            this.themeColor = editor.themeColor;
             this.providerName = editor.providerName;
             this.providerUrl = editor.providerUrl;
         }
@@ -152,7 +152,7 @@ public class EmbedEditor implements RawResponseData
             this.authorName = embed.getAuthorName();
             this.authorUrl = embed.getAuthorUrl();
             this.title = embed.getTitle();
-            this.color = embed.getColor();
+            this.themeColor = embed.getColor();
             this.providerName = embed.getProviderName();
             this.providerUrl = embed.getProviderUrl();
         }
@@ -171,7 +171,7 @@ public class EmbedEditor implements RawResponseData
                 && authorUrl == null
                 && title == null
                 && description.length() == 0
-                && color == null
+                && themeColor == null
                 && providerName == null
                 && providerUrl == null;
     }
@@ -295,7 +295,7 @@ public class EmbedEditor implements RawResponseData
     @NotNull
     public EmbedEditor setColor(@Nullable String hexColor)
     {
-        this.color = hexColor;
+        this.themeColor = hexColor;
         return this;
     }
 
@@ -622,7 +622,7 @@ public class EmbedEditor implements RawResponseData
 
         return URL_PATTERN.equals(editor.URL_PATTERN) && logger.equals(editor.logger) &&
                 Objects.equals(description.toString(), editor.description.toString()) && Objects.equals(providerName, editor.providerName) &&
-                Objects.equals(providerUrl, editor.providerUrl) && Objects.equals(color, editor.color) &&
+                Objects.equals(providerUrl, editor.providerUrl) && Objects.equals(themeColor, editor.themeColor) &&
                 Objects.equals(authorName, editor.authorName) && Objects.equals(authorUrl, editor.authorUrl) &&
                 Objects.equals(title, editor.title);
     }
@@ -630,7 +630,7 @@ public class EmbedEditor implements RawResponseData
     @Override
     public int hashCode()
     {
-        return Objects.hash(URL_PATTERN, logger, description, providerName, providerUrl, color, authorName, authorUrl, title);
+        return Objects.hash(URL_PATTERN, logger, description, providerName, providerUrl, themeColor, authorName, authorUrl, title);
     }
 
     @NotNull
@@ -642,7 +642,7 @@ public class EmbedEditor implements RawResponseData
                 ", description=" + description +
                 ", providerName='" + providerName + '\'' +
                 ", providerUrl='" + providerUrl + '\'' +
-                ", color='" + color + '\'' +
+                ", themeColor='" + themeColor + '\'' +
                 ", authorName='" + authorName + '\'' +
                 ", authorUrl='" + authorUrl + '\'' +
                 ", title='" + title + '\'' +
