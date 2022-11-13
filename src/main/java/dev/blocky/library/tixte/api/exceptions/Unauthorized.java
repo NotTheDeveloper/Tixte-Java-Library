@@ -21,14 +21,14 @@ import org.jetbrains.annotations.NotNull;
  * Exception thrown when a request is made to a Tixte API-endpoint, but you are not authorized to do so.
  *
  * @author BlockyDotJar
- * @version v1.1.1
+ * @version v1.1.2
  * @since v1.0.0-alpha.1
  */
 public class Unauthorized extends HTTPException
 {
 
     /**
-     * Constructs an {@link HTTPException HTTPException} for the response code {@code 402} with the specified detail message.
+     * Constructs an {@link HTTPException HTTPException} for the response code {@code 401} with the specified detail message.
      * <br>A detail message is a String that describes this particular exception.
      *
      * @param message The detail message.

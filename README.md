@@ -317,10 +317,10 @@ This project requires **Java 19+**
     * [Github](https://github.com/square/okhttp)
 * okio
     * Version: **v3.2.0**
-    * [Github](https://github.com/square/okio/)
+    * [Github](https://github.com/square/okio)
 * jackson
-    * Version: **v2.13.4.2**
-    * [Github](https://github.com/stleary/JSON-java)
+    * Version: **v2.14.0**
+    * [Github](https://github.com/FasterXML/jackson)
 * slf4j-api
     * Version: **v2.0.3**
     * [Github](https://github.com/qos-ch/slf4j)

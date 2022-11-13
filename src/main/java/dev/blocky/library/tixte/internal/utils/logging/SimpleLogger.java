@@ -39,7 +39,7 @@ import static dev.blocky.library.tixte.internal.utils.logging.SimpleLogger.Simpl
  * A custom {@link SimpleLogger}. (from <a href="https://www.slf4j.org/api/org/slf4j/simple/SimpleLogger.html">slf4j-simple</a>).
  *
  * @author QOS.ch and BlockyDotJar
- * @version v1.2.2
+ * @version v1.2.3
  * @since v1.0.0-alpha.3
  */
 public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogger
@@ -155,7 +155,7 @@ public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogge
         return DATE_FORMATTER.format(now);
     }
 
-    private void innerHandleNormalizedLoggingCall(@NotNull Level level, @NotNull List<Marker> markers, @NotNull String messagePattern,
+    private void innerHandleNormalizedLoggingCall(@NotNull Level level, @Nullable List<Marker> markers, @NotNull String messagePattern,
                                                   @NotNull Object[] arguments, @Nullable Throwable t)
     {
         final StringBuilder buf = new StringBuilder(32);
@@ -313,7 +313,7 @@ public sealed class SimpleLogger extends LegacyAbstractLogger permits TixteLogge
     }
 
     @Override
-    protected void handleNormalizedLoggingCall(@NotNull Level level, @NotNull Marker marker, @NotNull String messagePattern,
+    protected void handleNormalizedLoggingCall(@NotNull Level level, @Nullable Marker marker, @NotNull String messagePattern,
                                                @NotNull Object[] arguments, @Nullable Throwable t)
     {
         List<Marker> markers = null;

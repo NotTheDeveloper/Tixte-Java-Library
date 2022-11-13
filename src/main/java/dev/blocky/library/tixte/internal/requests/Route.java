@@ -16,7 +16,6 @@
  */
 package dev.blocky.library.tixte.internal.requests;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.Helpers;
 import okhttp3.Request;
@@ -38,7 +37,7 @@ import static dev.blocky.library.tixte.internal.requests.HTTPMethods.*;
  * Utility class for creating {@link Request requests}.
  *
  * @author MinnDevelopment and BlockyDotJar
- * @version v2.2.1
+ * @version v2.2.2
  * @since v1.0.0-alpha.3
  */
 public class Route
@@ -136,7 +135,7 @@ public class Route
      *     <li>{@code domain} for domain routes</li>
      * </ul>
      *
-     * For example, to compose the route to create a message in a channel:
+     * For example, to compose the route to delete an upload:
      * <pre>{@code
      * Route route = Route.custom(HTTPMethods.DELETE, "users/@me/uploads/{asset_id}");
      * }</pre>
@@ -174,9 +173,9 @@ public class Route
      *     <li>{@code domain} for domain routes</li>
      * </ul>
      *
-     * For example, to compose the route to delete a message in a channel:
+     * For example, to compose the route to delete an upload:
      * <pre>{@code
-     * Route route = Route.custom(HTTPMethods.DELETE, "channels/{channel_id}/messages/{message_id}");
+     * Route route = Route.custom(HTTPMethods.DELETE, "users/@me/uploads/{asset_id}");
      * }</pre>
      *
      * <p>To compile the route, use {@link #compile(String...)} with the positional arguments.
@@ -207,7 +206,7 @@ public class Route
      *     <li>{@code domain} for domain routes</li>
      * </ul>
      *
-     * For example, to compose the route to create a message in a channel:
+     * For example, to compose the route to create an upload:
      * <pre>{@code
      * Route route = Route.custom(HTTPMethods.POST, "upload");
      * }</pre>
@@ -240,15 +239,7 @@ public class Route
      *     <li>{@code domain} for domain routes</li>
      * </ul>
      *
-     * For example, to compose the route to ban a user in a guild:
-     * <pre>{@code
-     * Route route = Route.custom(HTTPMethods.PUT, "users/@me/domains/{domain}");
-     * }</pre>
-     *
-     * <p>To compile the route, use {@link #compile(String...)} with the positional arguments.
-     * <pre>{@code
-     * Route.CompiledRoute compiled = route.compile(domain);
-     * }</pre>
+     * <br>There are currently no routes, which are executed via. a {@link HTTPMethods#PUT PUT} request.
      *
      * @param route The route template with valid argument placeholders
      *
@@ -273,7 +264,7 @@ public class Route
      *     <li>{@code domain} for domain routes</li>
      * </ul>
      *
-     * For example, to compose the route to edit a message in a channel:
+     * For example, to compose the route to create a domain:
      * <pre>{@code
      * Route route = Route.custom(HTTPMethods.PATCH, "users/@me/domains/{domain}");
      * }</pre>
@@ -306,7 +297,7 @@ public class Route
      *     <li>{@code domain} for domain routes</li>
      * </ul>
      *
-     * For example, to compose the route to get a message in a channel:
+     * For example, to compose the route to get data from a user:
      * <pre>{@code
      * Route route = Route.custom(HTTPMethods.GET, "users/{user_data}");
      * }</pre>
@@ -386,7 +377,7 @@ public class Route
     /**
      * Compile the route with provided parameters.
      * <br>The number of parameters must match the number of placeholders in the route template.
-     * The provided arguments are positional and will replace the placeholders of the template in order of appearance.
+     * <br>The provided arguments are positional and will replace the placeholders of the template in order of appearance.
      *
      * <p>Use {@link CompiledRoute#withQueryParams(String...)} to add query parameters to the route.
      *
@@ -394,7 +385,7 @@ public class Route
      *
      * @throws IllegalArgumentException If the number of parameters does not match the number of placeholders, or null is provided.
      *
-     * @return The compiled route, ready to use for rate-limit handling.
+     * @return The {@link CompiledRoute}, ready to use for rate-limit handling.
      */
     @NotNull
     public CompiledRoute compile(@NotNull String... params)
@@ -461,7 +452,7 @@ public class Route
      * @see Route#compile(String...)
      *
      * @author BlockyDotJar
-     * @version v1.4.0
+     * @version v1.4.1
      * @since v1.0.0-beta.3
      */
     public class CompiledRoute
@@ -496,7 +487,7 @@ public class Route
          * <pre>{@code
          * Route.CompiledRoute uploads = Route.GET_UPLOADS.compile();
          *
-         * // Returns a *new* route.
+         * // Returns a *new* Route.
          * route = uploads.withQueryParams(
          *   "page", 1
          * );
@@ -516,10 +507,9 @@ public class Route
          *
          * @throws IllegalArgumentException If the number of arguments is not even or null is provided.
          *
-         * @return A copy of this CompiledRoute with the provided parameters added as query.
+         * @return A copy of this {@link CompiledRoute} with the provided parameters added as query.
          */
         @NotNull
-        @CheckReturnValue
         public CompiledRoute withQueryParams(@NotNull String... params)
         {
             Checks.notNull(params, "params");

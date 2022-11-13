@@ -26,7 +26,7 @@ import java.net.URL;
  * Some basic examples, how to upload a {@link File} to Tixte.
  *
  * @author BlockyDotJar
- * @version v1.1.2
+ * @version v1.1.3
  * @since v1.0.0-beta.3
  */
 public class FileExample
@@ -64,6 +64,7 @@ public class FileExample
      *
      * @return Upload a file from a specific {@link URL} to Tixte by initializing a <b>new</b> {@link File}.
      */
+    @NotNull
     public static MyFiles uploadFileFromURL() throws InterruptedException, IOException
     {
         final MyFiles myFiles = new MyFiles();

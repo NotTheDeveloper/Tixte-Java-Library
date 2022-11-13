@@ -15,7 +15,6 @@
  */
 package dev.blocky.library.tixte.api;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.requests.json.DataArray;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.requests.json.DataPath;
@@ -38,7 +37,7 @@ import java.util.regex.Pattern;
  * Represents the 'My Files' tab of the Tixte dashboard and everything else what Tixte offers you with files.
  *
  * @author BlockyDotJar
- * @version v1.5.2
+ * @version v1.5.3
  * @since v1.0.0-alpha.1
  */
 public record MyFiles() implements RawResponseData
@@ -168,8 +167,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return A {@link List} of permission level, which the file contains.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<Integer> getPermissionLevels() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
@@ -197,8 +195,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return A {@link List} of extensions from the files.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<String> getExtensions() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
@@ -223,8 +220,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return A {@link List} of sizes from the files in bytes.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<Integer> getSizes() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
@@ -253,8 +249,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return A {@link List} of upload dates from the files as a {@link OffsetDateTime} in ISO8601 format.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<OffsetDateTime> getUploadDates() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
@@ -279,8 +274,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return A {@link List} of domains, on which the files got uploaded.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<String> getDomains() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
@@ -305,8 +299,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return A {@link List} of names from the files.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<String> getNames() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
@@ -336,8 +329,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return A {@link List} of mime-types from the files.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<String> getMimeTypes() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
@@ -368,8 +360,7 @@ public record MyFiles() implements RawResponseData
      * @return A {@link List} of expiration times from the files as a {@link OffsetDateTime} in ISO8601 format or an int,
      * if the remaining time is lower than or equal to 60 minutes.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<Object> getExpirationTimes() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
@@ -401,8 +392,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return A {@link List} od IDs from the files.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<String> getAssetIds() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
@@ -430,8 +420,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return A {@link List} of types from the files. (public/private)
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<Integer> getTypes() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
@@ -459,9 +448,8 @@ public record MyFiles() implements RawResponseData
      * @return <b>true</b> - If the file is public.
      *         <br><b>false</b> - If the file is private.
      */
-    @Nullable
-    @CheckReturnValue
-    public List<Boolean> isPublic() throws InterruptedException, IOException
+    @NotNull
+    public List<Boolean> arePublic() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
@@ -488,9 +476,8 @@ public record MyFiles() implements RawResponseData
      * @return <b>true</b> - If the file is private.
      *         <br><b>false</b> - If the file is public.
      */
-    @Nullable
-    @CheckReturnValue
-    public List<Boolean> isPrivate() throws InterruptedException, IOException
+    @NotNull
+    public List<Boolean> arePrivate() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
         final DataArray uploads = DataPath.getDataArray(json, "data.uploads");
@@ -521,8 +508,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return The complete name of the file.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<String> getFileNames() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUploadsRaw().resultNow());
@@ -561,8 +547,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return The url of the current uploaded file.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public Optional<String> getURL()
     {
         return Optional.ofNullable(url);
@@ -575,8 +560,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return The direct-url of the current uploaded file.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public Optional<String> getDirectURL()
     {
         return Optional.ofNullable(directURL);
@@ -589,8 +573,7 @@ public record MyFiles() implements RawResponseData
      *
      * @return The deletion-url of the current uploaded file.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public Optional<String> getDeletionURL()
     {
         return Optional.ofNullable(deletionURL);

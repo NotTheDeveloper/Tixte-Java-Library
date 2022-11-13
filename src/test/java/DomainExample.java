@@ -16,7 +16,6 @@
 
 import dev.blocky.library.tixte.api.Domains;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -24,7 +23,7 @@ import java.io.IOException;
  * Some basic examples, how to use {@link Domains}.
  *
  * @author BlockyDotJar
- * @version v1.1.2
+ * @version v1.1.3
  * @since v1.0.0-beta.3
  */
 public class DomainExample
@@ -75,7 +74,7 @@ public class DomainExample
      *
      * @return Deletes a domain of your domain collection.
      */
-    @Nullable
+    @NotNull
     public static Domains deleteDomain() throws InterruptedException, IOException
     {
         final Domains domains = new Domains();

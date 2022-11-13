@@ -31,7 +31,7 @@ import java.util.Locale;
  * <br>Specifically {@code StringUtils.java} and {@code ExceptionUtils.java}
  *
  * @author MinnDevelopment and BlockyDotJar
- * @version v1.0.4
+ * @version v1.0.5
  * @since v1.0.0-beta.2
  */
 public class Helpers
@@ -48,7 +48,7 @@ public class Helpers
      * @return <b>true</b> - If the given {@link CharSequence} is empty.
      *         <br><b>false</b> - If the given {@link CharSequence} is not empty.
      */
-    public static boolean isEmpty(@NotNull CharSequence argument)
+    public static boolean isEmpty(@Nullable CharSequence argument)
     {
         return argument == null || argument.length() == 0;
     }

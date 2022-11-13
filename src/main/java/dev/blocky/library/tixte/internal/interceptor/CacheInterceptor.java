@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Handles Tixtes cache using an {@link Interceptor}. (only if an internet connection is available)
  *
  * @author BlockyDotJar
- * @version v1.0.2
+ * @version v1.1.0
  * @since v1.0.0-alpha.3
  */
 public class CacheInterceptor implements Interceptor
@@ -39,14 +39,15 @@ public class CacheInterceptor implements Interceptor
     public Response intercept(@NotNull Chain chain) throws IOException
     {
         final Request request = chain.request();
-        final Response response = chain.proceed(request);
+        try (final Response response = chain.proceed(request))
+        {
+            final CacheControl cacheControl = new CacheControl.Builder()
+                    .maxAge(604800, TimeUnit.MILLISECONDS)
+                    .build();
 
-        final CacheControl cacheControl = new CacheControl.Builder()
-                .maxAge(604800, TimeUnit.MILLISECONDS)
-                .build();
-
-        return response.newBuilder()
-                .header("Cache-Control", cacheControl.toString())
-                .build();
+            return response.newBuilder()
+                    .header("Cache-Control", cacheControl.toString())
+                    .build();
+        }
     }
 }

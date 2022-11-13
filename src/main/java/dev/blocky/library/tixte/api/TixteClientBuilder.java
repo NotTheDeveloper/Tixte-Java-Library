@@ -15,7 +15,6 @@
  */
 package dev.blocky.library.tixte.api;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dev.blocky.library.tixte.api.enums.CachePolicy;
 import dev.blocky.library.tixte.internal.interceptor.CacheInterceptor;
 import dev.blocky.library.tixte.internal.interceptor.ErrorResponseInterceptor;
@@ -42,7 +41,7 @@ import java.util.regex.Pattern;
  * <br>Each call to {@link #build()} creates a <b>new</b> {@link TixteClient} instance using the same information.
  *
  * @author BlockyDotJar
- * @version v1.3.1
+ * @version v1.3.2
  * @since v1.0.0-alpha.1
  */
 public record TixteClientBuilder()
@@ -203,7 +202,6 @@ public record TixteClientBuilder()
      */
     @NotNull
     @NonBlocking
-    @CanIgnoreReturnValue
     public TixteClient build()
     {
         dispatcher.setMaxRequestsPerHost(25);

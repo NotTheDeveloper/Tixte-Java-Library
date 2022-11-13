@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.MapType;
+import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.api.exceptions.ParsingException;
 import dev.blocky.library.tixte.internal.utils.Helpers;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
@@ -46,7 +47,7 @@ import java.util.function.UnaryOperator;
  * @param data A {@link List} of objects.
  *
  * @author MinnDevelopment, napstr, Andre601, Mitmocc and BlockyDotJar
- * @version v1.1.0
+ * @version v1.1.1
  * @since v1.0.0-beta.3
  */
 public record DataObject(@NotNull Map<String, Object> data) implements SerializableData
@@ -319,6 +320,7 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
      *
      */
     @NotNull
+    @CheckReturnValue
     public Object get(@NotNull String key)
     {
         final Object value = data.get(key);
@@ -774,12 +776,14 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     }
 
     @Nullable
+    @CheckReturnValue
     private <T> T get(@NotNull Class<T> type, @NotNull String key)
     {
         return get(type, key, null, null);
     }
 
     @Nullable
+    @CheckReturnValue
     private <T> T get(@NotNull Class<T> type, @NotNull String key, @Nullable Function<String, T> stringParse, @Nullable Function<Number, T> numberParse)
     {
         final Object value = data.get(key);

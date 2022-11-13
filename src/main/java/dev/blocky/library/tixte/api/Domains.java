@@ -15,13 +15,11 @@
  */
 package dev.blocky.library.tixte.api;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.requests.json.DataArray;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +30,7 @@ import java.util.Optional;
  * Represents the 'Domains' tab of the Tixte dashboard and everything else what Tixte offers you with domains.
  *
  * @author BlockyDotJar
- * @version v1.4.0
+ * @version v1.4.1
  * @since v1.0.0-alpha.1
  */
 public record  Domains() implements RawResponseData
@@ -65,8 +63,7 @@ public record  Domains() implements RawResponseData
      *
      * @return A {@link List} of every usable domain.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<String> getUsableDomainNames() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
@@ -91,9 +88,8 @@ public record  Domains() implements RawResponseData
      *
      * @return A {@link List} of {@code booleans} that represents if the domain is active at the moment.
      */
-    @Nullable
-    @CheckReturnValue
-    public List<Boolean> isActive() throws InterruptedException, IOException
+    @NotNull
+    public List<Boolean> areActive() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
         final DataArray domains = DataPath.getDataArray(json, "data.domains");
@@ -133,8 +129,7 @@ public record  Domains() implements RawResponseData
      *
      * @return A {@link List} of every owner by id of the domain.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<String> getOwnerIds() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
@@ -159,8 +154,7 @@ public record  Domains() implements RawResponseData
      *
      * @return A {@link List} of domain names.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<String> getDomainNames() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
@@ -185,8 +179,7 @@ public record  Domains() implements RawResponseData
      *
      * @return A {@link List} of upload-counts of the domain.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public List<Integer> getUploadCounts() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUserDomainsRaw().resultNow());
@@ -224,8 +217,7 @@ public record  Domains() implements RawResponseData
      *
      * @return The last deleted domain.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public Optional<String> getLastDeletedDomain()
     {
         return Optional.ofNullable(lastDeletedDomain);
@@ -244,8 +236,7 @@ public record  Domains() implements RawResponseData
      *
      * @return The current instance of the {@link Domains} class.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public Domains addSubdomain(@NotNull String domainName) throws InterruptedException, IOException
     {
         Checks.notEmpty(domainName, "domainName");
@@ -268,8 +259,7 @@ public record  Domains() implements RawResponseData
      *
      * @return The current instance of the {@link Domains} class.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public Domains addCustomDomain(@NotNull String domainName) throws InterruptedException, IOException
     {
         Checks.notEmpty(domainName, "domainName");
@@ -294,8 +284,7 @@ public record  Domains() implements RawResponseData
      *
      * @return The current instance of the {@link Domains} class.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public Domains deleteDomain(@NotNull String domainName) throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.deleteDomainRaw(domainName).resultNow());

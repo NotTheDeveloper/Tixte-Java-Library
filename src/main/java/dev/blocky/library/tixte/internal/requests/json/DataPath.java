@@ -15,6 +15,7 @@
  */
 package dev.blocky.library.tixte.internal.requests.json;
 
+import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.api.exceptions.ParsingException;
 import dev.blocky.library.tixte.internal.utils.Checks;
 import org.jetbrains.annotations.Contract;
@@ -61,7 +62,7 @@ import java.util.regex.Pattern;
  * This will result in {@code foo == "default"}, since the array element 1 is marked as optional, and missing in the actual object.
  *
  * @author MinnDevelopment and BlockyDotJar
- * @version v1.1.0
+ * @version v1.1.1
  * @since v1.0.0
  */
 public record DataPath()
@@ -91,7 +92,8 @@ public record DataPath()
      * @return The value at the provided path, using the provided resolver functions.
      *         <br>Possibly null, if the path ends with a "?" operator, or the resolver function returns null.
      */
-    @NotNull
+    @Nullable
+    @CheckReturnValue
     public static <T> T get(@NotNull DataObject root, @NotNull String path, @NotNull BiFunction<DataObject, String, ? extends T> fromObject,
                             @NotNull BiFunction<DataArray, Integer, ? extends T> fromArray)
     {
@@ -103,7 +105,8 @@ public record DataPath()
         return getUnchecked(root, path, fromObject, fromArray);
     }
 
-    @NotNull
+    @Nullable
+    @CheckReturnValue
     private static <T> T getUnchecked(@NotNull DataObject root, @NotNull String path, @NotNull BiFunction<DataObject, String, ? extends T> fromObject,
                                       @NotNull BiFunction<DataArray, Integer, ? extends T> fromArray)
     {
@@ -123,7 +126,9 @@ public record DataPath()
             {
                 key = key.substring(0, key.length() - 1);
                 if (root.isNull(key))
+                {
                     return null;
+                }
             }
 
             return getUnchecked(root.getDataArray(key), path, fromObject, fromArray);
@@ -175,7 +180,8 @@ public record DataPath()
      * @return The value at the provided path, using the provided resolver functions.
      *         <br>Possibly null, if the path ends with a "?" operator, or the resolver function returns null.
      */
-    @NotNull
+    @Nullable
+    @CheckReturnValue
     public static <T> T get(@NotNull DataArray root, @NotNull String path, @NotNull BiFunction<DataObject, String, ? extends T> fromObject,
                             @NotNull BiFunction<DataArray, Integer, ? extends T> fromArray)
     {
@@ -187,7 +193,8 @@ public record DataPath()
         return getUnchecked(root, path, fromObject, fromArray);
     }
 
-    @NotNull
+    @Nullable
+    @CheckReturnValue
     private static <T> T getUnchecked(@NotNull DataArray root, String path, @NotNull BiFunction<DataObject, String, ? extends T> fromObject,
                                       @NotNull BiFunction<DataArray, Integer, ? extends T> fromArray)
     {
@@ -1039,6 +1046,7 @@ public record DataPath()
      * @return The DataObject at the given path, or null if the path resolves to an optional value that is missing.
      */
     @Nullable
+    @CheckReturnValue
     public static DataObject optObject(@NotNull DataObject root, @NotNull String path)
     {
         if (!path.endsWith("?"))
@@ -1089,6 +1097,7 @@ public record DataPath()
      * @return The DataObject at the given path, or null if the path resolves to an optional value that is missing.
      */
     @Nullable
+    @CheckReturnValue
     public static DataObject optObject(@NotNull DataArray root, @NotNull String path)
     {
         if (!path.endsWith("?"))
@@ -1189,6 +1198,7 @@ public record DataPath()
      * @return The {@link DataArray} at the given path, or null if the path resolves to an optional value that is missing.
      */
     @Nullable
+    @CheckReturnValue
     public static DataArray optArray(@NotNull DataArray root, @NotNull String path)
     {
         if (!path.endsWith("?"))

@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.api.exceptions.ParsingException;
 import dev.blocky.library.tixte.internal.utils.Helpers;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
@@ -49,7 +50,7 @@ import java.util.stream.Stream;
  * @param data A {@link List} of objects.
  *
  * @author MinnDevelopment, napstr, Mitmocc and BlockyDotJar
- * @version v1.2.0
+ * @version v1.2.1
  * @since v1.0.0-beta.3
  */
 public record DataArray(@NotNull List<Object> data) implements Iterable<Object>, SerializableArray
@@ -738,12 +739,14 @@ public record DataArray(@NotNull List<Object> data) implements Iterable<Object>,
     }
 
     @Nullable
+    @CheckReturnValue
     private <T> T get(@NotNull Class<T> type, int index)
     {
         return get(type, index, null, null);
     }
 
     @Nullable
+    @CheckReturnValue
     private <T> T get(@NotNull Class<T> type, int index, @Nullable Function<String, T> stringMapper, @Nullable Function<Number, T> numberMapper)
     {
         final Object value = data.get(index);

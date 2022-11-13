@@ -18,7 +18,6 @@ package secrets;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -31,7 +30,7 @@ import java.nio.file.Paths;
  * From this class you can get all data from a JSON file.
  *
  * @author BlockyDotJar
- * @version v1.3.2
+ * @version v1.3.3
  * @since v1.0.0-beta.3
  */
 public class DONOTOPEN
@@ -87,7 +86,7 @@ public class DONOTOPEN
         return getString("DEFAULT_DOMAIN");
     }
 
-    @Nullable
+    @NotNull
     private static String getString(@NotNull String jsonObject) throws IOException
     {
         final String content = Files.readString(Paths.get(file.toURI()));

@@ -39,7 +39,7 @@ import static dev.blocky.library.tixte.api.TixteClientBuilder.*;
  * <br>All parts of the API can be accessed starting from this class.
  *
  * @author BlockyDotJar
- * @version v1.4.1
+ * @version v1.5.0
  * @since v1.0.0-alpha.1
  */
 public class TixteClient implements RawResponseData
@@ -67,8 +67,7 @@ public class TixteClient implements RawResponseData
      *
      * @return The session-token, you specified with {@link TixteClientBuilder#setSessionToken(String)}.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public Optional<String> getSessionToken()
     {
         return Optional.ofNullable(sessionToken);
@@ -80,8 +79,7 @@ public class TixteClient implements RawResponseData
      *
      * @return The default domain, you specified with {@link TixteClientBuilder#setDefaultDomain(String)}.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public Optional<String> getDefaultDomain()
     {
         return Optional.ofNullable(defaultDomain);
@@ -94,8 +92,7 @@ public class TixteClient implements RawResponseData
      *
      * @return An HTTP-request.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public Optional<Request> getRequest()
     {
         return Optional.ofNullable(request);
@@ -167,7 +164,6 @@ public class TixteClient implements RawResponseData
      * @return The current instance of the {@link TixteClient}.
      */
     @NotNull
-    @CheckReturnValue
     public TixteClient setBaseRedirect(@NotNull Object redirect) throws InterruptedException, IOException
     {
         if (!self.hasTixteSubscription())
@@ -211,9 +207,15 @@ public class TixteClient implements RawResponseData
     {
         try (Cache cache = client.cache())
         {
-            cache.delete();
-
-            logger.info("Deleted cache successfully.");
+            if (cache != null)
+            {
+                cache.delete();
+                logger.info("Deleted cache successfully.");
+            }
+            else
+            {
+                logger.info("No cache to delete.");
+            }
         }
     }
 
@@ -223,7 +225,15 @@ public class TixteClient implements RawResponseData
      */
     public void cancelRequests()
     {
-        client.dispatcher().cancelAll();
+        if (request != null)
+        {
+            client.dispatcher().cancelAll();
+            logger.info("Canceled all requests.");
+        }
+        else
+        {
+            logger.info("No requests to cancel.");
+        }
     }
 
     @Override

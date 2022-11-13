@@ -17,6 +17,7 @@ package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.utils.Helpers;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -34,7 +35,7 @@ import java.io.IOException;
  * @param providerUrl The provider url to be built.
  *
  * @author BlockyDotJar
- * @version v1.2.2
+ * @version v1.2.3
  * @since v1.0.0-beta.1
  */
 public record Embed(@Nullable String authorName, @Nullable String authorUrl, @Nullable String title,
@@ -217,8 +218,7 @@ public record Embed(@Nullable String authorName, @Nullable String authorUrl, @Nu
      *
      * @return Possibly-null color.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public String getColor()
     {
         return themeColor != null ? themeColor : "#ffffff";

@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  * Builder system used to build {@link Embed embeds}.
  *
  * @author BlockyDotJar
- * @version v1.5.0
+ * @version v1.5.1
  * @since v1.0.0-beta.1
  */
 public class EmbedEditor implements RawResponseData
@@ -202,6 +202,8 @@ public class EmbedEditor implements RawResponseData
      * Sets the title of the {@link Embed}.
      * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
      *
+     * <p>You can also use <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Embed-Variables" target="_blank">embed variables</a> to automatically set some value.
+     *
      * @param title The title of the {@link Embed}.
      *
      * @throws IllegalArgumentException
@@ -236,6 +238,8 @@ public class EmbedEditor implements RawResponseData
      * Sets the description of the {@link Embed}.
      * <br>This is where the main chunk of text for an {@link Embed} is typically placed.
      * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
+     *
+     * <p>You can also use <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Embed-Variables" target="_blank">embed variables</a> to automatically set some value.
      *
      * @param description The description of the {@link Embed}, {@code null} to reset.
      *
@@ -301,9 +305,11 @@ public class EmbedEditor implements RawResponseData
 
     /**
      * Sets the author of the {@link Embed}.
-     * <br>The author appears in the top left of the {@link Embed} with its name being made clickable by way of providing an url.
+     * <br>The author appears in the second top left line of the {@link Embed}.
      * <br>This convenience method just sets the name.
      * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
+     *
+     * <p>You can also use <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Embed-Variables" target="_blank">embed variables</a> to automatically set some value.
      *
      * @param authorName The name of the author of the {@link Embed}. If this is not set, the author will not appear in the {@link Embed}.
      *
@@ -320,11 +326,11 @@ public class EmbedEditor implements RawResponseData
 
     /**
      * Sets the author of the embed.
-     * <br>The author appears in the top left of the embed and can have a small image beside it along with the author's
-     * name being made clickable by way of providing an url.
+     * <br>The author appears in the second top left line of the {@link Embed} with its name being made clickable by way of providing an url.
      * <br>This convenience method sets the name and the url.
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
      *
-     * <p><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
+     * <p>You can also use <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Embed-Variables" target="_blank">embed variables</a> to automatically set some value.
      *
      * @param authorName The name of the author of the embed. If this is not set, the author will not appear in the embed.
      * @param authorUrl The url of the author of the embed.
@@ -364,6 +370,10 @@ public class EmbedEditor implements RawResponseData
 
     /**
      * Sets the provider of the embed.
+     * <br>The provider appears in the top left of the {@link Embed}.
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
+     *
+     * <p>You can also use <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Embed-Variables" target="_blank">embed variables</a> to automatically set some value.
      *
      * @param providerName The name of the provider of the embed. If this is not set, the provider will not appear in the embed.
      *
@@ -380,7 +390,11 @@ public class EmbedEditor implements RawResponseData
 
     /**
      * Sets the provider of the embed.
-     * This convenience method sets the name and the url.
+     * <br>The provider appears in the top left of the {@link Embed} with its name being made clickable by way of providing an url.
+     * <br>This convenience method sets the name and the url.
+     * <br><b><a href="https://github.com/BlockyDotJar/Tixte-Java-Library/blob/main/assets/Tixte-Embed.png" target="_blank">Example</a></b>
+     *
+     * <p>You can also use <a href="https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Embed-Variables" target="_blank">embed variables</a> to automatically set some value.
      *
      * @param providerName The name of the provider of the embed. If this is not set, the provider will not appear in the embed.
      * @param providerUrl The url of the provider of the embed.

@@ -15,10 +15,9 @@
  */
 package dev.blocky.library.tixte.api;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.requests.json.DataPath;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -28,10 +27,10 @@ import java.io.IOException;
  * @param userData A specific user-name or id.
  *
  * @author BlockyDotJar
- * @version v1.4.0
+ * @version v1.4.1
  * @since v1.0.0-beta.1
  */
-public record User(@Nullable String userData) implements RawResponseData
+public record User(@NotNull String userData) implements RawResponseData
 {
 
     /**
@@ -60,8 +59,7 @@ public record User(@Nullable String userData) implements RawResponseData
      *
      * @return The id of the specific user.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public String getId() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw(userData).resultNow());
@@ -79,8 +77,7 @@ public record User(@Nullable String userData) implements RawResponseData
      *
      * @return The avatar id of the specific user.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public String getAvatarId() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw(userData).resultNow());
@@ -97,8 +94,7 @@ public record User(@Nullable String userData) implements RawResponseData
      *
      * @return The username of the specific user.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public String getUsername() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw(userData).resultNow());

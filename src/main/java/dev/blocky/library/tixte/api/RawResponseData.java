@@ -16,7 +16,6 @@
 package dev.blocky.library.tixte.api;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.requests.Route;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.utils.Checks;
@@ -46,7 +45,7 @@ import static dev.blocky.library.tixte.internal.requests.Route.TIXTE_API_PREFIX;
  * Represents the raw response data from Tixte API-requests.
  *
  * @author BlockyDotJar
- * @version v3.1.0
+ * @version v3.1.1
  * @since v1.0.0-beta.1
  */
 public interface RawResponseData
@@ -56,11 +55,12 @@ public interface RawResponseData
     TixteClient tixteClient = new TixteClient();
 
     /**
-     * @see MyFiles#getUsedSize() MyFiles#getUsedSize()
-     * @see MyFiles#getLimit() MyFiles#getLimit()
-     * @see MyFiles#getPremiumTier() MyFiles#getPremiumTier()
-     * @see SelfUser#hasTixteTurboSubscription() SelfUser#hasTixteTurboSubscription()
-     * @see SelfUser#hasTixteTurboChargedSubscription() SelfUser#hasTixteTurboChargedSubscription()
+     * @see MyFiles#getUsedSize()
+     * @see MyFiles#getLimit()
+     * @see MyFiles#getRemainingSize()
+     * @see MyFiles#getPremiumTier()
+     * @see SelfUser#hasTixteTurboSubscription()
+     * @see SelfUser#hasTixteTurboChargedSubscription()
      *
      * @return The raw response of the request.
      */
@@ -84,6 +84,9 @@ public interface RawResponseData
      * @see MyFiles#getExpirationTimes()
      * @see MyFiles#getAssetIds()
      * @see MyFiles#getTypes()
+     * @see MyFiles#arePublic()
+     * @see MyFiles#arePrivate()
+     * @see MyFiles#getFileNames()
      *
      * @return The raw response of the request.
      */
@@ -100,6 +103,9 @@ public interface RawResponseData
      * @throws FileNotFoundException If the file is not found.
      *
      * @see MyFiles#uploadFile(File)
+     * @see MyFiles#getURL()
+     * @see MyFiles#getDirectURL()
+     * @see MyFiles#getDeletionURL()
      *
      * @return The raw response of the request.
      */
@@ -454,7 +460,7 @@ public interface RawResponseData
     /**
      * @see Domains#getUsableDomainNames()
      * @see Domains#getUsableDomainCount()
-     * @see Domains#isActive()
+     * @see Domains#areActive()
      *
      * @return The raw response of the request.
      */
@@ -553,6 +559,7 @@ public interface RawResponseData
      * @throws InterruptedException If the current thread was interrupted.
      *
      * @see Domains#deleteDomain(String)
+     * @see Domains#getLastDeletedDomain()
      *
      * @return The raw response of the request.
      */
@@ -825,7 +832,6 @@ public interface RawResponseData
      * @return The raw response of the request.
      */
     @NotNull
-    @CheckReturnValue
     static Future<String> getExperimentsRaw() throws IOException, InterruptedException
     {
         final Route.CompiledRoute route = Route.Self.GET_EXPERIMENTS.compile();
@@ -842,7 +848,6 @@ public interface RawResponseData
      */
     @NotNull
     @Experimental
-    @CheckReturnValue
     static Future<String> getFoldersRaw() throws IOException, InterruptedException
     {
         final Route.CompiledRoute route = Route.Self.GET_FOLDERS.compile();
@@ -866,7 +871,6 @@ public interface RawResponseData
      */
     @NotNull
     @Experimental
-    @CheckReturnValue
     static Future<String> setSearchQueryRaw(@NotNull String query, @Nullable String[] extensions,
                                             @Nullable String[] domains, @NotNull String sortBy,
                                             long minSize, long maxSize) throws IOException, InterruptedException
@@ -913,8 +917,7 @@ public interface RawResponseData
      *
      * @return The HTTP-headers of the request.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     static Optional<String> getHeader() throws IOException, InterruptedException
     {
         final Call call = tixteClient.getHttpClient().newCall(tixteClient.getRequest().orElse(null));
@@ -930,9 +933,8 @@ public interface RawResponseData
         }
     }
 
-    @Nullable
+    @NotNull
     @NonBlocking
-    @CheckReturnValue
     private static Future<String> request(@NotNull Route.CompiledRoute route, boolean sessionTokenNeeded, @Nullable RequestBody requestBody) throws IOException, InterruptedException
     {
         final Request.Builder builder = new Request.Builder()
@@ -971,9 +973,8 @@ public interface RawResponseData
         }
     }
 
-    @Nullable
+    @NotNull
     @NonBlocking
-    @CheckReturnValue
     private static Future<String> postFile(@Nullable String domain, @NotNull MultipartBody multipartBody, boolean privateFile) throws IOException, InterruptedException
     {
         final Request request = new Request.Builder()
@@ -1010,7 +1011,6 @@ public interface RawResponseData
     }
 
     @NotNull
-    @CheckReturnValue
     private static String prettyString(@NotNull Future<String> body, @NotNull Route.CompiledRoute route)
     {
         final DataObject object = DataObject.fromJson(body.resultNow());

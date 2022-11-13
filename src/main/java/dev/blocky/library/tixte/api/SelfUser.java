@@ -15,11 +15,9 @@
  */
 package dev.blocky.library.tixte.api;
 
-import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.internal.requests.json.DataObject;
 import dev.blocky.library.tixte.internal.requests.json.DataPath;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -28,7 +26,7 @@ import java.time.OffsetDateTime;
  * Represents your Tixte user-account.
  *
  * @author BlockyDotJar
- * @version v1.4.1
+ * @version v1.4.2
  * @since v1.0.0-beta.1
  */
 public record SelfUser() implements RawResponseData
@@ -62,8 +60,7 @@ public record SelfUser() implements RawResponseData
      *
      * @return Your phone number if not null or else it will return an empty string.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public String getPhoneNumber() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
@@ -167,8 +164,7 @@ public record SelfUser() implements RawResponseData
      *
      * @return The avatar id of your account.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public String getAvatarId() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
@@ -203,8 +199,7 @@ public record SelfUser() implements RawResponseData
      *
      * @return The email of your account.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public String getEmail() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getUserInfoRaw().resultNow());
@@ -238,8 +233,7 @@ public record SelfUser() implements RawResponseData
      *
      * @return Your API-key.
      */
-    @Nullable
-    @CheckReturnValue
+    @NotNull
     public String getAPIKeyBySessionToken() throws InterruptedException, IOException
     {
         final DataObject json = DataObject.fromJson(RawResponseData.getAPIKeyBySessionTokenRaw().resultNow());

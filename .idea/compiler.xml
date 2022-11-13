@@ -3,9 +3,4 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="19" />
   </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="tixte4j.main" options="--add-exports java.datatransfer/java.awt=tixte4j" />
-    </option>
-  </component>
 </project>

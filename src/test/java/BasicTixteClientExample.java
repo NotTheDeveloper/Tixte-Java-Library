@@ -20,15 +20,16 @@ import dev.blocky.library.tixte.api.enums.CachePolicy;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
-import secrets.DONOTOPEN;
 
 import java.io.IOException;
+
+import static secrets.DONOTOPEN.*;
 
 /**
  * Some basic examples, how to use an {@link TixteClient}.
  *
  * @author BlockyDotJar
- * @version v1.1.1
+ * @version v1.1.2
  * @since v1.0.0-beta.3
  */
 public class BasicTixteClientExample
@@ -43,11 +44,11 @@ public class BasicTixteClientExample
                 // This method also sets the cache policy. I really recommend to set this to ALL.
                 // If this is equal to null or not set, this will be automatically set to NONE.
                 // If you use this method like here, you don't have to set it via setCachePolicy(@Nullable CachePolicy).
-                .create(DONOTOPEN.getAPIKey(), CachePolicy.ALL)
+                .create(getAPIKey(), CachePolicy.ALL)
                 // Sets the session-token. (Optional but recommended)
-                .setSessionToken(DONOTOPEN.getSessionToken())
+                .setSessionToken(getSessionToken())
                 // Sets a default domain. (Optional)
-                .setDefaultDomain(DONOTOPEN.getDefaultDomain());
+                .setDefaultDomain(getDefaultDomain());
 
         // Builds a *new* TixteClient instance and uses the provided API-key and session-token to start the login process.
         builder.build();

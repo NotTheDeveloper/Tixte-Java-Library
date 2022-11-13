@@ -28,7 +28,7 @@ import java.io.IOException;
  * Handles http error-responses using an {@link Interceptor}.
  *
  * @author BlockyDotJar
- * @version v2.0.2
+ * @version v2.0.3
  * @since v1.0.0-alpha.3
  */
 public class ErrorResponseInterceptor implements Interceptor
@@ -46,7 +46,6 @@ public class ErrorResponseInterceptor implements Interceptor
         if (!response.isSuccessful())
         {
             final DataObject error = json.getDataObject("error");
-
             final String prettyString = json.toPrettyString();
 
             System.err.println(prettyString);
