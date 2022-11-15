@@ -86,6 +86,12 @@ If you have early access to a feature that I don't have, feel free to implement 
 
 You also should read the [contribution guidelines](https://github.com/BlockyDotJar/Tixte-Java-Library/wiki/Contributing) first.
 
+**Current Tixte experiments:**
+
+```bf
+FILE_SEARCH, SHARED_SUBDOMAINS, DOMAIN_FILE_TRANSFER, VIEW_FOLDERS, CREATE_FOLDERS, PER_DOMAIN_CONFIG, BILLING_PAYMENT_SOURCES
+```
+
 ## Tixte turbo(-charged)
 
 Some features are requiring a Tixte turbo(-charged) subscription, so be careful.
