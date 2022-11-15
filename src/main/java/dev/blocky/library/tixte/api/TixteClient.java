@@ -205,7 +205,7 @@ public class TixteClient implements RawResponseData
      */
     public void pruneCache() throws IOException
     {
-        try (Cache cache = client.cache())
+        try (final Cache cache = client.cache())
         {
             if (cache != null)
             {
@@ -214,7 +214,7 @@ public class TixteClient implements RawResponseData
             }
             else
             {
-                logger.info("No cache to delete.");
+                logger.warn("No cache to delete.");
             }
         }
     }
@@ -232,7 +232,7 @@ public class TixteClient implements RawResponseData
         }
         else
         {
-            logger.info("No requests to cancel.");
+            logger.warn("No requests to cancel.");
         }
     }
 

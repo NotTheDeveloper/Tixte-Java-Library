@@ -104,6 +104,31 @@ public record  Domains() implements RawResponseData
     }
 
     /**
+     * Gets a {@link List} of {@code booleans} that represents if the domain is inactive at the moment.
+     *
+     * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout.
+     *                     Because networks can fail during an exchange, it is possible that the remote server accepted
+     *                     the request before the failure.
+     * @throws InterruptedException If the current thread was interrupted.
+     *
+     * @return A {@link List} of {@code booleans} that represents if the domain is inactive at the moment.
+     */
+    @NotNull
+    public List<Boolean> areInActive() throws InterruptedException, IOException
+    {
+        final DataObject json = DataObject.fromJson(RawResponseData.getUsableDomainsRaw().resultNow());
+        final DataArray domains = DataPath.getDataArray(json, "data.domains");
+
+        final List<Boolean> list = new ArrayList<>();
+
+        for (int i = 0; i < domains.toList().size(); i++)
+        {
+            list.add(!DataPath.getBoolean(json, "data.domains[" + i + "]?.active"));
+        }
+        return list;
+    }
+
+    /**
      * Gets the count of how many domains you own.
      *
      * @throws IOException If the request could not be executed due to cancellation, a connectivity problem or timeout. 

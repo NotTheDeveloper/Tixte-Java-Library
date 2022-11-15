@@ -218,7 +218,7 @@ public record TixteClientBuilder()
         if (policy == null)
         {
             policy = CachePolicy.NONE;
-            logger.info("'policy' equals null, setting to 'NONE'.");
+            logger.warn("'policy' equals null, setting to 'NONE'.");
         }
 
         switch (policy)

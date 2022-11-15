@@ -461,6 +461,7 @@ public interface RawResponseData
      * @see Domains#getUsableDomainNames()
      * @see Domains#getUsableDomainCount()
      * @see Domains#areActive()
+     * @see Domains#areInActive()
      *
      * @return The raw response of the request.
      */

@@ -221,7 +221,7 @@ public class EmbedEditor implements RawResponseData
         if (title == null)
         {
             this.title = null;
-            logger.info("'title' equals null, setting to null");
+            logger.warn("'title' equals null, setting to null");
         }
         else
         {
@@ -354,7 +354,7 @@ public class EmbedEditor implements RawResponseData
         if (authorName == null)
         {
             this.authorName = null;
-            logger.info("'authorName' equals null, setting to null");
+            logger.warn("'authorName' equals null, setting to null");
         }
         else
         {
@@ -418,7 +418,7 @@ public class EmbedEditor implements RawResponseData
         if (providerName == null)
         {
             this.providerName = null;
-            logger.info("'providerName' equals null, setting to null");
+            logger.warn("'providerName' equals null, setting to null");
         }
         else
         {
