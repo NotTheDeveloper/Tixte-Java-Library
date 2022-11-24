@@ -325,10 +325,10 @@ This project requires **Java 19+**
     * Version: **v3.2.0**
     * [Github](https://github.com/square/okio)
 * jackson
-    * Version: **v2.14.0**
+    * Version: **v2.14.1**
     * [Github](https://github.com/FasterXML/jackson)
 * slf4j-api
-    * Version: **v2.0.3**
+    * Version: **v2.0.4**
     * [Github](https://github.com/qos-ch/slf4j)
 * jetbrains-annotations
     * Version: **v23.0.0**
