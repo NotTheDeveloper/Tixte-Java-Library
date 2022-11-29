@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.google.errorprone.annotations.CheckReturnValue;
 import dev.blocky.library.tixte.api.exceptions.ParsingException;
+import dev.blocky.library.tixte.internal.utils.Checks;
 import dev.blocky.library.tixte.internal.utils.Helpers;
 import dev.blocky.library.tixte.internal.utils.logging.TixteLogger;
 import org.jetbrains.annotations.Contract;
@@ -47,7 +48,7 @@ import java.util.function.UnaryOperator;
  * @param data A {@link List} of objects.
  *
  * @author MinnDevelopment, napstr, Andre601, Mitmocc and BlockyDotJar
- * @version v1.1.1
+ * @version v1.1.2
  * @since v1.0.0-beta.3
  */
 public record DataObject(@NotNull Map<String, Object> data) implements SerializableData
@@ -715,6 +716,33 @@ public record DataObject(@NotNull Map<String, Object> data) implements Serializa
     public Set<String> keys()
     {
         return data.keySet();
+    }
+
+    /**
+     * Renames an existing field to the new name.
+     * <br>This is a shorthand to {@link #remove(String) remove} under the old key and then {@link #put(String, Object) put} under the new key.
+     *
+     * <p>If there is nothing mapped to the old key, this does nothing.
+     *
+     * @param key The old key.
+     * @param newKey The new key.
+     *
+     * @throws IllegalArgumentException If null is provided.
+     *
+     * @return A DataObject with the updated value.
+     */
+    @NotNull
+    public DataObject rename(@NotNull String key, @NotNull String newKey)
+    {
+        Checks.notNull(key, "Key");
+        Checks.notNull(newKey, "Key");
+
+        if (!this.data.containsKey(key))
+        {
+            return this;
+        }
+        this.data.put(newKey, this.data.remove(key));
+        return this;
     }
 
     /**

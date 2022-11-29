@@ -162,15 +162,14 @@ public record TixteClientBuilder()
      *
      * <p><b>Example:</b>
      * <pre>
-     * <code>
-     * {
+     * <code>{
      *      "data" : {
      *       "limit" : 15000000000,
      *       "premium_tier" : 0,
      *        "used" : 156108016
      *      },
      *       "success" : true
-     *    }
+     * }
      * </code>
      * </pre>
      *

@@ -30,7 +30,7 @@ dependencies {
 
     api("com.squareup.okhttp3:okhttp:4.10.0")
     api("com.squareup.okio:okio-jvm:3.2.0")
-    api("org.slf4j:slf4j-api:2.0.4")
+    api("org.slf4j:slf4j-api:2.0.5")
     api("org.apache.commons:commons-collections4:4.4")
     api("commons-io:commons-io:2.11.0")
 
@@ -39,7 +39,7 @@ dependencies {
 }
 
 group = "dev.blocky.library"
-version = "1.1.7"
+version = "1.1.8"
 description = "A wrapper for the Tixte API in Java."
 
 java {
